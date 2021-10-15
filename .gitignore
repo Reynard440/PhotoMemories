@@ -1,0 +1,6 @@
+# Project exclude paths
+/PhotoMemoriesDomain/target/
+/PhotoMemoriesLogic/target/
+/PhotoMemoriesRepository/target/
+/PhotoMemoriesTranslator/target/
+/PhotoMemoriesWebSpringBoot/target/
