@@ -2,5 +2,6 @@
 /PhotoMemoriesDomain/target/
 /PhotoMemoriesLogic/target/
 /PhotoMemoriesRepository/target/
+/PhotoMemoriesRepository/src/main/resources/application-db.properties/
 /PhotoMemoriesTranslator/target/
 /PhotoMemoriesWebSpringBoot/target/
