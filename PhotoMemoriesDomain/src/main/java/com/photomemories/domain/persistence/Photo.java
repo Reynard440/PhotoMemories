@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "Photo")
+@Table(name = "Photo", schema = "PhotoMemoriesDB")
 public class Photo implements Serializable {
     private static final long serialVersionUID = 2034551615183602888L;
 
