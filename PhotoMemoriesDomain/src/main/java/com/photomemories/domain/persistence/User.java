@@ -13,6 +13,7 @@ import java.util.Set;
 public class User implements Serializable {
     private static final long serialVersionUID = -5512705369209852028L;
 
+    //TODO considering to make use of Integer instead of Long
     @Id
     @Column(name = "USER_ID")
     private Long UserId;
@@ -26,36 +27,47 @@ public class User implements Serializable {
     @Column(name = "USER_JOIN_DATE")
     private LocalDate date;
 
+    @Column(name = "USER_HASH_PASSWORD")
+    private String UserHashPassword;
+
     @Column(name = "USER_Email")
     private String Email;
 
     @Column(name = "USER_CELL_NR")
     private String PhoneNumber;
 
-    @OneToMany(targetEntity = Photo.class, fetch = FetchType.LAZY, mappedBy = "PhotoId"/*, orphanRemoval = true, cascade = CascadeType.ALL*/)
+    @OneToMany(targetEntity = Photo.class, fetch = FetchType.LAZY, mappedBy = "UserId"/*, orphanRemoval = true, cascade = CascadeType.ALL*/)
     @JsonManagedReference
     private Set<Photo> Photos;
+
+    @OneToMany(targetEntity = Shared.class, fetch = FetchType.LAZY, mappedBy = "UserId"/*, orphanRemoval = true, cascade = CascadeType.ALL*/)
+    @JsonManagedReference
+    private Set<Shared> Shares;
 
     public User() {
     }
 
-    public User(String firstName, String lastName, LocalDate date, String email, String phoneNumber, Set<Photo> photos) {
+    public User(String firstName, String lastName, LocalDate date, String userHashPassword, String email, String phoneNumber, Set<Photo> photos, Set<Shared> shares) {
         this.FirstName = firstName;
         this.LastName = lastName;
         this.date = date;
+        this.UserHashPassword = userHashPassword;
         this.Email = email;
         this.PhoneNumber = phoneNumber;
         this.Photos = photos;
+        this.Shares = shares;
     }
 
-    public User(Long userId, String firstName, String lastName, LocalDate date, String email, String phoneNumber, Set<Photo> photos) {
+    public User(Long userId, String firstName, String lastName, LocalDate date, String userHashPassword, String email, String phoneNumber, Set<Photo> photos, Set<Shared> shares) {
         this.UserId = userId;
         this.FirstName = firstName;
         this.LastName = lastName;
         this.date = date;
+        this.UserHashPassword = userHashPassword;
         this.Email = email;
         this.PhoneNumber = phoneNumber;
         this.Photos = photos;
+        this.Shares = shares;
     }
 
     public Long getUserId() {
@@ -119,11 +131,11 @@ public class User implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(UserId, user.UserId) && Objects.equals(FirstName, user.FirstName) && Objects.equals(LastName, user.LastName) && Objects.equals(date, user.date) && Objects.equals(Email, user.Email) && Objects.equals(PhoneNumber, user.PhoneNumber) && Objects.equals(Photos, user.Photos);
+        return Objects.equals(UserId, user.UserId) && Objects.equals(FirstName, user.FirstName) && Objects.equals(LastName, user.LastName) && Objects.equals(date, user.date) && Objects.equals(UserHashPassword, user.UserHashPassword) && Objects.equals(Email, user.Email) && Objects.equals(PhoneNumber, user.PhoneNumber) && Objects.equals(Photos, user.Photos) && Objects.equals(Shares, user.Shares);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(UserId, FirstName, LastName, date, Email, PhoneNumber, Photos);
+        return Objects.hash(UserId, FirstName, LastName, date, UserHashPassword, Email, PhoneNumber, Photos, Shares);
     }
 }

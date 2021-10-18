@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
 @SpringBootApplication
-//TODO Try and get the application to function without excluding the DataSourceAutoConfiguration
 public class PhotoMemoriesApplication {
     public static void main(String[] args){
         SpringApplication.run(PhotoMemoriesApplication.class, args);

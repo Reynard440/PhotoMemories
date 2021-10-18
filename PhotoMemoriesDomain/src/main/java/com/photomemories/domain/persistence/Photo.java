@@ -14,6 +14,7 @@ import java.util.Set;
 public class Photo implements Serializable {
     private static final long serialVersionUID = 2034551615183602888L;
 
+    //TODO considering to make use of Integer instead of Long
     @Id
     @Column(name = "PHOTO_ID")
     private Long PhotoId;
@@ -34,7 +35,7 @@ public class Photo implements Serializable {
     private String PhotoLink;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "UserId")
+    @JoinColumn(name = "USER_ID")
     @JsonBackReference
     private User UserId;
 
