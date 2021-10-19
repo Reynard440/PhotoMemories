@@ -13,10 +13,10 @@ import java.util.Set;
 public class User implements Serializable {
     private static final long serialVersionUID = -5512705369209852028L;
 
-    //TODO considering to make use of Integer instead of Long
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "USER_ID")
-    private Long UserId;
+    private Integer UserId;
 
     @Column(name = "USER_F_Name")
     private String FirstName;
@@ -58,7 +58,7 @@ public class User implements Serializable {
         this.Shares = shares;
     }
 
-    public User(Long userId, String firstName, String lastName, LocalDate date, String userHashPassword, String email, String phoneNumber, Set<Photo> photos, Set<Shared> shares) {
+    public User(Integer userId, String firstName, String lastName, LocalDate date, String userHashPassword, String email, String phoneNumber, Set<Photo> photos, Set<Shared> shares) {
         this.UserId = userId;
         this.FirstName = firstName;
         this.LastName = lastName;
@@ -70,11 +70,20 @@ public class User implements Serializable {
         this.Shares = shares;
     }
 
-    public Long getUserId() {
+    public User(String firstName, String lastName, LocalDate date, String userHashPassword, String email, String phoneNumber) {
+        this.FirstName = firstName;
+        this.LastName = lastName;
+        this.date = date;
+        this.UserHashPassword = userHashPassword;
+        this.Email = email;
+        this.PhoneNumber = phoneNumber;
+    }
+
+    public Integer getUserId() {
         return UserId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         UserId = userId;
     }
 
@@ -102,6 +111,14 @@ public class User implements Serializable {
         this.date = date;
     }
 
+    public String getUserHashPassword() {
+        return UserHashPassword;
+    }
+
+    public void setUserHashPassword(String userHashPassword) {
+        UserHashPassword = userHashPassword;
+    }
+
     public String getEmail() {
         return Email;
     }
@@ -124,6 +141,14 @@ public class User implements Serializable {
 
     public void setPhotos(Set<Photo> photos) {
         Photos = photos;
+    }
+
+    public Set<Shared> getShares() {
+        return Shares;
+    }
+
+    public void setShares(Set<Shared> shares) {
+        Shares = shares;
     }
 
     @Override

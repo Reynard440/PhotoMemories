@@ -11,6 +11,14 @@
         <module name="PhotoMemoriesLogic" />
         <module name="PhotoMemoriesDomain" />
         <module name="PhotoMemoriesRepository" />
+      </profile>
+      <profile name="Annotation profile for PhotoMemories" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/../repo/org/springframework/boot/spring-boot-configuration-processor/2.0.4.RELEASE/spring-boot-configuration-processor-2.0.4.RELEASE.jar" />
+        </processorPath>
         <module name="PhotoMemoriesWebSpringBoot" />
       </profile>
     </annotationProcessing>

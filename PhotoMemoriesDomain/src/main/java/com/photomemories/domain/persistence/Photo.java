@@ -17,13 +17,13 @@ public class Photo implements Serializable {
     //TODO considering to make use of Integer instead of Long
     @Id
     @Column(name = "PHOTO_ID")
-    private Long PhotoId;
+    private Integer PhotoId;
 
     @Column(name = "PH_NAME")
     private String PhotoName;
 
     @Column(name = "PH_SIZE")
-    private String PhotoSize;
+    private Double PhotoSize;
 
     @Column(name = "PH_UPLOAD_DATE")
     private LocalDate UploadDate;
@@ -55,7 +55,7 @@ public class Photo implements Serializable {
     public Photo() {
     }
 
-    public Photo(String photoName, String photoSize, LocalDate uploadDate, LocalDate dateModified, String photoLink, User userId, String photoLocation, String photoFormat, String photoPixels, Set<Shared> shares) {
+    public Photo(String photoName, Double photoSize, LocalDate uploadDate, LocalDate dateModified, String photoLink, User userId, String photoLocation, String photoFormat, String photoPixels, Set<Shared> shares) {
         this.PhotoName = photoName;
         this.PhotoSize = photoSize;
         this.UploadDate = uploadDate;
@@ -68,7 +68,7 @@ public class Photo implements Serializable {
         this.shares = shares;
     }
 
-    public Photo(Long photoId, String photoName, String photoSize, LocalDate uploadDate, LocalDate dateModified, String photoLink, User userId, String photoLocation, String photoFormat, String photoPixels, Set<Shared> shares) {
+    public Photo(Integer photoId, String photoName, Double photoSize, LocalDate uploadDate, LocalDate dateModified, String photoLink, User userId, String photoLocation, String photoFormat, String photoPixels, Set<Shared> shares) {
         this.PhotoId = photoId;
         this.PhotoName = photoName;
         this.PhotoSize = photoSize;
@@ -82,11 +82,11 @@ public class Photo implements Serializable {
         this.shares = shares;
     }
 
-    public Long getPhotoId() {
+    public Integer getPhotoId() {
         return PhotoId;
     }
 
-    public void setPhotoId(Long photoId) {
+    public void setPhotoId(Integer photoId) {
         PhotoId = photoId;
     }
 
@@ -98,11 +98,11 @@ public class Photo implements Serializable {
         PhotoName = photoName;
     }
 
-    public String getPhotoSize() {
+    public Double getPhotoSize() {
         return PhotoSize;
     }
 
-    public void setPhotoSize(String photoSize) {
+    public void setPhotoSize(Double photoSize) {
         PhotoSize = photoSize;
     }
 

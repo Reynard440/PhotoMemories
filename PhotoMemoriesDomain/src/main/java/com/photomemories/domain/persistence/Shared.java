@@ -15,7 +15,7 @@ public class Shared implements Serializable {
     //TODO considering to make use of Integer instead of Long
     @Id
     @Column(name = "SHARED_ID")
-    private Long SharedId;
+    private Integer SharedId;
 
     @Column(name = "SH_SHARED_DATE")
     private Long SharedBy;
@@ -39,18 +39,18 @@ public class Shared implements Serializable {
         this.PhotoId = photoId;
     }
 
-    public Shared(Long sharedId, Long sharedBy, User userId, Photo photoId) {
+    public Shared(Integer sharedId, Long sharedBy, User userId, Photo photoId) {
         this.SharedId = sharedId;
         this.SharedBy = sharedBy;
         this.UserId = userId;
         this.PhotoId = photoId;
     }
 
-    public Long getSharedId() {
+    public Integer getSharedId() {
         return SharedId;
     }
 
-    public void setSharedId(Long sharedId) {
+    public void setSharedId(Integer sharedId) {
         SharedId = sharedId;
     }
 
