@@ -12,13 +12,19 @@ import java.util.Objects;
 public class Shared implements Serializable {
     private static final long serialVersionUID = -807419981572411616L;
 
-    //TODO considering to make use of Integer instead of Long
     @Id
-    @Column(name = "SHARED_ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "SHARED_ID", nullable = false)
     private Integer SharedId;
 
-    @Column(name = "SH_SHARED_DATE")
-    private Long SharedBy;
+    @Column(name = "SH_SHARED_DATE", nullable = false)
+    private LocalDate SharedDate;
+
+    @Column(name = "SH_SHARED_WITH", nullable = false)
+    private Integer SharedWith;
+
+    @Column(name = "SH_HAS_ACCESS", nullable = false)
+    private Boolean SharedHasAccess;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
@@ -33,17 +39,28 @@ public class Shared implements Serializable {
     public Shared() {
     }
 
-    public Shared(Long sharedBy, User userId, Photo photoId) {
-        this.SharedBy = sharedBy;
+    public Shared(LocalDate sharedDate, Integer sharedWith, Boolean sharedHasAccess, User userId, Photo photoId) {
+        this.SharedDate = sharedDate;
+        this.SharedWith = sharedWith;
+        this.SharedHasAccess = sharedHasAccess;
         this.UserId = userId;
         this.PhotoId = photoId;
     }
 
-    public Shared(Integer sharedId, Long sharedBy, User userId, Photo photoId) {
+    public Shared(Integer sharedId, LocalDate sharedDate, Integer sharedWith, Boolean sharedHasAccess, User userId, Photo photoId) {
         this.SharedId = sharedId;
-        this.SharedBy = sharedBy;
+        this.SharedDate = sharedDate;
+        this.SharedWith = sharedWith;
+        this.SharedHasAccess = sharedHasAccess;
         this.UserId = userId;
         this.PhotoId = photoId;
+    }
+
+    public Shared(Integer sharedId, LocalDate sharedDate, Integer sharedWith, Boolean sharedHasAccess) {
+        SharedId = sharedId;
+        SharedDate = sharedDate;
+        SharedWith = sharedWith;
+        SharedHasAccess = sharedHasAccess;
     }
 
     public Integer getSharedId() {
@@ -54,12 +71,12 @@ public class Shared implements Serializable {
         SharedId = sharedId;
     }
 
-    public Long getSharedBy() {
-        return SharedBy;
+    public LocalDate getSharedBy() {
+        return SharedDate;
     }
 
-    public void setSharedBy(Long sharedBy) {
-        SharedBy = sharedBy;
+    public void setSharedBy(LocalDate sharedBy) {
+        SharedDate = sharedBy;
     }
 
     public Photo getPhotoId() {
@@ -70,16 +87,48 @@ public class Shared implements Serializable {
         PhotoId = photoId;
     }
 
+    public LocalDate getSharedDate() {
+        return SharedDate;
+    }
+
+    public void setSharedDate(LocalDate sharedDate) {
+        SharedDate = sharedDate;
+    }
+
+    public Integer getSharedWith() {
+        return SharedWith;
+    }
+
+    public void setSharedWith(Integer sharedWith) {
+        SharedWith = sharedWith;
+    }
+
+    public Boolean getSharedHasAccess() {
+        return SharedHasAccess;
+    }
+
+    public void setSharedHasAccess(Boolean sharedHasAccess) {
+        SharedHasAccess = sharedHasAccess;
+    }
+
+    public User getUserId() {
+        return UserId;
+    }
+
+    public void setUserId(User userId) {
+        UserId = userId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Shared shared = (Shared) o;
-        return Objects.equals(SharedId, shared.SharedId) && Objects.equals(SharedBy, shared.SharedBy) && Objects.equals(UserId, shared.UserId) && Objects.equals(PhotoId, shared.PhotoId);
+        return Objects.equals(SharedId, shared.SharedId) && Objects.equals(SharedDate, shared.SharedDate) && Objects.equals(SharedWith, shared.SharedWith) && Objects.equals(SharedHasAccess, shared.SharedHasAccess) && Objects.equals(UserId, shared.UserId) && Objects.equals(PhotoId, shared.PhotoId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(SharedId, SharedBy, UserId, PhotoId);
+        return Objects.hash(SharedId, SharedDate, SharedWith, SharedHasAccess, UserId, PhotoId);
     }
 }

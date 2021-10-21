@@ -15,30 +15,26 @@ public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "USER_ID")
+    @Column(name = "USER_ID", nullable = false)
     private Integer UserId;
 
-    @Column(name = "USER_F_Name")
+    @Column(name = "USER_FName", nullable = false, length = 100)
     private String FirstName;
 
-    @Column(name = "USER_L_Name")
+    @Column(name = "USER_LName", nullable = false, length = 100)
     private String LastName;
 
-    @Column(name = "USER_JOIN_DATE")
+    @Column(name = "USER_JOIN_DATE", nullable = false)
     private LocalDate date;
 
-    @Column(name = "USER_HASH_PASSWORD")
+    @Column(name = "USER_HASH_PASSWORD", nullable = false)
     private String UserHashPassword;
 
-    @Column(name = "USER_Email")
+    @Column(name = "USER_Email", unique = true, length = 150)
     private String Email;
 
-    @Column(name = "USER_CELL_NR")
+    @Column(name = "USER_CELL_NR", nullable = false, unique = true, length = 10)
     private String PhoneNumber;
-
-    @OneToMany(targetEntity = Photo.class, fetch = FetchType.LAZY, mappedBy = "UserId"/*, orphanRemoval = true, cascade = CascadeType.ALL*/)
-    @JsonManagedReference
-    private Set<Photo> Photos;
 
     @OneToMany(targetEntity = Shared.class, fetch = FetchType.LAZY, mappedBy = "UserId"/*, orphanRemoval = true, cascade = CascadeType.ALL*/)
     @JsonManagedReference
@@ -47,18 +43,17 @@ public class User implements Serializable {
     public User() {
     }
 
-    public User(String firstName, String lastName, LocalDate date, String userHashPassword, String email, String phoneNumber, Set<Photo> photos, Set<Shared> shares) {
+    public User(String firstName, String lastName, LocalDate date, String userHashPassword, String email, String phoneNumber, Set<Shared> shares) {
         this.FirstName = firstName;
         this.LastName = lastName;
         this.date = date;
         this.UserHashPassword = userHashPassword;
         this.Email = email;
         this.PhoneNumber = phoneNumber;
-        this.Photos = photos;
         this.Shares = shares;
     }
 
-    public User(Integer userId, String firstName, String lastName, LocalDate date, String userHashPassword, String email, String phoneNumber, Set<Photo> photos, Set<Shared> shares) {
+    public User(Integer userId, String firstName, String lastName, LocalDate date, String userHashPassword, String email, String phoneNumber, Set<Shared> shares) {
         this.UserId = userId;
         this.FirstName = firstName;
         this.LastName = lastName;
@@ -66,7 +61,6 @@ public class User implements Serializable {
         this.UserHashPassword = userHashPassword;
         this.Email = email;
         this.PhoneNumber = phoneNumber;
-        this.Photos = photos;
         this.Shares = shares;
     }
 
@@ -135,14 +129,6 @@ public class User implements Serializable {
         PhoneNumber = phoneNumber;
     }
 
-    public Set<Photo> getPhotos() {
-        return Photos;
-    }
-
-    public void setPhotos(Set<Photo> photos) {
-        Photos = photos;
-    }
-
     public Set<Shared> getShares() {
         return Shares;
     }
@@ -156,11 +142,11 @@ public class User implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(UserId, user.UserId) && Objects.equals(FirstName, user.FirstName) && Objects.equals(LastName, user.LastName) && Objects.equals(date, user.date) && Objects.equals(UserHashPassword, user.UserHashPassword) && Objects.equals(Email, user.Email) && Objects.equals(PhoneNumber, user.PhoneNumber) && Objects.equals(Photos, user.Photos) && Objects.equals(Shares, user.Shares);
+        return Objects.equals(UserId, user.UserId) && Objects.equals(FirstName, user.FirstName) && Objects.equals(LastName, user.LastName) && Objects.equals(date, user.date) && Objects.equals(UserHashPassword, user.UserHashPassword) && Objects.equals(Email, user.Email) && Objects.equals(PhoneNumber, user.PhoneNumber) && Objects.equals(Shares, user.Shares);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(UserId, FirstName, LastName, date, UserHashPassword, Email, PhoneNumber, Photos, Shares);
+        return Objects.hash(UserId, FirstName, LastName, date, UserHashPassword, Email, PhoneNumber, Shares);
     }
 }

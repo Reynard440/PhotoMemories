@@ -1,6 +1,5 @@
 package com.photomemories.domain.persistence;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -14,39 +13,34 @@ import java.util.Set;
 public class Photo implements Serializable {
     private static final long serialVersionUID = 2034551615183602888L;
 
-    //TODO considering to make use of Integer instead of Long
     @Id
-    @Column(name = "PHOTO_ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "PHOTO_ID", nullable = false)
     private Integer PhotoId;
 
-    @Column(name = "PH_NAME")
+    @Column(name = "PH_NAME", nullable = false)
     private String PhotoName;
 
-    @Column(name = "PH_SIZE")
+    @Column(name = "PH_SIZE", nullable = true)
     private Double PhotoSize;
 
-    @Column(name = "PH_UPLOAD_DATE")
+    @Column(name = "PH_UPLOAD_DATE", nullable = false)
     private LocalDate UploadDate;
 
-    @Column(name = "PH_MODIFIED_DATE")
+    @Column(name = "PH_MODIFIED_DATE", nullable = false)
     private LocalDate DateModified;
 
-    @Column(name = "PH_LINK")
+    @Column(name = "PH_LINK", nullable = false)
     private String PhotoLink;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USER_ID")
-    @JsonBackReference
-    private User UserId;
-
-    @Column(name = "PH_LOCATION")
+    @Column(name = "PH_LOCATION", nullable = true)
     private String PhotoLocation;
 
-    @Column(name = "PH_FORMAT")
+    @Column(name = "PH_FORMAT", nullable = false)
     private String PhotoFormat;
 
-    @Column(name = "PH_PIXELS")
-    private String PhotoPixels;
+    @Column(name = "PH_CAPTUREDBY", nullable = false)
+    private String PhotoCapturedBy;
 
     @OneToMany(targetEntity = Shared.class, mappedBy = "PhotoId")
     @JsonManagedReference
@@ -55,31 +49,41 @@ public class Photo implements Serializable {
     public Photo() {
     }
 
-    public Photo(String photoName, Double photoSize, LocalDate uploadDate, LocalDate dateModified, String photoLink, User userId, String photoLocation, String photoFormat, String photoPixels, Set<Shared> shares) {
+    public Photo(String photoName, Double photoSize, LocalDate uploadDate, LocalDate dateModified, String photoLink, String photoLocation, String photoFormat, String photoCapturedBy, Set<Shared> shares) {
         this.PhotoName = photoName;
         this.PhotoSize = photoSize;
         this.UploadDate = uploadDate;
         this.DateModified = dateModified;
         this.PhotoLink = photoLink;
-        this.UserId = userId;
         this.PhotoLocation = photoLocation;
         this.PhotoFormat = photoFormat;
-        this.PhotoPixels = photoPixels;
         this.shares = shares;
+        this.PhotoCapturedBy =  photoCapturedBy;
     }
 
-    public Photo(Integer photoId, String photoName, Double photoSize, LocalDate uploadDate, LocalDate dateModified, String photoLink, User userId, String photoLocation, String photoFormat, String photoPixels, Set<Shared> shares) {
+    public Photo(Integer photoId, String photoName, Double photoSize, LocalDate uploadDate, LocalDate dateModified, String photoLink, String photoLocation, String photoFormat, String photoCapturedBy, Set<Shared> shares) {
         this.PhotoId = photoId;
         this.PhotoName = photoName;
         this.PhotoSize = photoSize;
         this.UploadDate = uploadDate;
         this.DateModified = dateModified;
         this.PhotoLink = photoLink;
-        this.UserId = userId;
         this.PhotoLocation = photoLocation;
         this.PhotoFormat = photoFormat;
-        this.PhotoPixels = photoPixels;
         this.shares = shares;
+        this.PhotoCapturedBy =  photoCapturedBy;
+    }
+
+    public Photo(Integer photoId, String photoName, Double photoSize, LocalDate uploadDate, LocalDate dateModified, String photoLink, String photoLocation, String photoFormat, String photoCapturedBy) {
+        this.PhotoId = photoId;
+        this.PhotoName = photoName;
+        this.PhotoSize = photoSize;
+        this.UploadDate = uploadDate;
+        this.DateModified = dateModified;
+        this.PhotoLink = photoLink;
+        this.PhotoLocation = photoLocation;
+        this.PhotoFormat = photoFormat;
+        this.PhotoCapturedBy = photoCapturedBy;
     }
 
     public Integer getPhotoId() {
@@ -130,14 +134,6 @@ public class Photo implements Serializable {
         PhotoLink = photoLink;
     }
 
-    public User getUserId() {
-        return UserId;
-    }
-
-    public void setUserId(User userId) {
-        UserId = userId;
-    }
-
     public String getPhotoLocation() {
         return PhotoLocation;
     }
@@ -154,12 +150,12 @@ public class Photo implements Serializable {
         PhotoFormat = photoFormat;
     }
 
-    public String getPhotoPixels() {
-        return PhotoPixels;
+    public String getPhotoCapturedBy() {
+        return PhotoCapturedBy;
     }
 
-    public void setPhotoPixels(String photoPixels) {
-        PhotoPixels = photoPixels;
+    public void setPhotoCapturedBy(String photoCapturedBy) {
+        PhotoCapturedBy = photoCapturedBy;
     }
 
     public Set<Shared> getShares() {
@@ -175,11 +171,11 @@ public class Photo implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Photo photo = (Photo) o;
-        return Objects.equals(PhotoId, photo.PhotoId) && Objects.equals(PhotoName, photo.PhotoName) && Objects.equals(PhotoSize, photo.PhotoSize) && Objects.equals(UploadDate, photo.UploadDate) && Objects.equals(DateModified, photo.DateModified) && Objects.equals(PhotoLink, photo.PhotoLink) && Objects.equals(UserId, photo.UserId) && Objects.equals(PhotoLocation, photo.PhotoLocation) && Objects.equals(PhotoFormat, photo.PhotoFormat) && Objects.equals(PhotoPixels, photo.PhotoPixels) && Objects.equals(shares, photo.shares);
+        return Objects.equals(PhotoId, photo.PhotoId) && Objects.equals(PhotoName, photo.PhotoName) && Objects.equals(PhotoSize, photo.PhotoSize) && Objects.equals(UploadDate, photo.UploadDate) && Objects.equals(DateModified, photo.DateModified) && Objects.equals(PhotoLink, photo.PhotoLink) && Objects.equals(PhotoLocation, photo.PhotoLocation) && Objects.equals(PhotoFormat, photo.PhotoFormat) && Objects.equals(PhotoCapturedBy, photo.PhotoCapturedBy) && Objects.equals(shares, photo.shares);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(PhotoId, PhotoName, PhotoSize, UploadDate, DateModified, PhotoLink, UserId, PhotoLocation, PhotoFormat, PhotoPixels, shares);
+        return Objects.hash(PhotoId, PhotoName, PhotoSize, UploadDate, DateModified, PhotoLink, PhotoLocation, PhotoFormat, PhotoCapturedBy, shares);
     }
 }
