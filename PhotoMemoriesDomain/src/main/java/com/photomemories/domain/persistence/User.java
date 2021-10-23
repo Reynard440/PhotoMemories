@@ -36,7 +36,7 @@ public class User implements Serializable {
     @Column(name = "USER_CELL_NR", nullable = false, unique = true, length = 10)
     private String PhoneNumber;
 
-    @OneToMany(targetEntity = Shared.class, fetch = FetchType.LAZY, mappedBy = "UserId"/*, orphanRemoval = true, cascade = CascadeType.ALL*/)
+    @OneToMany(targetEntity = Shared.class, fetch = FetchType.LAZY, mappedBy = "UserId", orphanRemoval = true, cascade = CascadeType.ALL)
     @JsonManagedReference
     private Set<Shared> Shares;
 

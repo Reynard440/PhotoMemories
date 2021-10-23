@@ -7,19 +7,19 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 
 @RestController
 @RequestMapping(path="/v1/c1")
 public class UserController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PhotoController.class);
     private final UserCRUDService userCRUDService;
 
     @Autowired
@@ -27,17 +27,32 @@ public class UserController {
         this.userCRUDService = userCRUDService;
     }
 
-    @PostMapping("/addUser")
+    @PostMapping("/addNewUser")
     @ApiOperation(value = "Create a new User.", notes = "Creates a new User in the DB.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "User successfully created", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 400, message = "Bad Request: could not resolve the creation of a new user.", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
-    public ResponseEntity<PhotoMemoriesResponse<UserDto>> newUser(
+    public ResponseEntity<PhotoMemoriesResponse<UserDto>> addNewUser(
             @ApiParam(value = "Request body to create a new User", required = true)
             @RequestBody UserDto userDto) throws Exception {
         UserDto userResponse = userCRUDService.createNewUser(userDto);
         PhotoMemoriesResponse<UserDto> response = new PhotoMemoriesResponse<>(true, userResponse);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/userExists/{id}")
+    @ApiOperation(value = "Checks if a user exists based on their id.", notes = "Tries to fetch a user by id from the DB.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Photo exists", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by id", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 404, message = "Could not found the user with this id", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
+    public ResponseEntity<PhotoMemoriesResponse<Boolean>> photoExists(
+            @ApiParam(value = "The id of each user", example = "1", name = "id", required = true)
+            @PathVariable("id") Integer id) throws SQLException {
+        boolean userResponse = userCRUDService.userExists(id);
+        PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, userResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

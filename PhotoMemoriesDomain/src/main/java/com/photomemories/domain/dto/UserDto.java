@@ -1,6 +1,7 @@
 package com.photomemories.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.photomemories.domain.persistence.Photo;
 import com.photomemories.domain.persistence.User;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
