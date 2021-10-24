@@ -1,5 +1,7 @@
 # Project exclude paths
 /PhotoMemoriesDomain/target/
+/PhotoMemoriesAws/target/
+/PhotoMemoriesAws/src/main/java/com/photomemories/aws/config/AwsConfig.java/
 /PhotoMemoriesLogic/target/
 /PhotoMemoriesRepository/target/
 /PhotoMemoriesRepository/src/main/resources/application-db.properties/
