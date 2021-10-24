@@ -43,6 +43,10 @@ public class User implements Serializable {
     public User() {
     }
 
+    public User(Integer userId) {
+        UserId = userId;
+    }
+
     public User(String firstName, String lastName, LocalDate date, String userHashPassword, String email, String phoneNumber, Set<Shared> shares) {
         this.FirstName = firstName;
         this.LastName = lastName;

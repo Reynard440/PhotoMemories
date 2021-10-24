@@ -24,6 +24,7 @@
     </properties>
 
     <modules>
+        <module>PhotoMemoriesAws</module>
         <module>PhotoMemoriesDomain</module>
         <module>PhotoMemoriesRepository</module>
         <module>PhotoMemoriesTranslator</module>
@@ -98,7 +99,11 @@
                 <artifactId>spring-security-core</artifactId>
                 <version>5.5.3</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk</artifactId>
+                <version>1.12.85</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

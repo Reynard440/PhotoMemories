@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="PhotoMemoriesTranslator" />
         <module name="PhotoMemoriesLogic" />
+        <module name="PhotoMemoriesAws" />
         <module name="PhotoMemoriesDomain" />
         <module name="PhotoMemoriesRepository" />
       </profile>
@@ -28,6 +29,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="PhotoMemoriesAws" options="-parameters" />
       <module name="PhotoMemoriesDomain" options="-parameters" />
       <module name="PhotoMemoriesLogic" options="-parameters" />
       <module name="PhotoMemoriesRepository" options="-parameters" />

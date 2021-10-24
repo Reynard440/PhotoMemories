@@ -96,12 +96,12 @@ public class SharedDto implements Serializable {
         this.SharedWith = shared.getSharedWith();
         this.SharedHasAccess = shared.getSharedHasAccess();
         this.UserId = shared.getUserId().getUserId();
-        this.SharedId = shared.getSharedId();
+        this.PhotoId = shared.getPhotoId().getPhotoId();
     }
 
     @JsonIgnore
     public Shared buildShared() {
-        return new Shared(this.getSharedId(), this.getSharedDate(), this.getSharedId(), this.getSharedHasAccess());
+        return new Shared(this.getSharedId(), this.getSharedDate(), this.getSharedId(), this.getSharedHasAccess(), this.getUserId(), this.getPhotoId());
     }
 
     @Override

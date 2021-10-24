@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 public interface PhotoTranslator {
     Photo addPhoto(Photo photo) throws Exception;
 
+    Photo getPhotoById(Integer id);
+
     boolean photoExists(Integer id);
 
     boolean deletePhoto(Integer id) throws Exception;

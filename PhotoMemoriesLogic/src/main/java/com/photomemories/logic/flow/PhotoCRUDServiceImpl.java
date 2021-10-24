@@ -40,6 +40,11 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     }
 
     @Override
+    public PhotoDto getPhotoDtoById(Integer id) {
+        return new PhotoDto(photoTranslator.getPhotoById(id));
+    }
+
+    @Override
     public boolean photoExists(Integer id) {
         LOGGER.info("[Photo Logic log] photoExists method, queried id: {}", id);
         boolean returnPhotoLogicValue = photoTranslator.photoExists(id);

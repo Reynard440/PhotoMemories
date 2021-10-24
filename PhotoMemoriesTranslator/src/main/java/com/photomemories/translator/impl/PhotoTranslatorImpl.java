@@ -25,6 +25,11 @@ public class PhotoTranslatorImpl implements PhotoTranslator {
     }
 
     @Override
+    public Photo getPhotoById(Integer id) {
+        return photoRepository.findByPhotoId(id);
+    }
+
+    @Override
     public boolean photoExists(Integer id) {
         LOGGER.info("[Photo Translator log] photoExists method, queried id: {}", id);
         boolean returnValue = photoRepository.existsByPhotoId(id);

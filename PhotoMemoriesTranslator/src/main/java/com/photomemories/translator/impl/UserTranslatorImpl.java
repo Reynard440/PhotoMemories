@@ -25,6 +25,11 @@ public class UserTranslatorImpl implements UserTranslator {
     }
 
     @Override
+    public User getUserById(Integer id) {
+        return userRepository.findByUserId(id);
+    }
+
+    @Override
     public boolean userExists(Integer id) {
         LOGGER.info("[User Translator log] userExists method, input id: {}", id);
         boolean returnValue = userRepository.existsByUserId(id);

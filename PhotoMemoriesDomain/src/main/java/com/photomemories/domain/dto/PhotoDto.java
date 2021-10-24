@@ -38,6 +38,12 @@ public class PhotoDto implements Serializable {
         PhotoId = photoId;
     }
 
+    @ApiModelProperty(position = 2,
+            value = "Photo name",
+            name = "Photo Name",
+            notes = "Name of the photo.",
+            dataType = "java.lang.String",
+            example = "Reynard Engels")
     public String getPhotoName() {
         return PhotoName;
     }
@@ -46,6 +52,12 @@ public class PhotoDto implements Serializable {
         PhotoName = photoName;
     }
 
+    @ApiModelProperty(position = 3,
+            value = "Photo size",
+            name = "Photo Size",
+            notes = "Size of the photo.",
+            dataType = "java.lang.Double",
+            example = "1159524.0")
     public Double getPhotoSize() {
         return PhotoSize;
     }
@@ -54,6 +66,12 @@ public class PhotoDto implements Serializable {
         PhotoSize = photoSize;
     }
 
+    @ApiModelProperty(position = 4,
+            value = "Photo upload date",
+            name = "Photo upload date",
+            notes = "Upload date of the photo.",
+            dataType = "java.lang.LocalDate",
+            example = "2012-01-01")
     public LocalDate getUploadDate() {
         return UploadDate;
     }
@@ -62,6 +80,12 @@ public class PhotoDto implements Serializable {
         UploadDate = uploadDate;
     }
 
+    @ApiModelProperty(position = 5,
+            value = "Photo modified date",
+            name = "Photo modified date",
+            notes = "Modified date of the photo.",
+            dataType = "java.lang.LocalDate",
+            example = "2012-01-01")
     public LocalDate getDateModified() {
         return DateModified;
     }
@@ -70,6 +94,12 @@ public class PhotoDto implements Serializable {
         DateModified = dateModified;
     }
 
+    @ApiModelProperty(position = 6,
+            value = "Photo link",
+            name = "Photo Link",
+            notes = "Link of the photo.",
+            dataType = "java.lang.String",
+            example = "ReynardEngels.jpeg")
     public String getPhotoLink() {
         return PhotoLink;
     }
@@ -78,6 +108,12 @@ public class PhotoDto implements Serializable {
         PhotoLink = photoLink;
     }
 
+    @ApiModelProperty(position = 7,
+            value = "Photo location",
+            name = "Photo Location",
+            notes = "Location of the photo.",
+            dataType = "java.lang.String",
+            example = "Vaalpark")
     public String getPhotoLocation() {
         return PhotoLocation;
     }
@@ -86,6 +122,12 @@ public class PhotoDto implements Serializable {
         PhotoLocation = photoLocation;
     }
 
+    @ApiModelProperty(position = 8,
+            value = "Photo format",
+            name = "Photo Format",
+            notes = "Format of the photo.",
+            dataType = "java.lang.String",
+            example = "jpeg")
     public String getPhotoFormat() {
         return PhotoFormat;
     }
@@ -94,6 +136,12 @@ public class PhotoDto implements Serializable {
         PhotoFormat = photoFormat;
     }
 
+    @ApiModelProperty(position = 8,
+            value = "Photo captured by",
+            name = "Photo Captured By",
+            notes = "Person that captured the photo.",
+            dataType = "java.lang.String",
+            example = "Reyno Engels")
     public String getPhotoCapturedBy() {
         return PhotoCapturedBy;
     }

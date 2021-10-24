@@ -9,6 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
+    @Query("select u from User u where u.UserId = ?1")
+    User findByUserId(Integer UserId);
+
     @Query("select (count(u) > 0) from User u where u.UserHashPassword = ?1 and u.Email = ?2")
     boolean existsByUserHashPasswordAndEmail(String UserHashPassword, String Email);
 

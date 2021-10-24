@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 public interface UserTranslator {
     User newUser(User user) throws Exception;
 
+    User getUserById(Integer id);
+
     boolean userExists(Integer id);
 
     Integer deleteUser(Integer id) throws Exception;

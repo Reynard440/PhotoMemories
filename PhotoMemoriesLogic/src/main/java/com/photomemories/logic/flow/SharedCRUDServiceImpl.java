@@ -40,16 +40,21 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
                 LOGGER.warn("[Shared Logic log] input Dto contained invalid photo id: {}", "invalid");
                 sharedDto.setSharedId(0);
             }
-            LOGGER.info("[Shared Logic log] input Dto object is: {}", sharedDto);
+//            LOGGER.info("[Shared Logic log] input Dto object is: {}", sharedDto);
             Shared shared = sharedDto.buildShared();
-            LOGGER.info("[Shared Logic log] Dto Object converted to persistence is: {}", shared);
+//            LOGGER.info("[Shared Logic log] Dto Object converted to persistence is: {}", shared);
             Shared addedShared = sharedTranslator.addShared(shared);
-            LOGGER.info("[Shared Logic log] object saved to database: {}", addedShared);
+//            LOGGER.info("[Shared Logic log] object saved to database: {}", addedShared);
             SharedDto returnShared = new SharedDto(sharedTranslator.addShared(addedShared));
-            LOGGER.info("[Shared Logic log] Dto returned: {}", returnShared);
+//            LOGGER.info("[Shared Logic log] Dto returned: {}", returnShared);
             return returnShared;
         } catch (Exception e) {
             throw new RuntimeException("Shared record could not be created!", e);
         }
+    }
+
+    @Override
+    public SharedDto getSHaredByUserId(Integer id) {
+        return new SharedDto(sharedTranslator.getSharedByUserId(id));
     }
 }

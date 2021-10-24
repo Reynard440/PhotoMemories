@@ -20,8 +20,13 @@ public class SharedTranslatorImpl implements SharedTranslator {
 
     @Override
     public Shared addShared(Shared shared) throws Exception {
-        LOGGER.info("[Shared Translator log] addShared method, input object: {}", shared);
+//        LOGGER.info("[Shared Translator log] addShared method, input object: {}", shared);
         return sharedRepository.save(shared);
+    }
+
+    @Override
+    public Shared getSharedByUserId(Integer id) {
+        return sharedRepository.findByUserId_UserId(id);
     }
 
     //TODO: Delete methods (must cascade from parent entities)

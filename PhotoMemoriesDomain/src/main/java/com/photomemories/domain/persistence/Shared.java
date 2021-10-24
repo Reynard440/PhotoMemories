@@ -63,6 +63,15 @@ public class Shared implements Serializable {
         SharedHasAccess = sharedHasAccess;
     }
 
+    public Shared(Integer sharedId, LocalDate sharedDate, Integer sharedWith, Boolean sharedHasAccess, Integer userId, Integer photoId) {
+        this.SharedId = sharedId;
+        this.SharedDate = sharedDate;
+        this.SharedWith = sharedWith;
+        this.SharedHasAccess = sharedHasAccess;
+        this.UserId = new User(userId);
+        this.PhotoId = new Photo(photoId);
+    }
+
     public Integer getSharedId() {
         return SharedId;
     }

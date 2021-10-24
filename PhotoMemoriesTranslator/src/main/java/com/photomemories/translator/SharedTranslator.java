@@ -6,4 +6,6 @@ import org.springframework.stereotype.Component;
 @Component
 public interface SharedTranslator {
     Shared addShared (Shared shared) throws Exception;
+
+    Shared getSharedByUserId(Integer id);
 }

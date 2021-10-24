@@ -47,6 +47,11 @@ public class UserCRUDServiceImpl implements UserCRUDService {
         }
     }
 
+    @Override
+    public UserDto getUserDtoById(Integer id) {
+        return new UserDto(userTranslator.getUserById(id));
+    }
+
     private void isUniqueUser(UserDto userDto) throws Exception {
         if (userTranslator.registerCheck(userDto.getPhoneNumber(), userDto.getEmail())) {
             LOGGER.warn("User with phone number: {} and email: {} already exists", userDto.getPhoneNumber(), userDto.getEmail());

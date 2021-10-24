@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SharedRepository extends JpaRepository<Shared, Integer> {
+    @Query("select s from Shared s where s.UserId.UserId = ?1")
+    Shared findByUserId_UserId(Integer UserId);
 }

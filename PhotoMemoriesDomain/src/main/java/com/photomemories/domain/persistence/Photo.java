@@ -49,6 +49,10 @@ public class Photo implements Serializable {
     public Photo() {
     }
 
+    public Photo(Integer photoId) {
+        PhotoId = photoId;
+    }
+
     public Photo(String photoName, Double photoSize, LocalDate uploadDate, LocalDate dateModified, String photoLink, String photoLocation, String photoFormat, String photoCapturedBy, Set<Shared> shares) {
         this.PhotoName = photoName;
         this.PhotoSize = photoSize;
