@@ -26,11 +26,13 @@ public class UserCRUDServiceImpl implements UserCRUDService {
         this.userTranslator = userTranslator;
     }
 
-    //TODO: when logging a user in, use the following to verify the password passwordEncoder.matches(userDto.getUserHashPassword(), user.getUserHashPassword()
     @Override
     public UserDto createNewUser(UserDto userDto) throws Exception {
         try {
             LOGGER.info("[User Logic log] input Dto object is: {}", userDto);
+
+            isUniqueUser(userDto);
+
             User user = userDto.buildUser();
             LOGGER.info("[User Logic log] Dto Object converted to persistence is: {}", user);
             user.setUserHashPassword(passwordEncoder.encode(userDto.getUserHashPassword()));
@@ -45,11 +47,42 @@ public class UserCRUDServiceImpl implements UserCRUDService {
         }
     }
 
+    private void isUniqueUser(UserDto userDto) throws Exception {
+        if (userTranslator.registerCheck(userDto.getPhoneNumber(), userDto.getEmail())) {
+            LOGGER.warn("User with phone number: {} and email: {} already exists", userDto.getPhoneNumber(), userDto.getEmail());
+            throw new RuntimeException("User already exists");
+        }
+    }
+
     @Override
     public boolean userExists(Integer id) {
         LOGGER.info("[User Logic log] userExists method, queried id: {}", id);
         boolean returnLogicValue = userTranslator.userExists(id);
         LOGGER.info("[User Logic log] userExists method, result: {}", returnLogicValue);
         return returnLogicValue;
+    }
+
+
+    @Override
+    public Integer deleteUser(Integer id) throws Exception {
+        LOGGER.info("[User Logic log] deleteUser method, queried id: {}", id);
+        boolean beforeDelete = userTranslator.userExists(id);
+        LOGGER.info("[User Logic log] deleteUser method, (exists?): {}", beforeDelete);
+        if (!userExists(id)) {
+            LOGGER.warn("User with id {} does not exists", id);
+            throw new RuntimeException("User deletion error.");
+        }
+        int userDelete = userTranslator.deleteUser(id);
+        boolean afterDelete = userTranslator.userExists(id);
+        LOGGER.info("[User Logic log] deleteUser method, (exists?): {}", afterDelete);
+        return userDelete;
+    }
+
+    @Override
+    public boolean loginUser(String password, String email) throws Exception {
+        LOGGER.info("[User Logic log] loginUser method, password: {} and email: {}", password, email);
+        boolean userValid = userTranslator.loginUser(password, email);
+        LOGGER.info("[User Logic log] loginUser method, (valid?): {}", userValid);
+        return userValid;
     }
 }

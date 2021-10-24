@@ -57,4 +57,19 @@ public class PhotoController {
         PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, photoResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @DeleteMapping("/deletePhoto/{id}")
+    @ApiOperation(value = "Deletes a photo by id.", notes = "Removes a photo from the DB.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Photo deleted", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not resolve deleting the photo by id", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 404, message = "Could not found the photo with this id", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
+    public ResponseEntity<PhotoMemoriesResponse<Boolean>> deletePhoto(
+            @ApiParam(value = "The id of each user", example = "1", name = "id", required = true)
+            @PathVariable("id") Integer id) throws Exception {
+        boolean photoResponse = photoCRUDService.deletePhoto(id);
+        PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, photoResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

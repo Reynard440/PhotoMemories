@@ -8,4 +8,6 @@ public interface PhotoTranslator {
     Photo addPhoto(Photo photo) throws Exception;
 
     boolean photoExists(Integer id);
+
+    boolean deletePhoto(Integer id) throws Exception;
 }

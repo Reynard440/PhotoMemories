@@ -6,4 +6,6 @@ public interface PhotoCRUDService {
     PhotoDto createPhotoDto(PhotoDto photoDto) throws Exception;
 
     boolean photoExists(Integer id);
+
+    boolean deletePhoto(Integer id) throws Exception;
 }

@@ -32,7 +32,33 @@ public class UserTranslatorImpl implements UserTranslator {
         return returnValue;
     }
 
-    //TODO: Delete method
+    @Override
+    public Integer deleteUser(Integer id) throws Exception {
+        LOGGER.info("[User Translator log] deleteUser method, input id: {}", id);
+        int deleteValue = userRepository.deleteByUserId(id);
+        LOGGER.info("[User Translator log] deleteUser method, (exists?): {}", deleteValue);
+        return deleteValue;
+    }
+
+    @Override
+    public boolean loginUser(String password, String email) throws Exception {
+        LOGGER.info("[User Translator log] loginUser method, input password: {}, and email: {}", password, email);
+        boolean loginValue = userRepository.existsByUserHashPasswordAndEmail(password, email);
+        LOGGER.info("[User Translator log] loginUser method, (exists?): {}", loginValue);
+        return loginValue;
+    }
+
+    @Override
+    public boolean registerCheck(String phoneNumber, String email) throws Exception {
+        LOGGER.info("[User Translator log] registerCheck method, input phone number: {} and email: {}", phoneNumber, email);
+        if (userRepository.existsByPhoneNumberAndEmail(phoneNumber, email)) {
+            LOGGER.info("[User Translator log] registerCheck method, user status: {}", true);
+            return true;
+        }
+        LOGGER.info("[User Translator log] registerCheck method, user status: {}", false);
+        return false;
+    }
+
     //TODO: Update method
     //TODO: Get by email method
 }

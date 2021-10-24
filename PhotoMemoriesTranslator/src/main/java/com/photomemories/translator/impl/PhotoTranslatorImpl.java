@@ -32,7 +32,14 @@ public class PhotoTranslatorImpl implements PhotoTranslator {
         return returnValue;
     }
 
-    //TODO: Delete method
+    @Override
+    public boolean deletePhoto(Integer id) throws Exception {
+        LOGGER.info("[Photo Translator log] deletePhoto method, input id: {}", id);
+        boolean deleteValue = photoRepository.deleteByPhotoId(id);
+        LOGGER.info("[Photo Translator log] deletePhoto method, (exists?): {}", deleteValue);
+        return deleteValue;
+    }
+
     //TODO: Update method
     //TODO: Get by metadata method
 }

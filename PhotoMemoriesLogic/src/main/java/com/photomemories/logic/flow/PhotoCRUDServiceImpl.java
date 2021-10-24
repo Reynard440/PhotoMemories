@@ -46,4 +46,19 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
         LOGGER.info("[Photo Logic log] photoExists method, result: {}", returnPhotoLogicValue);
         return returnPhotoLogicValue;
     }
+
+    @Override
+    public boolean deletePhoto(Integer id) throws Exception {
+        LOGGER.info("[Photo Logic log] deletePhoto method, queried id: {}", id);
+        boolean beforeDelete = photoTranslator.photoExists(id);
+        LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", beforeDelete);
+        if (!photoExists(id)) {
+            LOGGER.warn("Photo with id {} does not exists", id);
+            throw new RuntimeException("Photo deletion error");
+        }
+        boolean photoDelete = photoTranslator.deletePhoto(id);
+        boolean afterDelete = photoTranslator.photoExists(id);
+        LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", afterDelete);
+        return photoDelete;
+    }
 }
