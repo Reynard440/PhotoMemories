@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -31,8 +32,13 @@ public class AwsController {
         awsCRUDService.uploadPhoto(userProfileId, photo);
     }
 
-    @GetMapping("{userProfileId}/image/download")
-    public byte[] downloadPhoto(@PathVariable("userProfileId")Integer userProfileId) {
-        return awsCRUDService.downloadPhoto(userProfileId);
+    @GetMapping("{userProfileId}/image/{imageName}/download")
+    public byte[] downloadPhoto(@PathVariable("userProfileId")Integer userProfileId, @PathVariable("imageName")String imageName) {
+        return awsCRUDService.downloadPhoto(userProfileId, imageName);
+    }
+
+    @GetMapping("{id}/user/photos")
+    public List<Object> getAllPhotos(@PathVariable("id")Integer id) {
+        return awsCRUDService.getAllPhotosOfUser(id);
     }
 }

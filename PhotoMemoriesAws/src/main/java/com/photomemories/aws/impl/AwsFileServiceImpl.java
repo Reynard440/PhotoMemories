@@ -8,11 +8,13 @@ import com.amazonaws.util.IOUtils;
 import com.photomemories.aws.AwsFileServices;
 import com.sun.org.slf4j.internal.Logger;
 import com.sun.org.slf4j.internal.LoggerFactory;
+import io.netty.handler.codec.http.multipart.FileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -35,5 +37,10 @@ public class AwsFileServiceImpl implements AwsFileServices {
     @Override
     public byte[] download(String path, String key) {
         return new byte[0];
+    }
+
+    @Override
+    public List<FileUpload> getAllPhotos(Integer id) {
+        return null;
     }
 }

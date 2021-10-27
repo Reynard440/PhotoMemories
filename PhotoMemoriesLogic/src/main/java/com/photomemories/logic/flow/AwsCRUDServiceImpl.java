@@ -62,7 +62,7 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
 
     //TODO: convert from application-octet/stream to the actual image
     @Override
-    public byte[] downloadPhoto(Integer id) {
+    public byte[] downloadPhoto(Integer id, String imageName) {
         Shared shared = sharedTranslator.getSharedByUserId(id);
         User user = userTranslator.getUserById(shared.getUserId().getUserId());
         Photo photo = photoTranslator.getPhotoById(shared.getPhotoId().getPhotoId());
@@ -72,6 +72,11 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
         String key = String.format("%s/%s", user.getUserId(), photo.getPhotoLink());
         LOGGER.info("The path and key is {}/{}", path, key);
         return awsTranslator.download(path, key);
+    }
+
+    @Override
+    public List<Object> getAllPhotosOfUser(Integer id) {
+        return awsTranslator.getAllUserPhotos(id);
     }
 
     private void isPhotoEmpty(MultipartFile photo) {
