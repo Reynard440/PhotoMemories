@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Optional;
 
@@ -36,6 +37,7 @@ public class AwsTranslatorImpl implements AwsTranslator {
             }
         }));
         try {
+            objectMetadata.setContentType(objectMetadata.getContentType());
             s3.putObject(path, fileName, inputStream, objectMetadata);
         } catch (AmazonServiceException error) {
             throw new IllegalStateException("Failed to store the file to s3", error);

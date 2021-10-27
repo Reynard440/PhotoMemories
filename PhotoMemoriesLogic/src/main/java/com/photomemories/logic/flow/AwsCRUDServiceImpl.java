@@ -43,11 +43,11 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
 
         isPhoto(photo);
 
+        Map<String, String> metadata = extractMetadata(photo);
+
         Shared shared = sharedTranslator.getSharedByUserId(id);
         User user = userTranslator.getUserById(shared.getUserId().getUserId());
         Photo p = photoTranslator.getPhotoById(shared.getPhotoId().getPhotoId());
-
-        Map<String, String> metadata = extractMetadata(photo);
 
         String path = String.format("%s/%s", AwsBucket.PROFILE_IMAGE.getAwsBucket(), user.getUserId());
         String filename = String.format("%s-%s", photo.getOriginalFilename(), user.getUserId());
@@ -59,16 +59,19 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
         }
     }
 
+
+    //TODO: convert from application-octet/stream to the actual image
     @Override
     public byte[] downloadPhoto(Integer id) {
         Shared shared = sharedTranslator.getSharedByUserId(id);
         User user = userTranslator.getUserById(shared.getUserId().getUserId());
         Photo photo = photoTranslator.getPhotoById(shared.getPhotoId().getPhotoId());
 
-        String path = String.format("%s/%s",
-                AwsBucket.PROFILE_IMAGE.getAwsBucket(),
-                user.getUserId());
-        return awsTranslator.download(path, photo.getPhotoLink());
+        String path = String.format("%s",
+                AwsBucket.PROFILE_IMAGE.getAwsBucket());
+        String key = String.format("%s/%s", user.getUserId(), photo.getPhotoLink());
+        LOGGER.info("The path and key is {}/{}", path, key);
+        return awsTranslator.download(path, key);
     }
 
     private void isPhotoEmpty(MultipartFile photo) {
