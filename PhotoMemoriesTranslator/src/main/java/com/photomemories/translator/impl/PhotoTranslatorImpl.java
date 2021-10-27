@@ -50,11 +50,16 @@ public class PhotoTranslatorImpl implements PhotoTranslator {
     }
 
     @Override
-    public boolean deletePhoto(Integer id) throws Exception {
+    public Integer deletePhoto(Integer id) throws Exception {
         LOGGER.info("[Photo Translator log] deletePhoto method, input id: {}", id);
-        boolean deleteValue = photoRepository.deleteByPhotoId(id);
+        int deleteValue = photoRepository.deleteByPhotoId(id);
         LOGGER.info("[Photo Translator log] deletePhoto method, (exists?): {}", deleteValue);
         return deleteValue;
+    }
+
+    @Override
+    public List<Photo> getAllPhotos() {
+        return photoRepository.findAll();
     }
 
     //TODO: Update method

@@ -74,6 +74,19 @@ public class PhotoController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/getAllPhotos")
+    @ApiOperation(value = "Checks if a photo exists based on their id.", notes = "Tries to fetch a photo by id from the DB.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Member found by email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 404, message = "Could not found a member by this email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
+    public ResponseEntity<PhotoMemoriesResponse<List<PhotoDto>>> getAllPhotos() throws SQLException {
+        List<PhotoDto> photoResponse = photoCRUDService.getAllPhotos();
+        PhotoMemoriesResponse<List<PhotoDto>> response = new PhotoMemoriesResponse<>(true, photoResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @GetMapping("/getAllPhotosOfUser/{id}/id/{email}/email")
     @ApiOperation(value = "Gets a list of photos exists based on its id and the users email.", notes = "Tries to fetch a photo by id from the DB.")
     @ApiResponses(value = {
@@ -97,11 +110,11 @@ public class PhotoController {
             @ApiResponse(code = 400, message = "Bad Request: could not resolve deleting the photo by id", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 404, message = "Could not found the photo with this id", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
-    public ResponseEntity<PhotoMemoriesResponse<Boolean>> deletePhoto(
+    public ResponseEntity<PhotoMemoriesResponse<Integer>> deletePhoto(
             @ApiParam(value = "The id of each user", example = "1", name = "id", required = true)
             @PathVariable("id") Integer id) throws Exception {
-        boolean photoResponse = photoCRUDService.deletePhoto(id);
-        PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, photoResponse);
+        int photoResponse = photoCRUDService.deletePhoto(id);
+        PhotoMemoriesResponse<Integer> response = new PhotoMemoriesResponse<>(true, photoResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

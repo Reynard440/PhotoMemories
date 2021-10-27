@@ -13,7 +13,9 @@ public interface PhotoCRUDService {
 
     List<PhotoDto> getByPhotoIdAndShares_UserId_Email(Integer id, String email);
 
+    List<PhotoDto> getAllPhotos();
+
     boolean photoExists(Integer id);
 
-    boolean deletePhoto(Integer id) throws Exception;
+    Integer deletePhoto(Integer id) throws Exception;
 }

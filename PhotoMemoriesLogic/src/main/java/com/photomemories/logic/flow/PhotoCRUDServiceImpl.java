@@ -58,6 +58,15 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     }
 
     @Override
+    public List<PhotoDto> getAllPhotos() {
+        List<PhotoDto> photos = new ArrayList<>();
+        for(Photo photo : photoTranslator.getAllPhotos()) {
+            photos.add(new PhotoDto(photo));
+        }
+        return photos;
+    }
+
+    @Override
     public boolean photoExists(Integer id) {
         LOGGER.info("[Photo Logic log] photoExists method, queried id: {}", id);
         boolean returnPhotoLogicValue = photoTranslator.photoExists(id);
@@ -66,7 +75,7 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     }
 
     @Override
-    public boolean deletePhoto(Integer id) throws Exception {
+    public Integer deletePhoto(Integer id) throws Exception {
         LOGGER.info("[Photo Logic log] deletePhoto method, queried id: {}", id);
         boolean beforeDelete = photoTranslator.photoExists(id);
         LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", beforeDelete);
@@ -74,7 +83,7 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
             LOGGER.warn("Photo with id {} does not exists", id);
             throw new RuntimeException("Photo deletion error");
         }
-        boolean photoDelete = photoTranslator.deletePhoto(id);
+        int photoDelete = photoTranslator.deletePhoto(id);
         boolean afterDelete = photoTranslator.photoExists(id);
         LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", afterDelete);
         return photoDelete;

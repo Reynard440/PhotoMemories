@@ -27,7 +27,7 @@ public interface PhotoRepository extends JpaRepository<Photo, Integer> {
     @Transactional
     @Modifying
     @Query("delete from Photo p where p.PhotoId = ?1")
-    boolean deleteByPhotoId(Integer PhotoId);
+    int deleteByPhotoId(Integer PhotoId);
 
     @Query("select (count(p) > 0) from Photo p where p.PhotoId = ?1")
     boolean existsByPhotoId(Integer PhotoId);

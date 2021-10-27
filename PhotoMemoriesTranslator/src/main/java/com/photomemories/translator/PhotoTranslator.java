@@ -17,5 +17,7 @@ public interface PhotoTranslator {
 
     boolean photoExists(Integer id);
 
-    boolean deletePhoto(Integer id) throws Exception;
+    Integer deletePhoto(Integer id) throws Exception;
+
+    List<Photo> getAllPhotos();
 }
