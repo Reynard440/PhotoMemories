@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class PhotoTranslatorImpl implements PhotoTranslator {
     private static final Logger LOGGER = LoggerFactory.getLogger(PhotoTranslatorImpl.class);
@@ -27,6 +29,16 @@ public class PhotoTranslatorImpl implements PhotoTranslator {
     @Override
     public Photo getPhotoById(Integer id) {
         return photoRepository.findByPhotoId(id);
+    }
+
+    @Override
+    public Photo findByPhotoNameAndPhotoFormat(String name, String format) {
+        return photoRepository.findByPhotoNameAndPhotoFormat(name, format);
+    }
+
+    @Override
+    public List<Photo> findByPhotoIdAndShares_UserId_Email(Integer id, String email) {
+        return photoRepository.findByPhotoIdAndShares_UserId_Email(id, email);
     }
 
     @Override

@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component("photoServiceFlow")
 public class PhotoCRUDServiceImpl implements PhotoCRUDService {
@@ -42,6 +45,16 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     @Override
     public PhotoDto getPhotoDtoById(Integer id) {
         return new PhotoDto(photoTranslator.getPhotoById(id));
+    }
+
+    @Override
+    public PhotoDto getByPhotoNameAndPhotoFormat(String name, String format) {
+        return new PhotoDto(photoTranslator.findByPhotoNameAndPhotoFormat(name, format));
+    }
+
+    @Override
+    public List<PhotoDto> getByPhotoIdAndShares_UserId_Email(Integer id, String email) {
+        return photoTranslator.findByPhotoIdAndShares_UserId_Email(id, email).stream().map(PhotoDto::new).collect(Collectors.toList());
     }
 
     @Override

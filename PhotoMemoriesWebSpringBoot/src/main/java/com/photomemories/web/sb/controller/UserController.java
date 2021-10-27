@@ -1,5 +1,6 @@
 package com.photomemories.web.sb.controller;
 
+import com.photomemories.domain.dto.PhotoDto;
 import com.photomemories.domain.dto.UserDto;
 import com.photomemories.domain.service.PhotoMemoriesResponse;
 import com.photomemories.logic.UserCRUDService;
@@ -44,7 +45,8 @@ public class UserController {
     @GetMapping("/userExists/{id}")
     @ApiOperation(value = "Checks if a user exists based on their id.", notes = "Tries to fetch a user by id from the DB.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Photo exists", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 200, message = "User exists", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 302, message = "User found", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by id", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 404, message = "Could not found the user with this id", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
@@ -85,6 +87,21 @@ public class UserController {
             @PathVariable("id") Integer id) throws Exception {
         int userResponse = userCRUDService.deleteUser(id);
         PhotoMemoriesResponse<Integer> response = new PhotoMemoriesResponse<>(true, userResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/getUserById/{id}")
+    @ApiOperation(value = "Checks if a photo exists based on their id.", notes = "Tries to fetch a photo by id from the DB.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "User found by id", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by id", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 404, message = "Could not found a user with this id", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
+    public ResponseEntity<PhotoMemoriesResponse<UserDto>> getUserById(
+            @ApiParam(value = "The id of each user", example = "1", name = "id", required = true)
+            @PathVariable("id") Integer id) throws SQLException {
+        UserDto userResponse = userCRUDService.getUserDtoById(id);
+        PhotoMemoriesResponse<UserDto> response = new PhotoMemoriesResponse<>(true, userResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

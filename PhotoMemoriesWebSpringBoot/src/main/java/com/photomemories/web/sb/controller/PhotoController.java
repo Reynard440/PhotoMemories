@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
+import java.util.List;
 
 @RestController
 @RequestMapping(path="/v1/c2")
@@ -55,6 +56,37 @@ public class PhotoController {
             @PathVariable("id") Integer id) throws SQLException {
         boolean photoResponse = photoCRUDService.photoExists(id);
         PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, photoResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/getPhotoById/{id}")
+    @ApiOperation(value = "Checks if a photo exists based on their id.", notes = "Tries to fetch a photo by id from the DB.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Member found by email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 404, message = "Could not found a member by this email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
+    public ResponseEntity<PhotoMemoriesResponse<PhotoDto>> getPhotoById(
+            @ApiParam(value = "The id of each photo", example = "1", name = "id", required = true)
+            @PathVariable("id") Integer id) throws SQLException {
+        PhotoDto photoResponse = photoCRUDService.getPhotoDtoById(id);
+        PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/getAllPhotosOfUser/{id}/id/{email}/email")
+    @ApiOperation(value = "Gets a list of photos exists based on its id and the users email.", notes = "Tries to fetch a photo by id from the DB.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Member found by email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 404, message = "Could not found a member by this email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
+    public ResponseEntity<PhotoMemoriesResponse<List<PhotoDto>>> getAllPhotosOfUser(
+            @ApiParam(value = "The id of each photo", example = "1", name = "id", required = true)
+            @PathVariable("id") Integer id,
+            @PathVariable("email") String email) throws SQLException {
+        List<PhotoDto> photoResponse = photoCRUDService.getByPhotoIdAndShares_UserId_Email(id, email);
+        PhotoMemoriesResponse<List<PhotoDto>> response = new PhotoMemoriesResponse<>(true, photoResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

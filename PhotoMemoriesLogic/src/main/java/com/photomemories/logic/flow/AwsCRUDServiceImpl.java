@@ -38,7 +38,7 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
     }
 
     @Override
-    public void uploadPhoto(Integer id, MultipartFile photo) {
+    public void uploadPhoto(Integer id, MultipartFile photo){
         isPhotoEmpty(photo);
 
         isPhoto(photo);
@@ -62,7 +62,7 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
 
     //TODO: convert from application-octet/stream to the actual image
     @Override
-    public byte[] downloadPhoto(Integer id, String imageName) {
+    public byte[] downloadPhoto(Integer id, String imageName){
         Shared shared = sharedTranslator.getSharedByUserId(id);
         User user = userTranslator.getUserById(shared.getUserId().getUserId());
         Photo photo = photoTranslator.getPhotoById(shared.getPhotoId().getPhotoId());

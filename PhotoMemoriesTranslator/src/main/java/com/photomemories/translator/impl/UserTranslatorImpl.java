@@ -1,5 +1,6 @@
 package com.photomemories.translator.impl;
 
+import com.amazonaws.services.connect.model.UserNotFoundException;
 import com.photomemories.domain.persistence.User;
 import com.photomemories.repo.persistence.UserRepository;
 import com.photomemories.translator.UserTranslator;
@@ -26,7 +27,7 @@ public class UserTranslatorImpl implements UserTranslator {
 
     @Override
     public User getUserById(Integer id) {
-        return userRepository.findByUserId(id);
+        return userRepository.findByUserId(id).orElseThrow(() -> new UserNotFoundException("User with id " + id + " was not found"));
     }
 
     @Override

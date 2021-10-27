@@ -7,10 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("select u from User u where u.UserId = ?1")
-    User findByUserId(Integer UserId);
+    Optional<User> findByUserId(Integer UserId);
 
     @Query("select (count(u) > 0) from User u where u.UserHashPassword = ?1 and u.Email = ?2")
     boolean existsByUserHashPasswordAndEmail(String UserHashPassword, String Email);
