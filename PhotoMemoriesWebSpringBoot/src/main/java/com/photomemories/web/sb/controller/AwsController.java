@@ -1,6 +1,7 @@
 package com.photomemories.web.sb.controller;
 
 import com.photomemories.logic.AwsCRUDService;
+import io.netty.handler.codec.base64.Base64Decoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,15 +25,17 @@ public class AwsController {
     }
 
     @PostMapping(
-            path = "{userProfileId}/image/upload",
+            path = "/image/upload",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public void uploadPhoto(@PathVariable("userProfileId") Integer userProfileId,
-                                       @RequestParam("file") MultipartFile photo) {
-        awsCRUDService.uploadPhoto(userProfileId, photo);
+    public void uploadPhoto(@RequestParam("userId") Integer userId,
+                                       @RequestParam("photo") MultipartFile photo) {
+        awsCRUDService.uploadToS3(userId, photo);
     }
 
-    @GetMapping("{userProfileId}/image/{imageName}/download")
+    @GetMapping(
+            path = "{userProfileId}/image/{imageName}/download",
+            produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE})
     public byte[] downloadPhoto(@PathVariable("userProfileId")Integer userProfileId, @PathVariable("imageName")String imageName) {
         return awsCRUDService.downloadPhoto(userProfileId, imageName);
     }

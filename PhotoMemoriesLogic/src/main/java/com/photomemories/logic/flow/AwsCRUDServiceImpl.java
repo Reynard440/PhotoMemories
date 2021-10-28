@@ -38,29 +38,30 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
     }
 
     @Override
-    public void uploadPhoto(Integer id, MultipartFile photo){
+    public void uploadToS3(Integer id, MultipartFile photo){
         isPhotoEmpty(photo);
 
         isPhoto(photo);
 
-        Map<String, String> metadata = extractMetadata(photo);
+        Map<String, String> extraData = getMetadata(photo);
 
         Shared shared = sharedTranslator.getSharedByUserId(id);
         User user = userTranslator.getUserById(shared.getUserId().getUserId());
         Photo p = photoTranslator.getPhotoById(shared.getPhotoId().getPhotoId());
 
+        LOGGER.info("File name {}", photo.getOriginalFilename());
+
         String path = String.format("%s/%s", AwsBucket.PROFILE_IMAGE.getAwsBucket(), user.getUserId());
-        String filename = String.format("%s-%s", photo.getOriginalFilename(), user.getUserId());
+        String filename = String.format("%s", photo.getOriginalFilename());
         try {
-            awsTranslator.save(path, filename, Optional.of(metadata), photo.getInputStream());
+            awsTranslator.save(path, filename, Optional.of(extraData), photo.getInputStream());
             p.setPhotoLink(filename);
+            p.setPhotoName(photo.getOriginalFilename());
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
-
-    //TODO: convert from application-octet/stream to the actual image
     @Override
     public byte[] downloadPhoto(Integer id, String imageName){
         Shared shared = sharedTranslator.getSharedByUserId(id);
@@ -69,7 +70,7 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
 
         String path = String.format("%s",
                 AwsBucket.PROFILE_IMAGE.getAwsBucket());
-        String key = String.format("%s/%s", user.getUserId(), photo.getPhotoLink());
+        String key = String.format("%s/%s", user.getUserId(), imageName);
         LOGGER.info("The path and key is {}/{}", path, key);
         return awsTranslator.download(path, key);
     }
@@ -81,7 +82,7 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
 
     private void isPhotoEmpty(MultipartFile photo) {
         if (photo.isEmpty()) {
-            throw new IllegalStateException("Cannot upload empty file [ " + photo.getSize() + " ]");
+            throw new IllegalStateException("No photo provided [ " + photo.getSize() + " ]");
         }
     }
 
@@ -93,14 +94,15 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
                 IMAGE_BMP.getMimeType(),
                 IMAGE_TIFF.getMimeType(),
                 IMAGE_WEBP.getMimeType()).contains(photo.getContentType())) {
-            throw new IllegalStateException("File must be an image [" + photo.getContentType() + "]");
+            throw new IllegalStateException("Photo must be an image of type [" + photo.getContentType() + "]");
         }
     }
 
-    private Map<String, String> extractMetadata(MultipartFile photo) {
-        Map<String,String> metadata = new HashMap<>();
-        metadata.put("Content-Type", photo.getContentType());
-        metadata.put("Content-Length", String.valueOf(photo.getSize()));
-        return metadata;
+    private Map<String, String> getMetadata(MultipartFile photo) {
+        Map<String,String> data = new HashMap<>();
+        data.put("Content-Type", photo.getContentType());
+        LOGGER.info("The content-Type is {}", photo.getContentType());
+        data.put("Content-Length", String.valueOf(photo.getSize()));
+        return data;
     }
 }

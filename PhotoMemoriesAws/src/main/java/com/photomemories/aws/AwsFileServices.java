@@ -12,5 +12,5 @@ public interface AwsFileServices {
 
     byte[] download(String path, String key);
 
-    List<FileUpload> getAllPhotos (Integer id);
+    List<Object> getAllPhotos (Integer id);
 }

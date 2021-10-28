@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Import;
 @Import({RepositoryConfig.class, AwsConfig.class})
 @Configuration
 @ComponentScan(basePackages = {
-        "com.photomemories.translator"
+        "com.photomemories.translator",
+        "com.photomemories.aws"
 })
 public class TranslatorConfig {
 

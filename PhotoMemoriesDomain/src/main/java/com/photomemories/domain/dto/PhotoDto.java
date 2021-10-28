@@ -169,6 +169,14 @@ public class PhotoDto implements Serializable {
         this.PhotoCapturedBy = photoCapturedBy;
     }
 
+    public PhotoDto(Integer photoId, String photoName, LocalDate dateModified, String photoLocation, String photoCapturedBy) {
+        this.PhotoId = photoId;
+        this.PhotoName = photoName;
+        this.DateModified = dateModified;
+        this.PhotoLocation = photoLocation;
+        this.PhotoCapturedBy = photoCapturedBy;
+    }
+
     public PhotoDto(Photo photo){
         this.PhotoId = photo.getPhotoId();
         this.PhotoName = photo.getPhotoName();
