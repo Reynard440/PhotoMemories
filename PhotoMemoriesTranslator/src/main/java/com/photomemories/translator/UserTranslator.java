@@ -9,6 +9,10 @@ public interface UserTranslator {
 
     User getUserById(Integer id);
 
+    User getUserByEmail(String email);
+
+    boolean userExistsWithEmail(String email);
+
     boolean userExists(Integer id);
 
     Integer deleteUser(Integer id) throws Exception;

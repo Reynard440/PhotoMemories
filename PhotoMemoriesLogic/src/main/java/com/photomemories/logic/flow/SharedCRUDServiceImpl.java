@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 @Component("sharedServiceFlow")
@@ -29,6 +31,7 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
         this.photoTranslator = photoTranslator;
     }
 
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
     @Override
     public SharedDto createSharedDto(SharedDto sharedDto) throws Exception {
         try {
@@ -40,21 +43,21 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
                 LOGGER.warn("[Shared Logic log] input Dto contained invalid photo id: {}", "invalid");
                 sharedDto.setSharedId(0);
             }
-//            LOGGER.info("[Shared Logic log] input Dto object is: {}", sharedDto);
+
             Shared shared = sharedDto.buildShared();
-//            LOGGER.info("[Shared Logic log] Dto Object converted to persistence is: {}", shared);
+
             Shared addedShared = sharedTranslator.addShared(shared);
-//            LOGGER.info("[Shared Logic log] object saved to database: {}", addedShared);
+
             SharedDto returnShared = new SharedDto(sharedTranslator.addShared(addedShared));
-//            LOGGER.info("[Shared Logic log] Dto returned: {}", returnShared);
+
             return returnShared;
         } catch (Exception e) {
-            throw new RuntimeException("Shared record could not be created!", e);
+            throw new RuntimeException("Could not complete the action", e);
         }
     }
 
     @Override
-    public SharedDto getSHaredByUserId(Integer id) {
+    public SharedDto getSharedByUserId(Integer id) {
         return new SharedDto(sharedTranslator.getSharedByUserId(id));
     }
 }

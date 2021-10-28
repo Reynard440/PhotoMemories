@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -37,6 +38,7 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
         this.awsTranslator = awsTranslator;
     }
 
+    @Transactional(rollbackOn = {IllegalStateException.class, RuntimeException.class})
     @Override
     public void uploadToS3(Integer id, MultipartFile photo){
         isPhotoEmpty(photo);

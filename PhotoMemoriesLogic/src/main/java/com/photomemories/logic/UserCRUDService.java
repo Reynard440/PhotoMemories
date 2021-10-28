@@ -7,6 +7,8 @@ public interface UserCRUDService {
 
     UserDto getUserDtoById(Integer id);
 
+    UserDto getUserDtoByEmail(String email);
+
     boolean userExists(Integer id);
 
     Integer deleteUser(Integer id) throws Exception;

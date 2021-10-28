@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
+import java.sql.SQLException;
+
 @Component
 public class SharedTranslatorImpl implements SharedTranslator {
     private static final Logger LOGGER = LoggerFactory.getLogger(SharedTranslatorImpl.class);
@@ -18,8 +21,9 @@ public class SharedTranslatorImpl implements SharedTranslator {
         this.sharedRepository = sharedRepository;
     }
 
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
     @Override
-    public Shared addShared(Shared shared) throws Exception {
+    public Shared addShared(Shared shared) throws SQLException {
         return sharedRepository.save(shared);
     }
 

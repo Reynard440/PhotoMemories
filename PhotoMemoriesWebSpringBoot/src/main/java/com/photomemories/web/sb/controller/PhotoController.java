@@ -1,10 +1,14 @@
 package com.photomemories.web.sb.controller;
 
 import com.photomemories.domain.dto.PhotoDto;
+import com.photomemories.domain.dto.SharedDto;
+import com.photomemories.domain.dto.UserDto;
+import com.photomemories.domain.persistence.Shared;
 import com.photomemories.domain.service.PhotoMemoriesResponse;
 import com.photomemories.logic.AwsCRUDService;
 import com.photomemories.logic.PhotoCRUDService;
 import com.photomemories.logic.SharedCRUDService;
+import com.photomemories.logic.UserCRUDService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -19,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
@@ -29,13 +34,18 @@ public class PhotoController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PhotoController.class);
     private final PhotoCRUDService photoCRUDService;
     private final AwsCRUDService awsCRUDService;
+    private final UserCRUDService userCRUDService;
+    private final SharedCRUDService sharedCRUDService;
 
     @Autowired
-    public PhotoController(PhotoCRUDService photoCRUDService, AwsCRUDService awsCRUDService) {
+    public PhotoController(PhotoCRUDService photoCRUDService, SharedCRUDService sharedCRUDService, AwsCRUDService awsCRUDService, UserCRUDService userCRUDService) {
         this.photoCRUDService = photoCRUDService;
         this.awsCRUDService = awsCRUDService;
+        this.userCRUDService = userCRUDService;
+        this.sharedCRUDService = sharedCRUDService;
     }
 
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
     @PostMapping(
             path = "/addNewPhoto",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -56,13 +66,26 @@ public class PhotoController {
             @RequestParam("photoFormat") String photoFormat,
             @RequestParam("photoCapturedBy") String photoCapturedBy,
             @RequestParam("photoId") Integer photoId,
+            @RequestParam("email") String email,
             @RequestParam("userId") Integer userId,
             @RequestParam("photo") MultipartFile photo) throws Exception {
-        PhotoDto photoDto = new PhotoDto(photoId, photoName, photoSize, LocalDate.now(), LocalDate.now(), photoLink, photoLocation, photoFormat, photoCapturedBy);
-        PhotoDto photoResponse = photoCRUDService.createPhotoDto(photoDto);
-        awsCRUDService.uploadToS3(userId, photo);
-        PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        UserDto user = userCRUDService.getUserDtoByEmail(email);
+        if (user != null) {
+            SharedDto sharedDto = new SharedDto();
+            sharedDto.setSharedHasAccess(false);
+            sharedDto.setPhotoId(photoId);
+            sharedDto.setSharedDate(LocalDate.now());
+            sharedDto.setUserId(userId);
+            sharedDto.setSharedWith(0);
+            SharedDto dto = sharedCRUDService.createSharedDto(sharedDto);
+            PhotoDto photoDto = new PhotoDto(photoId, photoName, photoSize, LocalDate.now(), LocalDate.now(), photoLink, photoLocation, photoFormat, photoCapturedBy);
+            PhotoDto photoResponse = photoCRUDService.createPhotoDto(photoDto);
+            awsCRUDService.uploadToS3(user.getUserId(), photo);
+            PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        }
+        throw new RuntimeException("Could not add the photo");
+        //return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
     }
 
     @GetMapping("/photoExists/{id}")

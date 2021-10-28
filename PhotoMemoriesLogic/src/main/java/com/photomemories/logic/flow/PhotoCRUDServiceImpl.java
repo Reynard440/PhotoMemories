@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,14 +26,13 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PhotoCRUDServiceImpl.class);
 
     private final PhotoTranslator photoTranslator;
-    private final SharedTranslator sharedTranslator;
 
     @Autowired
-    public PhotoCRUDServiceImpl(PhotoTranslator photoTranslator, SharedTranslator sharedTranslator) {
+    public PhotoCRUDServiceImpl(PhotoTranslator photoTranslator) {
         this.photoTranslator = photoTranslator;
-        this.sharedTranslator = sharedTranslator;
     }
 
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
     @Override
     public PhotoDto createPhotoDto(PhotoDto photoDto) throws Exception {
         try {

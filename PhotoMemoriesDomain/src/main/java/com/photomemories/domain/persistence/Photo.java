@@ -42,7 +42,7 @@ public class Photo implements Serializable {
     @Column(name = "PH_CAPTUREDBY", nullable = false)
     private String PhotoCapturedBy;
 
-    @OneToMany(targetEntity = Shared.class, mappedBy = "PhotoId", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(targetEntity = Shared.class, mappedBy = "PhotoId"/*, orphanRemoval = true, cascade = CascadeType.ALL*/)
     @JsonManagedReference
     private Set<Shared> shares;
 

@@ -52,6 +52,14 @@ public class UserCRUDServiceImpl implements UserCRUDService {
         return new UserDto(userTranslator.getUserById(id));
     }
 
+    @Override
+    public UserDto getUserDtoByEmail(String email) {
+        if (!userTranslator.userExistsWithEmail(email)) {
+            throw new RuntimeException("User with email " + email + " does not exist");
+        }
+        return new UserDto(userTranslator.getUserByEmail(email));
+    }
+
     private void isUniqueUser(UserDto userDto) throws Exception {
         if (userTranslator.registerCheck(userDto.getPhoneNumber(), userDto.getEmail())) {
             LOGGER.warn("User with phone number: {} and email: {} already exists", userDto.getPhoneNumber(), userDto.getEmail());
@@ -66,7 +74,6 @@ public class UserCRUDServiceImpl implements UserCRUDService {
         LOGGER.info("[User Logic log] userExists method, result: {}", returnLogicValue);
         return returnLogicValue;
     }
-
 
     @Override
     public Integer deleteUser(Integer id) throws Exception {
