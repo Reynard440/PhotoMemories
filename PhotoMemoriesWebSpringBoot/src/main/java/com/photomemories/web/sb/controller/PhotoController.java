@@ -1,10 +1,10 @@
 package com.photomemories.web.sb.controller;
 
 import com.photomemories.domain.dto.PhotoDto;
-import com.photomemories.domain.dto.UserDto;
 import com.photomemories.domain.service.PhotoMemoriesResponse;
+import com.photomemories.logic.AwsCRUDService;
 import com.photomemories.logic.PhotoCRUDService;
-import com.photomemories.logic.UserCRUDService;
+import com.photomemories.logic.SharedCRUDService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -12,11 +12,15 @@ import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -24,22 +28,39 @@ import java.util.List;
 public class PhotoController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PhotoController.class);
     private final PhotoCRUDService photoCRUDService;
+    private final AwsCRUDService awsCRUDService;
 
     @Autowired
-    public PhotoController(PhotoCRUDService photoCRUDService) {
+    public PhotoController(PhotoCRUDService photoCRUDService, AwsCRUDService awsCRUDService) {
         this.photoCRUDService = photoCRUDService;
+        this.awsCRUDService = awsCRUDService;
     }
 
-    @PostMapping("/addNewPhoto")
+    @PostMapping(
+            path = "/addNewPhoto",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Create a new Photo.", notes = "Adds a new Photo in the DB.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Photo successfully created", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 400, message = "Bad Request: could not resolve the creation of the new photo.", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
     public ResponseEntity<PhotoMemoriesResponse<PhotoDto>> addNewPhoto(
-            @ApiParam(value = "Request body to create a new Photo", required = true)
-            @RequestBody PhotoDto photoDto) throws Exception {
+            @ApiParam(value = "Date of photo uploaded", example = "2021-10-12", name = "modifiedDate", required = true)
+            @RequestParam("modifiedDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate modifiedDate,
+            @RequestParam("photoLink") String photoLink,
+            @RequestParam("photoLocation") String photoLocation,
+            @RequestParam("photoSize") double photoSize,
+            @ApiParam(value = "Date of photo uploaded", example = "2021-10-28", name = "photoUploadDate", required = true)
+            @RequestParam("photoUploadDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate photoUploadDate,
+            @RequestParam("photoName") String photoName,
+            @RequestParam("photoFormat") String photoFormat,
+            @RequestParam("photoCapturedBy") String photoCapturedBy,
+            @RequestParam("photoId") Integer photoId,
+            @RequestParam("userId") Integer userId,
+            @RequestParam("photo") MultipartFile photo) throws Exception {
+        PhotoDto photoDto = new PhotoDto(photoId, photoName, photoSize, LocalDate.now(), LocalDate.now(), photoLink, photoLocation, photoFormat, photoCapturedBy);
         PhotoDto photoResponse = photoCRUDService.createPhotoDto(photoDto);
+        awsCRUDService.uploadToS3(userId, photo);
         PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }

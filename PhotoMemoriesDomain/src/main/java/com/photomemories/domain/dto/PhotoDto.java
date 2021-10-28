@@ -85,7 +85,7 @@ public class PhotoDto implements Serializable {
             name = "Photo modified date",
             notes = "Modified date of the photo.",
             dataType = "java.lang.LocalDate",
-            example = "2012-01-01")
+            example = "2021-10-28")
     public LocalDate getDateModified() {
         return DateModified;
     }

@@ -1,7 +1,6 @@
 package com.photomemories.web.sb.controller;
 
 import com.photomemories.logic.AwsCRUDService;
-import io.netty.handler.codec.base64.Base64Decoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping(path ="/v1/c4")

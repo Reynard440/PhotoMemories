@@ -20,7 +20,6 @@ public class SharedTranslatorImpl implements SharedTranslator {
 
     @Override
     public Shared addShared(Shared shared) throws Exception {
-//        LOGGER.info("[Shared Translator log] addShared method, input object: {}", shared);
         return sharedRepository.save(shared);
     }
 
