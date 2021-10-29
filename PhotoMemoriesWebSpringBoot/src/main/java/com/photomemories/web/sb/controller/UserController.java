@@ -90,6 +90,8 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    //TODO: Update photo method
+
     @GetMapping("/getUserById/{id}")
     @ApiOperation(value = "Checks if a photo exists based on their id.", notes = "Tries to fetch a photo by id from the DB.")
     @ApiResponses(value = {

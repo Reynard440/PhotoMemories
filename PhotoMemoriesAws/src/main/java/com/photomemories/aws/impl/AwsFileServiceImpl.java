@@ -58,6 +58,10 @@ public class AwsFileServiceImpl implements AwsFileServices {
         }
     }
 
+    //TODO: Delete photo method
+
+    //TODO: Update photo method
+
     @Override
     public List<Object> getAllPhotos(Integer id) {
         ListObjectsV2Request listObjectsV2Request = new ListObjectsV2Request().withBucketName(AwsBucket.PROFILE_IMAGE.getAwsBucket());

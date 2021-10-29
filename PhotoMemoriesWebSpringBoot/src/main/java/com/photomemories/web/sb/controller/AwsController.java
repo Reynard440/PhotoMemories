@@ -38,6 +38,10 @@ public class AwsController {
         return awsCRUDService.downloadPhoto(userProfileId, imageName);
     }
 
+    //TODO: Delete photo method
+
+    //TODO: Update photo method
+
     @GetMapping("{id}/user/photos")
     public List<Object> getAllPhotos(@PathVariable("id")Integer id) {
         return awsCRUDService.getAllPhotosOfUser(id);

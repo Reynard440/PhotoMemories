@@ -60,6 +60,8 @@ public class UserTranslatorImpl implements UserTranslator {
         return deleteValue;
     }
 
+    //TODO: Update user method
+
     @Override
     public boolean loginUser(String password, String email) throws Exception {
         LOGGER.info("[User Translator log] loginUser method, input password: {}, and email: {}", password, email);

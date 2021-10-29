@@ -23,6 +23,8 @@ public interface PhotoRepository extends JpaRepository<Photo, Integer> {
     @Query("select p from Photo p where p.PhotoId = ?1")
     Photo findByPhotoId(Integer PhotoId);
 
+    //TODO: Update photo method
+
     //TODO: replace boolean with int for the delete photo method!!!
     @Transactional
     @Modifying

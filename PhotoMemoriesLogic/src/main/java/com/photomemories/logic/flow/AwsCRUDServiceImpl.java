@@ -77,6 +77,10 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
         return awsTranslator.download(path, key);
     }
 
+    //TODO: Delete photo method
+
+    //TODO: Update photo method
+
     @Override
     public List<Object> getAllPhotosOfUser(Integer id) {
         return awsTranslator.getAllUserPhotos(id);

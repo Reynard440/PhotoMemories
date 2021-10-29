@@ -14,5 +14,9 @@ public interface AwsTranslator {
 
     byte[] download(String path, String key);
 
+    //TODO: Delete photo method
+
+    //TODO: Update photo method
+
     List<Object> getAllUserPhotos(Integer id);
 }

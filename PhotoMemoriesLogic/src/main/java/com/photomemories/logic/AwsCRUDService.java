@@ -10,5 +10,9 @@ public interface AwsCRUDService {
 
     byte[] downloadPhoto(Integer id, String imageName);
 
+    //TODO: Delete photo method
+
+    //TODO: Update photo method
+
     List<Object> getAllPhotosOfUser(Integer id);
 }

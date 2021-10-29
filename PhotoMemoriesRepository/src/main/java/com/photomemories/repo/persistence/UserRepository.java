@@ -26,6 +26,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("select (count(u) > 0) from User u where u.PhoneNumber = ?1 and u.Email = ?2")
     boolean existsByPhoneNumberAndEmail(String PhoneNumber, String Email);
 
+    //TODO: Update user method
+
     @Transactional
     @Modifying
     @Query("delete from User u where u.UserId = ?1")

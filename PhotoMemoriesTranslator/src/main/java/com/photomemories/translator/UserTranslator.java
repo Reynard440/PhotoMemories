@@ -17,6 +17,8 @@ public interface UserTranslator {
 
     Integer deleteUser(Integer id) throws Exception;
 
+    //TODO: Update user method
+
     boolean loginUser(String password, String email) throws Exception;
 
     boolean registerCheck(String phoneNumber, String email) throws Exception;

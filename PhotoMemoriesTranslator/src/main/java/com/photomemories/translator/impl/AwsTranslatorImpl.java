@@ -42,6 +42,10 @@ public class AwsTranslatorImpl implements AwsTranslator {
         }
     }
 
+    //TODO: Delete photo method
+
+    //TODO: Update photo method
+
     @Override
     public List<Object> getAllUserPhotos(Integer id) {
         LOGGER.info("Bucket name {} {} {}", AwsBucket.PROFILE_IMAGE.getAwsBucket(), id, "/");
