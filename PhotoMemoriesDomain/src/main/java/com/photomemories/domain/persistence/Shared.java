@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-@Table(name = "Shared", schema = "PhotoMemoriesDB")
+@Table(name = "Shared", schema = "local_photo_memories_db")
 public class Shared implements Serializable {
     private static final long serialVersionUID = -807419981572411616L;
 
