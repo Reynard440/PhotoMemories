@@ -77,10 +77,10 @@ public class PhotoController {
             sharedDto.setSharedDate(LocalDate.now());
             sharedDto.setUserId(userId);
             sharedDto.setSharedWith(0);
-            SharedDto dto = sharedCRUDService.createSharedDto(sharedDto);
             PhotoDto photoDto = new PhotoDto(photoId, photoName, photoSize, LocalDate.now(), LocalDate.now(), photoLink, photoLocation, photoFormat, photoCapturedBy);
             PhotoDto photoResponse = photoCRUDService.createPhotoDto(photoDto);
-            awsCRUDService.uploadToS3(user.getUserId(), photo);
+            SharedDto dto = sharedCRUDService.createSharedDto(sharedDto);
+            awsCRUDService.uploadToS3(user.getEmail(), photo);
             PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         }

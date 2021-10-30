@@ -1,14 +1,20 @@
 package com.photomemories.web.sb.controller;
 
+import com.amazonaws.services.s3.model.ObjectListing;
 import com.photomemories.logic.AwsCRUDService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 @RestController
 @RequestMapping(path ="/v1/c4")
@@ -26,24 +32,35 @@ public class AwsController {
             path = "/image/upload",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public void uploadPhoto(@RequestParam("userId") Integer userId,
-                                       @RequestParam("photo") MultipartFile photo) {
-        awsCRUDService.uploadToS3(userId, photo);
+    public void uploadPhoto(@RequestParam("email") String email,
+                                       @RequestParam("photo") MultipartFile photo) throws IOException {
+        awsCRUDService.uploadToS3(email, photo);
     }
 
     @GetMapping(
-            path = "{userProfileId}/image/{imageName}/download",
-            produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE})
-    public byte[] downloadPhoto(@PathVariable("userProfileId")Integer userProfileId, @PathVariable("imageName")String imageName) {
-        return awsCRUDService.downloadPhoto(userProfileId, imageName);
+            path = "/{email}/image/{imageName}/download")
+    public ResponseEntity<ByteArrayResource> downloadPhoto(@PathVariable("email")String email, @PathVariable("imageName")String imageName) {
+        byte[] imageData = awsCRUDService.downloadPhoto(email, imageName);
+        ByteArrayResource arrayResource = new ByteArrayResource(imageData);
+        return ResponseEntity
+                .ok()
+                .contentLength(imageData.length)
+                .header("Content-type", "application/octet-stream")
+                .header("Content-disposition", "attachment; filename=\"" + imageName + "\"")
+                .body(arrayResource);
     }
 
-    //TODO: Delete photo method
+    @DeleteMapping(value = "/deletePhoto")
+    public void deletePhoto(
+            @RequestParam("fileName") String fileName,
+            @RequestParam("email") String email) throws Exception {
+        awsCRUDService.deletePhoto(fileName, email);
+    }
 
     //TODO: Update photo method
 
-    @GetMapping("{id}/user/photos")
-    public List<Object> getAllPhotos(@PathVariable("id")Integer id) {
-        return awsCRUDService.getAllPhotosOfUser(id);
+    @GetMapping("{folderName}/user/photos")
+    public ObjectListing getAllPhotos(@PathVariable("folderName")String folderName) {
+        return awsCRUDService.getAllPhotosOfUser(folderName);
     }
 }

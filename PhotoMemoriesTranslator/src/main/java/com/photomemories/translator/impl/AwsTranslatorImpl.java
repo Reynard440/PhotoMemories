@@ -1,5 +1,6 @@
 package com.photomemories.translator.impl;
 
+import com.amazonaws.services.s3.model.ObjectListing;
 import com.photomemories.aws.AwsFileServices;
 import com.photomemories.domain.persistence.AwsBucket;
 import com.photomemories.translator.AwsTranslator;
@@ -9,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -42,13 +42,21 @@ public class AwsTranslatorImpl implements AwsTranslator {
         }
     }
 
-    //TODO: Delete photo method
+    @Override
+    public boolean deletePhotoFromFolder(String fileName) {
+        try {
+            awsFileServices.deletePhotoFromFolder(fileName);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Could not delete the photo", e);
+        }
+        return false;
+    }
 
     //TODO: Update photo method
 
     @Override
-    public List<Object> getAllUserPhotos(Integer id) {
-        LOGGER.info("Bucket name {} {} {}", AwsBucket.PROFILE_IMAGE.getAwsBucket(), id, "/");
-        return awsFileServices.getAllPhotos(id);
+    public ObjectListing getAllUserPhotos(String folderName) {
+        LOGGER.info("Bucket name {} {} {}", AwsBucket.PROFILE_IMAGE.getAwsBucket(), folderName, "/");
+        return awsFileServices.getAllPhotos(folderName);
     }
 }

@@ -1,10 +1,9 @@
 package com.photomemories.translator;
 
-import io.netty.handler.codec.http.multipart.FileUpload;
+import com.amazonaws.services.s3.model.ObjectListing;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -14,9 +13,9 @@ public interface AwsTranslator {
 
     byte[] download(String path, String key);
 
-    //TODO: Delete photo method
+    boolean deletePhotoFromFolder(String fileName);
 
     //TODO: Update photo method
 
-    List<Object> getAllUserPhotos(Integer id);
+    ObjectListing getAllUserPhotos(String folderName);
 }

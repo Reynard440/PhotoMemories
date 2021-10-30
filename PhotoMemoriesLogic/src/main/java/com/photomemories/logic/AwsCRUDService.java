@@ -1,18 +1,22 @@
 package com.photomemories.logic;
 
+import com.amazonaws.services.s3.model.ObjectListing;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
 public interface AwsCRUDService {
-    void uploadToS3(Integer id, MultipartFile file);
+    void uploadToS3(String email, MultipartFile file) throws IOException;
 
-    byte[] downloadPhoto(Integer id, String imageName);
+    byte[] downloadPhoto(String email, String imageName);
 
-    //TODO: Delete photo method
+    String deletePhoto(String fileName, String email);
 
     //TODO: Update photo method
 
-    List<Object> getAllPhotosOfUser(Integer id);
+    ObjectListing getAllPhotosOfUser(String folderName);
 }

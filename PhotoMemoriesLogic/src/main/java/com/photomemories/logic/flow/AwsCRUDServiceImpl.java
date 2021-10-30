@@ -1,13 +1,11 @@
 package com.photomemories.logic.flow;
 
+import com.amazonaws.services.s3.model.ObjectListing;
+import com.photomemories.domain.dto.UserDto;
 import com.photomemories.domain.persistence.AwsBucket;
-import com.photomemories.domain.persistence.Photo;
-import com.photomemories.domain.persistence.Shared;
 import com.photomemories.domain.persistence.User;
 import com.photomemories.logic.AwsCRUDService;
 import com.photomemories.translator.AwsTranslator;
-import com.photomemories.translator.PhotoTranslator;
-import com.photomemories.translator.SharedTranslator;
 import com.photomemories.translator.UserTranslator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,74 +14,76 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.apache.http.entity.ContentType.*;
 
 @Component("awsServiceFlow")
 public class AwsCRUDServiceImpl implements AwsCRUDService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AwsCRUDServiceImpl.class);
-    private final SharedTranslator sharedTranslator;
-    private final PhotoTranslator photoTranslator;
     private final UserTranslator userTranslator;
     private final AwsTranslator awsTranslator;
 
     @Autowired
-    public AwsCRUDServiceImpl(SharedTranslator sharedTranslator, PhotoTranslator photoTranslator, UserTranslator userTranslator, AwsTranslator awsTranslator) {
-        this.sharedTranslator = sharedTranslator;
-        this.photoTranslator = photoTranslator;
+    public AwsCRUDServiceImpl(UserTranslator userTranslator, AwsTranslator awsTranslator) {
         this.userTranslator = userTranslator;
         this.awsTranslator = awsTranslator;
     }
 
     @Transactional(rollbackOn = {IllegalStateException.class, RuntimeException.class})
     @Override
-    public void uploadToS3(Integer id, MultipartFile photo){
-        isPhotoEmpty(photo);
-
-        isPhoto(photo);
-
-        Map<String, String> extraData = getMetadata(photo);
-
-        Shared shared = sharedTranslator.getSharedByUserId(id);
-        User user = userTranslator.getUserById(shared.getUserId().getUserId());
-        Photo p = photoTranslator.getPhotoById(shared.getPhotoId().getPhotoId());
-
-        LOGGER.info("File name {}", photo.getOriginalFilename());
-
-        String path = String.format("%s/%s", AwsBucket.PROFILE_IMAGE.getAwsBucket(), user.getUserId());
-        String filename = String.format("%s", photo.getOriginalFilename());
+    public void uploadToS3(String email, MultipartFile photo) throws IOException {
         try {
+            isPhotoEmpty(photo);
+
+            isPhoto(photo);
+
+            Map<String, String> extraData = getMetadata(photo);
+
+            UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
+
+            LOGGER.info("File name {}", photo.getOriginalFilename());
+
+            String path = String.format("%s/%s", AwsBucket.PROFILE_IMAGE.getAwsBucket(), userDto.getUserId());
+            String filename = photo.getOriginalFilename();
             awsTranslator.save(path, filename, Optional.of(extraData), photo.getInputStream());
-            p.setPhotoLink(filename);
-            p.setPhotoName(photo.getOriginalFilename());
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
     @Override
-    public byte[] downloadPhoto(Integer id, String imageName){
-        Shared shared = sharedTranslator.getSharedByUserId(id);
-        User user = userTranslator.getUserById(shared.getUserId().getUserId());
-        Photo photo = photoTranslator.getPhotoById(shared.getPhotoId().getPhotoId());
-
+    public byte[] downloadPhoto(String email, String imageName){
+        UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
         String path = String.format("%s",
                 AwsBucket.PROFILE_IMAGE.getAwsBucket());
-        String key = String.format("%s/%s", user.getUserId(), imageName);
+        String key = String.format("%s/%s", userDto.getUserId(), imageName);
         LOGGER.info("The path and key is {}/{}", path, key);
         return awsTranslator.download(path, key);
     }
 
-    //TODO: Delete photo method
+    @Override
+    public String deletePhoto(String fileName, String email) {
+        UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
+        awsTranslator.deletePhotoFromFolder(userDto.getUserId() + "/" + fileName);
+        if (!awsTranslator.deletePhotoFromFolder(userDto.getUserId() + "/" + fileName)) {
+            return "Photo could not be deleted";
+        }
+        return "Photo was deleted successfully";
+    }
 
     //TODO: Update photo method
 
     @Override
-    public List<Object> getAllPhotosOfUser(Integer id) {
-        return awsTranslator.getAllUserPhotos(id);
+    public ObjectListing getAllPhotosOfUser(String folderName) {
+        return awsTranslator.getAllUserPhotos(folderName);
     }
 
     private void isPhotoEmpty(MultipartFile photo) {

@@ -36,6 +36,9 @@ public class UserTranslatorImpl implements UserTranslator {
 
     @Override
     public User getUserByEmail(String email) {
+        if (!userExistsWithEmail(email)) {
+            throw new RuntimeException("User with email " + email + " does not exist");
+        }
         return userRepository.findByEmail(email);
     }
 

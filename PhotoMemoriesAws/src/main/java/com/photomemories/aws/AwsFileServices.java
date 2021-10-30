@@ -1,7 +1,11 @@
 package com.photomemories.aws;
 
+import com.amazonaws.services.s3.model.ObjectListing;
 import io.netty.handler.codec.http.multipart.FileUpload;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -12,9 +16,9 @@ public interface AwsFileServices {
 
     byte[] download(String path, String key);
 
-    //TODO: Delete photo method
+    void deletePhotoFromFolder(String fileName);
 
     //TODO: Update photo method
 
-    List<Object> getAllPhotos (Integer id);
+    ObjectListing getAllPhotos (String folderName);
 }
