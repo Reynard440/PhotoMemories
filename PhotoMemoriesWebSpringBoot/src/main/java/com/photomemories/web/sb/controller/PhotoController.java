@@ -66,7 +66,6 @@ public class PhotoController {
             @RequestParam("photoCapturedBy") String photoCapturedBy,
             @RequestParam("photoId") Integer photoId,
             @RequestParam("email") String email,
-//            @RequestParam("userId") Integer userId,
             @RequestParam("photo") MultipartFile photo) throws Exception {
         UserDto user = userCRUDService.getUserDtoByEmail(email);
         if (user != null) {
@@ -83,8 +82,8 @@ public class PhotoController {
             PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         }
+        LOGGER.warn("[Photo Controller log] addNewPhoto method, Photo could not be created");
         throw new RuntimeException("Could not add the photo");
-        //return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
     }
 
     @GetMapping("/photoExists/{id}/{photoLink}")
@@ -99,6 +98,7 @@ public class PhotoController {
             @PathVariable("id") Integer id,
             @ApiParam(value = "The name of each photo", example = "ReynardEngels.jpeg", name = "photoLink", required = true)
             @PathVariable("photoLink") String photoLink) throws SQLException {
+        LOGGER.info("[Photo Controller log] photoExists method, input id {} and photoLink {}", id, photoLink);
         boolean photoResponse = photoCRUDService.photoExists(id, photoLink);
         PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, photoResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -114,6 +114,7 @@ public class PhotoController {
     public ResponseEntity<PhotoMemoriesResponse<PhotoDto>> getPhotoById(
             @ApiParam(value = "The id of each photo", example = "1", name = "id", required = true)
             @PathVariable("id") Integer id) throws SQLException {
+        LOGGER.info("[Photo Controller log] getPhotoById method, input id {} ", id);
         PhotoDto photoResponse = photoCRUDService.getPhotoDtoById(id);
         PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -132,7 +133,7 @@ public class PhotoController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/getAllPhotosOfUser/{id}/id/{email}/email")
+    @GetMapping("/getAllPhotosOfUser/{id}/{email}/")
     @ApiOperation(value = "Gets a list of photos exists based on its id and the users email.", notes = "Tries to fetch a photo by id from the DB.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Member found by email", response = PhotoMemoriesResponse.class),
@@ -143,6 +144,7 @@ public class PhotoController {
             @ApiParam(value = "The id of each photo", example = "1", name = "id", required = true)
             @PathVariable("id") Integer id,
             @PathVariable("email") String email) throws SQLException {
+        LOGGER.info("[Photo Controller log] getAllPhotosOfUser method, input id {} and email {} ", id, email);
         List<PhotoDto> photoResponse = photoCRUDService.getByPhotoIdAndShares_UserId_Email(id, email);
         PhotoMemoriesResponse<List<PhotoDto>> response = new PhotoMemoriesResponse<>(true, photoResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -163,6 +165,7 @@ public class PhotoController {
             @PathVariable(value = "email") String email,
             @ApiParam(value = "The id of the photo", example = "1", name = "id", required = true)
             @PathVariable("id") Integer id) throws Exception {
+        LOGGER.info("[Photo Controller log] deletePhoto method, input id {} and email {} and photoLink {}", id, email, photoLink);
         int photoResponse = photoCRUDService.deletePhoto(id, photoLink);
         awsCRUDService.deletePhoto(photoLink, email);
         PhotoMemoriesResponse<Integer> response = new PhotoMemoriesResponse<>(true, photoResponse);

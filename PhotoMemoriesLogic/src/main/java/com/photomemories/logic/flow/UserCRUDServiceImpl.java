@@ -18,7 +18,6 @@ public class UserCRUDServiceImpl implements UserCRUDService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     private final UserTranslator userTranslator;
 
     @Autowired
@@ -29,32 +28,40 @@ public class UserCRUDServiceImpl implements UserCRUDService {
     @Override
     public UserDto createNewUser(UserDto userDto) throws Exception {
         try {
-            LOGGER.info("[User Logic log] input Dto object is: {}", userDto);
+            LOGGER.info("[User Logic log] createNewUser method, input Dto object is {}", userDto);
 
             isUniqueUser(userDto);
 
             User user = userDto.buildUser();
-            LOGGER.info("[User Logic log] Dto Object converted to persistence is: {}", user);
+            LOGGER.info("[User Logic log] createNewUser method, Dto Object converted to persistence is {}", user);
+
             user.setUserHashPassword(passwordEncoder.encode(userDto.getUserHashPassword()));
             user.setDate(LocalDate.now());
+
             User addedUser = userTranslator.newUser(user);
-            LOGGER.info("[USer Logic log] object saved to database: {}", addedUser);
+            LOGGER.info("[USer Logic log] createNewUser method, object saved to database {}", addedUser);
+
             UserDto returnUser = new UserDto(userTranslator.newUser(addedUser));
-            LOGGER.info("[User Logic log] Dto returned: {}", returnUser);
+            LOGGER.info("[User Logic log] createNewUser method, Dto returned {}", returnUser);
+
             return returnUser;
         } catch (Exception e) {
+            LOGGER.warn("[User Logic log] createNewUser method, exception with error {}", e.getMessage());
             throw new RuntimeException("User could not be created!", e);
         }
     }
 
     @Override
     public UserDto getUserDtoById(Integer id) {
+        LOGGER.info("[User Logic log] getUserDtoById method, input id {}", id);
         return new UserDto(userTranslator.getUserById(id));
     }
 
     @Override
     public UserDto getUserDtoByEmail(String email) {
+        LOGGER.info("[User Logic log] getUserDtoById method, input email {}", email);
         if (!userTranslator.userExistsWithEmail(email)) {
+            LOGGER.warn("[User Logic log] getUserDtoByEmail method, User with email {} does not exist", email);
             throw new RuntimeException("User with email " + email + " does not exist");
         }
         return new UserDto(userTranslator.getUserByEmail(email));
@@ -80,10 +87,12 @@ public class UserCRUDServiceImpl implements UserCRUDService {
         LOGGER.info("[User Logic log] deleteUser method, queried id: {}", id);
         boolean beforeDelete = userTranslator.userExists(id);
         LOGGER.info("[User Logic log] deleteUser method, (exists?): {}", beforeDelete);
+
         if (!userExists(id)) {
             LOGGER.warn("User with id {} does not exists", id);
             throw new RuntimeException("User deletion error.");
         }
+
         int userDelete = userTranslator.deleteUser(id);
         boolean afterDelete = userTranslator.userExists(id);
         LOGGER.info("[User Logic log] deleteUser method, (exists?): {}", afterDelete);

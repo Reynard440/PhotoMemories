@@ -28,7 +28,9 @@ public class AwsTranslatorImpl implements AwsTranslator {
     public void save(String path, String fileName, Optional<Map<String, String>> optionalMetaData, InputStream inputStream) {
         try {
             awsFileServices.save(path, fileName, optionalMetaData, inputStream);
+            LOGGER.info("[AWS Translator log] save method, successful save");
         } catch (RuntimeException error) {
+            LOGGER.warn("[AWS Translator log] save method, Could not execute the save request with error {}", error.getMessage());
             throw new RuntimeException("Could not execute the save request", error);
         }
     }
@@ -36,8 +38,11 @@ public class AwsTranslatorImpl implements AwsTranslator {
     @Override
     public byte[] download(String path, String key) {
         try {
-             return awsFileServices.download(path, key);
+            byte[] downloadResult = awsFileServices.download(path, key);
+            LOGGER.info("[AWS Translator log] download method, successful download");
+            return downloadResult;
         } catch (RuntimeException e) {
+            LOGGER.warn("[AWS Translator log] download method, Could not execute the download request with error {}", e.getMessage());
             throw new RuntimeException("Could not download the photo", e);
         }
     }
@@ -46,7 +51,9 @@ public class AwsTranslatorImpl implements AwsTranslator {
     public boolean deletePhotoFromFolder(String fileName) {
         try {
             awsFileServices.deletePhotoFromFolder(fileName);
+            LOGGER.info("[AWS Translator log] deletePhotoFromFolder method, successfully deleted photo from {}", fileName);
         } catch (RuntimeException e) {
+            LOGGER.warn("[AWS Translator log] deletePhotoFromFolder method, Could not delete the photo with error {}", e.getMessage());
             throw new RuntimeException("Could not delete the photo", e);
         }
         return false;

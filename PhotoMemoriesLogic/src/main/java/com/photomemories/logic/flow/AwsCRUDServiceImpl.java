@@ -3,7 +3,6 @@ package com.photomemories.logic.flow;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.photomemories.domain.dto.UserDto;
 import com.photomemories.domain.persistence.AwsBucket;
-import com.photomemories.domain.persistence.User;
 import com.photomemories.logic.AwsCRUDService;
 import com.photomemories.translator.AwsTranslator;
 import com.photomemories.translator.UserTranslator;
@@ -14,9 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -54,7 +50,9 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
             String path = String.format("%s/%s", AwsBucket.PROFILE_IMAGE.getAwsBucket(), userDto.getUserId());
             String filename = photo.getOriginalFilename();
             awsTranslator.save(path, filename, Optional.of(extraData), photo.getInputStream());
+            LOGGER.info("[AWS Logic log] uploadToS3 method, saved successfully");
         } catch (IOException e) {
+            LOGGER.warn("[AWS Logic log] uploadToS3 method, exception {} ", e.getMessage());
             throw new IllegalStateException(e);
         }
     }
@@ -62,11 +60,12 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
     @Override
     public byte[] downloadPhoto(String email, String imageName){
         UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
-        String path = String.format("%s",
-                AwsBucket.PROFILE_IMAGE.getAwsBucket());
+        String path = String.format("%s", AwsBucket.PROFILE_IMAGE.getAwsBucket());
         String key = String.format("%s/%s", userDto.getUserId(), imageName);
         LOGGER.info("The path and key is {}/{}", path, key);
-        return awsTranslator.download(path, key);
+        byte[] downloadValue = awsTranslator.download(path, key);
+        LOGGER.info("[AWS Logic log] downloadPhoto method, Photo downloaded successfully");
+        return downloadValue;
     }
 
     @Override
@@ -74,8 +73,10 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
         UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
         awsTranslator.deletePhotoFromFolder(userDto.getUserId() + "/" + fileName);
         if (!awsTranslator.deletePhotoFromFolder(userDto.getUserId() + "/" + fileName)) {
+            LOGGER.warn("[AWS Logic log] deletePhoto method, Photo could not be deleted");
             return "Photo could not be deleted";
         }
+        LOGGER.info("[AWS Logic log] deletePhoto method, Photo was deleted successfully");
         return "Photo was deleted successfully";
     }
 
@@ -83,11 +84,13 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
 
     @Override
     public ObjectListing getAllPhotosOfUser(String folderName) {
+        LOGGER.info("[AWS Logic log] getAllPhotosOfUser method, Photos retrieved from {}", folderName);
         return awsTranslator.getAllUserPhotos(folderName);
     }
 
     private void isPhotoEmpty(MultipartFile photo) {
         if (photo.isEmpty()) {
+            LOGGER.warn("[AWS Logic log] isPhotoEmpty method, No photo provided [ {} ]", photo.getSize());
             throw new IllegalStateException("No photo provided [ " + photo.getSize() + " ]");
         }
     }
@@ -100,6 +103,7 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
                 IMAGE_BMP.getMimeType(),
                 IMAGE_TIFF.getMimeType(),
                 IMAGE_WEBP.getMimeType()).contains(photo.getContentType())) {
+            LOGGER.warn("[AWS Logic log] isPhoto method, Photo must be an image of type [ {} ]", photo.getContentType());
             throw new IllegalStateException("Photo must be an image of type [" + photo.getContentType() + "]");
         }
     }
@@ -109,6 +113,7 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
         data.put("Content-Type", photo.getContentType());
         LOGGER.info("The content-Type is {}", photo.getContentType());
         data.put("Content-Length", String.valueOf(photo.getSize()));
+        LOGGER.info("The content-Length is {}", photo.getSize());
         return data;
     }
 }

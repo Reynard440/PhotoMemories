@@ -25,18 +25,21 @@ public class UserTranslatorImpl implements UserTranslator {
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
     @Override
     public User newUser(User user) throws Exception {
-        LOGGER.info("[User Translator log] newUser method, input object: {}", user);
+        LOGGER.info("[User Translator log] newUser method, input object's email: {}", user.getEmail());
         return userRepository.save(user);
     }
 
     @Override
     public User getUserById(Integer id) {
+        LOGGER.info("[User Translator log] getUserById method, input id: {}", id);
         return userRepository.findByUserId(id).orElseThrow(() -> new UserNotFoundException("User with id " + id + " was not found"));
     }
 
     @Override
     public User getUserByEmail(String email) {
+        LOGGER.info("[User Translator log] getUserByEmail method, input email: {}", email);
         if (!userExistsWithEmail(email)) {
+            LOGGER.warn("[User Translator log] getUserByEmail method, User with email {} does not exist", email);
             throw new RuntimeException("User with email " + email + " does not exist");
         }
         return userRepository.findByEmail(email);
@@ -44,7 +47,10 @@ public class UserTranslatorImpl implements UserTranslator {
 
     @Override
     public boolean userExistsWithEmail(String email) {
-        return userRepository.existsByEmail(email);
+        LOGGER.info("[User Translator log] userExistsWithEmail method, input email: {}", email);
+        boolean returnValue = userRepository.existsByEmail(email);
+        LOGGER.info("[User Translator log] userExistsWithEmail method, email exists: {}", returnValue);
+        return returnValue;
     }
 
     @Override
@@ -83,7 +89,4 @@ public class UserTranslatorImpl implements UserTranslator {
         LOGGER.info("[User Translator log] registerCheck method, user status: {}", false);
         return false;
     }
-
-    //TODO: Update method
-    //TODO: Get by email method
 }

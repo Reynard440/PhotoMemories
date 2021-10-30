@@ -1,10 +1,8 @@
 package com.photomemories.web.sb.controller;
 
 import com.photomemories.domain.dto.SharedDto;
-import com.photomemories.domain.dto.UserDto;
 import com.photomemories.domain.service.PhotoMemoriesResponse;
 import com.photomemories.logic.SharedCRUDService;
-import com.photomemories.logic.UserCRUDService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -39,6 +37,7 @@ public class SharedController {
     public ResponseEntity<PhotoMemoriesResponse<SharedDto>> addNewUserRecord(
             @ApiParam(value = "Request body to create a new Shared record", required = true)
             @RequestBody SharedDto sharedDto) throws Exception {
+        LOGGER.info("[Shared Controller log] addNewUserRecord method, input object {} ", sharedDto);
         SharedDto sharedResponse = sharedCRUDService.createSharedDto(sharedDto);
         PhotoMemoriesResponse<SharedDto> response = new PhotoMemoriesResponse<>(true, sharedResponse);
         return new ResponseEntity<>(response, HttpStatus.CREATED);

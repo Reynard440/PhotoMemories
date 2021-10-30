@@ -11,9 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 @RestController
@@ -33,13 +30,14 @@ public class AwsController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void uploadPhoto(@RequestParam("email") String email,
-                                       @RequestParam("photo") MultipartFile photo) throws IOException {
+                            @RequestParam("photo") MultipartFile photo) throws IOException {
+        LOGGER.info("[AWS Controller log] uploadPhoto method, input email {} ", email);
         awsCRUDService.uploadToS3(email, photo);
     }
 
-    @GetMapping(
-            path = "/{email}/image/{imageName}/download")
+    @GetMapping(path = "/{email}/image/{imageName}/download")
     public ResponseEntity<ByteArrayResource> downloadPhoto(@PathVariable("email")String email, @PathVariable("imageName")String imageName) {
+        LOGGER.info("[AWS Controller log] downloadPhoto method, input email {} and imageName {}", email, imageName);
         byte[] imageData = awsCRUDService.downloadPhoto(email, imageName);
         ByteArrayResource arrayResource = new ByteArrayResource(imageData);
         return ResponseEntity
@@ -54,6 +52,7 @@ public class AwsController {
     public void deletePhoto(
             @RequestParam("fileName") String fileName,
             @RequestParam("email") String email) throws Exception {
+        LOGGER.info("[AWS Controller log] deletePhoto method, input fileName {} and email {}", fileName, email);
         awsCRUDService.deletePhoto(fileName, email);
     }
 
@@ -61,6 +60,7 @@ public class AwsController {
 
     @GetMapping("{folderName}/user/photos")
     public ObjectListing getAllPhotos(@PathVariable("folderName")String folderName) {
+        LOGGER.info("[AWS Controller log] getAllPhotos method, Photos retrieved from {}", folderName);
         return awsCRUDService.getAllPhotosOfUser(folderName);
     }
 }

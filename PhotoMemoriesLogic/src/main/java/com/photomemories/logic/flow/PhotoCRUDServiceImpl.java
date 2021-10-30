@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 @Component("photoServiceFlow")
 public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PhotoCRUDServiceImpl.class);
-
     private final PhotoTranslator photoTranslator;
 
     @Autowired
@@ -31,36 +30,39 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     @Override
     public PhotoDto createPhotoDto(PhotoDto photoDto) throws Exception {
         try {
-
-            LOGGER.info("[Photo Logic log] input Dto object is: {}", photoDto);
             Photo photo = photoDto.buildPhoto();
-            LOGGER.info("[Photo Logic log] Dto Object converted to persistence is: {}", photo);
+            LOGGER.info("[Photo Logic log] createPhotoDto method, Dto Object converted to persistence is: {}", photo);
+
             photo.setUploadDate(LocalDate.now());
             photo.setDateModified(LocalDate.now());
+
             Photo addedPhoto = photoTranslator.addPhoto(photo);
-            LOGGER.info("[Photo Logic log] object saved to database: {}", addedPhoto);
+            LOGGER.info("[Photo Logic log] createPhotoDto method, object saved to database: {}", addedPhoto);
+
             PhotoDto returnDto = new PhotoDto(photoTranslator.addPhoto(addedPhoto));
-
-
-            LOGGER.info("[Photo Logic log] Dto returned: {}", returnDto);
+            LOGGER.info("[Photo Logic log] createPhotoDto method, Dto returned: {}", returnDto);
             return returnDto;
         } catch (Exception e) {
+            LOGGER.warn("[Photo Logic log] createPhotoDto method, Photo could not be created with error {}", e.getMessage());
             throw new RuntimeException("Photo could not be created!", e);
         }
     }
 
     @Override
     public PhotoDto getPhotoDtoById(Integer id) {
+        LOGGER.info("[Photo Logic log] getPhotoDtoById method, input id {}", id);
         return new PhotoDto(photoTranslator.getPhotoById(id));
     }
 
     @Override
     public PhotoDto getByPhotoNameAndPhotoFormat(String name, String format) {
+        LOGGER.info("[Photo Logic log] getByPhotoNameAndPhotoFormat method, input name {} and format {}", name, format);
         return new PhotoDto(photoTranslator.findByPhotoNameAndPhotoFormat(name, format));
     }
 
     @Override
     public List<PhotoDto> getByPhotoIdAndShares_UserId_Email(Integer id, String email) {
+        LOGGER.info("[Photo Logic log] getByPhotoIdAndShares_UserId_Email method, input id {} and email {}", id, email);
         return photoTranslator.findByPhotoIdAndShares_UserId_Email(id, email).stream().map(PhotoDto::new).collect(Collectors.toList());
     }
 
@@ -84,9 +86,9 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
     @Override
     public Integer deletePhoto(Integer id, String photoLink) throws Exception {
-        LOGGER.info("[Photo Logic log] deletePhoto method, queried id: {}", id);
         boolean beforeDelete = photoTranslator.photoExists(id, photoLink);
         LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", beforeDelete);
+
         if (!photoExists(id, photoLink)) {
             LOGGER.warn("Photo with id {} does not exists", id);
             throw new RuntimeException("Photo with id " + id + " does not exist!");
@@ -94,6 +96,7 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
         int photoDelete = photoTranslator.deletePhoto(id, photoLink);
         boolean afterDelete = photoTranslator.photoExists(id, photoLink);
         LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", afterDelete);
+
         return photoDelete;
     }
 }

@@ -23,22 +23,25 @@ public class PhotoTranslatorImpl implements PhotoTranslator {
 
     @Override
     public Photo addPhoto(Photo photo) throws Exception {
-        LOGGER.info("[Photo Translator log] addPhoto method, input object: {}", photo);
+        LOGGER.info("[Photo Translator log] addPhoto method, input object's name: {}", photo.getPhotoName());
         return photoRepository.save(photo);
     }
 
     @Override
     public Photo getPhotoById(Integer id) {
+        LOGGER.info("[Photo Translator log] getPhotoById method, input id: {}", id);
         return photoRepository.findByPhotoId(id);
     }
 
     @Override
     public Photo findByPhotoNameAndPhotoFormat(String name, String format) {
+        LOGGER.info("[Photo Translator log] findByPhotoNameAndPhotoFormat method, input name {} and format {}", name, format);
         return photoRepository.findByPhotoNameAndPhotoFormat(name, format);
     }
 
     @Override
     public List<Photo> findByPhotoIdAndShares_UserId_Email(Integer id, String email) {
+        LOGGER.info("[Photo Translator log] findByPhotoIdAndShares_UserId_Email method, input id {} and user email {}", id, email);
         return photoRepository.findByPhotoIdAndShares_UserId_Email(id, email);
     }
 

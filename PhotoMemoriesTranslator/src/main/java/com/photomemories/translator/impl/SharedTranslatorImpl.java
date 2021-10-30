@@ -24,11 +24,13 @@ public class SharedTranslatorImpl implements SharedTranslator {
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
     @Override
     public Shared addShared(Shared shared) throws SQLException {
+        LOGGER.info("[Shared Translator log] addShared method, input object's date: {}", shared.getSharedDate());
         return sharedRepository.save(shared);
     }
 
     @Override
     public Shared getSharedByUserId(Integer id) {
+        LOGGER.info("[Shared Translator log] getSharedByUserId method, input id: {}", id);
         return sharedRepository.findByUserId_UserId(id);
     }
 
