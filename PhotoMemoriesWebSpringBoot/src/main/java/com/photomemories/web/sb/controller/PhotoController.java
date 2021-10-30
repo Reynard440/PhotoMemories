@@ -3,7 +3,6 @@ package com.photomemories.web.sb.controller;
 import com.photomemories.domain.dto.PhotoDto;
 import com.photomemories.domain.dto.SharedDto;
 import com.photomemories.domain.dto.UserDto;
-import com.photomemories.domain.persistence.Shared;
 import com.photomemories.domain.service.PhotoMemoriesResponse;
 import com.photomemories.logic.AwsCRUDService;
 import com.photomemories.logic.PhotoCRUDService;
@@ -67,18 +66,18 @@ public class PhotoController {
             @RequestParam("photoCapturedBy") String photoCapturedBy,
             @RequestParam("photoId") Integer photoId,
             @RequestParam("email") String email,
-            @RequestParam("userId") Integer userId,
+//            @RequestParam("userId") Integer userId,
             @RequestParam("photo") MultipartFile photo) throws Exception {
         UserDto user = userCRUDService.getUserDtoByEmail(email);
         if (user != null) {
+            PhotoDto photoDto = new PhotoDto(photoId, photoName, photoSize, photoUploadDate, modifiedDate, photoLink, photoLocation, photoFormat, photoCapturedBy);
+            PhotoDto photoResponse = photoCRUDService.createPhotoDto(photoDto);
             SharedDto sharedDto = new SharedDto();
             sharedDto.setSharedHasAccess(false);
-            sharedDto.setPhotoId(photoId);
+            sharedDto.setPhotoId(photoResponse.getPhotoId());
             sharedDto.setSharedDate(LocalDate.now());
-            sharedDto.setUserId(userId);
+            sharedDto.setUserId(user.getUserId());
             sharedDto.setSharedWith(0);
-            PhotoDto photoDto = new PhotoDto(photoId, photoName, photoSize, LocalDate.now(), LocalDate.now(), photoLink, photoLocation, photoFormat, photoCapturedBy);
-            PhotoDto photoResponse = photoCRUDService.createPhotoDto(photoDto);
             SharedDto dto = sharedCRUDService.createSharedDto(sharedDto);
             awsCRUDService.uploadToS3(user.getEmail(), photo);
             PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
@@ -88,7 +87,7 @@ public class PhotoController {
         //return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
     }
 
-    @GetMapping("/photoExists/{id}")
+    @GetMapping("/photoExists/{id}/{photoLink}")
     @ApiOperation(value = "Checks if a photo exists based on their id.", notes = "Tries to fetch a photo by id from the DB.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Member found by email", response = PhotoMemoriesResponse.class),
@@ -97,8 +96,10 @@ public class PhotoController {
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
     public ResponseEntity<PhotoMemoriesResponse<Boolean>> photoExists(
             @ApiParam(value = "The id of each photo", example = "1", name = "id", required = true)
-            @PathVariable("id") Integer id) throws SQLException {
-        boolean photoResponse = photoCRUDService.photoExists(id);
+            @PathVariable("id") Integer id,
+            @ApiParam(value = "The name of each photo", example = "ReynardEngels.jpeg", name = "photoLink", required = true)
+            @PathVariable("photoLink") String photoLink) throws SQLException {
+        boolean photoResponse = photoCRUDService.photoExists(id, photoLink);
         PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, photoResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -147,7 +148,8 @@ public class PhotoController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @DeleteMapping("/deletePhoto/{id}")
+    @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
+    @DeleteMapping("/deletePhoto/{photoLink}/{email}/{id}")
     @ApiOperation(value = "Deletes a photo by id.", notes = "Removes a photo from the DB.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Photo deleted", response = PhotoMemoriesResponse.class),
@@ -155,9 +157,14 @@ public class PhotoController {
             @ApiResponse(code = 404, message = "Could not found the photo with this id", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
     public ResponseEntity<PhotoMemoriesResponse<Integer>> deletePhoto(
-            @ApiParam(value = "The id of each user", example = "1", name = "id", required = true)
+            @ApiParam(value = "The name of the photo", example = "ReynardEngels.jpeg", name = "photoLink", required = true)
+            @PathVariable("photoLink") String photoLink,
+            @ApiParam(value = "The email of the user", example = "reynardengels@gmail.com", name = "email", required = true)
+            @PathVariable(value = "email") String email,
+            @ApiParam(value = "The id of the photo", example = "1", name = "id", required = true)
             @PathVariable("id") Integer id) throws Exception {
-        int photoResponse = photoCRUDService.deletePhoto(id);
+        int photoResponse = photoCRUDService.deletePhoto(id, photoLink);
+        awsCRUDService.deletePhoto(photoLink, email);
         PhotoMemoriesResponse<Integer> response = new PhotoMemoriesResponse<>(true, photoResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

@@ -15,9 +15,9 @@ public interface PhotoTranslator {
 
     List<Photo> findByPhotoIdAndShares_UserId_Email(Integer id, String email);
 
-    boolean photoExists(Integer id);
+    boolean photoExists(Integer id, String photoLink);
 
-    Integer deletePhoto(Integer id) throws Exception;
+    Integer deletePhoto(Integer id, String photoLink) throws Exception;
 
     List<Photo> getAllPhotos();
 }

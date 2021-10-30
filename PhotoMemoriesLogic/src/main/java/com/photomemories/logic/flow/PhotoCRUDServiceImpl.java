@@ -2,17 +2,12 @@ package com.photomemories.logic.flow;
 
 import com.photomemories.domain.dto.PhotoDto;
 import com.photomemories.domain.persistence.Photo;
-import com.photomemories.domain.persistence.Shared;
-import com.photomemories.logic.AwsCRUDService;
 import com.photomemories.logic.PhotoCRUDService;
 import com.photomemories.translator.PhotoTranslator;
-import com.photomemories.translator.SharedTranslator;
-import com.photomemories.translator.UserTranslator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.sql.SQLException;
@@ -79,24 +74,25 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     }
 
     @Override
-    public boolean photoExists(Integer id) {
+    public boolean photoExists(Integer id, String photoLink) {
         LOGGER.info("[Photo Logic log] photoExists method, queried id: {}", id);
-        boolean returnPhotoLogicValue = photoTranslator.photoExists(id);
+        boolean returnPhotoLogicValue = photoTranslator.photoExists(id, photoLink);
         LOGGER.info("[Photo Logic log] photoExists method, result: {}", returnPhotoLogicValue);
         return returnPhotoLogicValue;
     }
 
+    @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
     @Override
-    public Integer deletePhoto(Integer id) throws Exception {
+    public Integer deletePhoto(Integer id, String photoLink) throws Exception {
         LOGGER.info("[Photo Logic log] deletePhoto method, queried id: {}", id);
-        boolean beforeDelete = photoTranslator.photoExists(id);
+        boolean beforeDelete = photoTranslator.photoExists(id, photoLink);
         LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", beforeDelete);
-        if (!photoExists(id)) {
+        if (!photoExists(id, photoLink)) {
             LOGGER.warn("Photo with id {} does not exists", id);
-            throw new RuntimeException("Photo deletion error");
+            throw new RuntimeException("Photo with id " + id + " does not exist!");
         }
-        int photoDelete = photoTranslator.deletePhoto(id);
-        boolean afterDelete = photoTranslator.photoExists(id);
+        int photoDelete = photoTranslator.deletePhoto(id, photoLink);
+        boolean afterDelete = photoTranslator.photoExists(id, photoLink);
         LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", afterDelete);
         return photoDelete;
     }

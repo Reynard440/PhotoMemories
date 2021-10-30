@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Component
@@ -42,17 +43,18 @@ public class PhotoTranslatorImpl implements PhotoTranslator {
     }
 
     @Override
-    public boolean photoExists(Integer id) {
+    public boolean photoExists(Integer id, String photoLink) {
         LOGGER.info("[Photo Translator log] photoExists method, queried id: {}", id);
-        boolean returnValue = photoRepository.existsByPhotoId(id);
+        boolean returnValue = photoRepository.existsByPhotoIdAndPhotoLink(id, photoLink);
         LOGGER.info("[Photo Translator log] photoExists method, result: {}", returnValue);
         return returnValue;
     }
 
+    @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
     @Override
-    public Integer deletePhoto(Integer id) throws Exception {
+    public Integer deletePhoto(Integer id, String photoLink) throws Exception {
         LOGGER.info("[Photo Translator log] deletePhoto method, input id: {}", id);
-        int deleteValue = photoRepository.deleteByPhotoId(id);
+        int deleteValue = photoRepository.deleteByPhotoIdAndPhotoLink(id, photoLink);
         LOGGER.info("[Photo Translator log] deletePhoto method, (exists?): {}", deleteValue);
         return deleteValue;
     }

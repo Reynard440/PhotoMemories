@@ -1,9 +1,7 @@
 package com.photomemories.logic.flow;
 
 import com.photomemories.domain.dto.SharedDto;
-import com.photomemories.domain.dto.UserDto;
 import com.photomemories.domain.persistence.Shared;
-import com.photomemories.domain.persistence.User;
 import com.photomemories.logic.SharedCRUDService;
 import com.photomemories.translator.PhotoTranslator;
 import com.photomemories.translator.SharedTranslator;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.sql.SQLException;
-import java.time.LocalDate;
 
 @Component("sharedServiceFlow")
 public class SharedCRUDServiceImpl implements SharedCRUDService {
@@ -38,10 +35,6 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
             if (!userTranslator.userExists(sharedDto.getUserId())) {
                 LOGGER.warn("[Shared Logic log] input Dto contained invalid user id: {}", "invalid");
                 sharedDto.setUserId(0);
-            }
-            if (!photoTranslator.photoExists(sharedDto.getPhotoId())) {
-                LOGGER.warn("[Shared Logic log] input Dto contained invalid photo id: {}", "invalid");
-                sharedDto.setSharedId(0);
             }
 
             Shared shared = sharedDto.buildShared();

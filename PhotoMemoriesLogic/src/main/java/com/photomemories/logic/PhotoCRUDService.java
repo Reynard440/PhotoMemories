@@ -15,7 +15,7 @@ public interface PhotoCRUDService {
 
     List<PhotoDto> getAllPhotos();
 
-    boolean photoExists(Integer id);
+    boolean photoExists(Integer id, String photoLink);
 
-    Integer deletePhoto(Integer id) throws Exception;
+    Integer deletePhoto(Integer id, String photoLink) throws Exception;
 }

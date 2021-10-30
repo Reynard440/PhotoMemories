@@ -2,7 +2,6 @@ package com.photomemories.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.photomemories.domain.persistence.Photo;
-import com.photomemories.domain.persistence.Shared;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -155,6 +154,17 @@ public class PhotoDto implements Serializable {
 
     public PhotoDto(Integer photoId) {
         PhotoId = photoId;
+    }
+
+    public PhotoDto(String photoName, Double photoSize, LocalDate uploadDate, LocalDate dateModified, String photoLink, String photoLocation, String photoFormat, String photoCapturedBy) {
+        this.PhotoName = photoName;
+        this.PhotoSize = photoSize;
+        this.UploadDate = uploadDate;
+        this.DateModified = dateModified;
+        this.PhotoLink = photoLink;
+        this.PhotoLocation = photoLocation;
+        this.PhotoFormat = photoFormat;
+        this.PhotoCapturedBy = photoCapturedBy;
     }
 
     public PhotoDto(Integer photoId, String photoName, Double photoSize, LocalDate uploadDate, LocalDate dateModified, String photoLink, String photoLocation, String photoFormat, String photoCapturedBy) {

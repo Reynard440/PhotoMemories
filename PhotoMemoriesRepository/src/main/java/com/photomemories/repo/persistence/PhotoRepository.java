@@ -25,12 +25,11 @@ public interface PhotoRepository extends JpaRepository<Photo, Integer> {
 
     //TODO: Update photo method
 
-    //TODO: replace boolean with int for the delete photo method!!!
-    @Transactional
+    @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
     @Modifying
-    @Query("delete from Photo p where p.PhotoId = ?1")
-    int deleteByPhotoId(Integer PhotoId);
+    @Query("delete from Photo p where p.PhotoId = ?1 and p.PhotoLink = ?2")
+    int deleteByPhotoIdAndPhotoLink(Integer PhotoId, String photoLink);
 
-    @Query("select (count(p) > 0) from Photo p where p.PhotoId = ?1")
-    boolean existsByPhotoId(Integer PhotoId);
+    @Query("select (count(p) > 0) from Photo p where p.PhotoId = ?1 and p.PhotoLink = ?2")
+    boolean existsByPhotoIdAndPhotoLink(Integer PhotoId, String photoLink);
 }

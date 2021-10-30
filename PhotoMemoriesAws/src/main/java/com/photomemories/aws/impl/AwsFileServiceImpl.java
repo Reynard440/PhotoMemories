@@ -1,28 +1,22 @@
 package com.photomemories.aws.impl;
 
-import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
 import com.photomemories.aws.AwsFileServices;
 import com.photomemories.domain.persistence.AwsBucket;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
-import io.netty.handler.codec.http.multipart.FileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class AwsFileServiceImpl implements AwsFileServices {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AwsFileServiceImpl.class);
-
     private final AmazonS3 s3;
 
     @Autowired
