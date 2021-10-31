@@ -7,22 +7,27 @@ import com.photomemories.translator.UserTranslator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Component("userServiceFlow")
-public class UserCRUDServiceImpl implements UserCRUDService {
+public class UserCRUDServiceImpl implements UserCRUDService, UserDetailsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PhotoCRUDServiceImpl.class);
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
     private final UserTranslator userTranslator;
 
     @Autowired
-    public UserCRUDServiceImpl(UserTranslator userTranslator) {
+    public UserCRUDServiceImpl(UserTranslator userTranslator, PasswordEncoder passwordEncoder) {
         this.userTranslator = userTranslator;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -105,5 +110,19 @@ public class UserCRUDServiceImpl implements UserCRUDService {
         boolean userValid = userTranslator.loginUser(password, email);
         LOGGER.info("[User Logic log] loginUser method, (valid?): {}", userValid);
         return userValid;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
+        if (userDto == null) {
+            LOGGER.error("User not present in database");
+            throw new UsernameNotFoundException("User not present in database");
+        } else {
+            LOGGER.info("User present in database: {}", email);
+        }
+        Collection<SimpleGrantedAuthority> auths = new ArrayList<>();
+        auths.add(new SimpleGrantedAuthority("USER_ROLE"));
+        return new org.springframework.security.core.userdetails.User(userDto.getEmail(), userDto.getUserHashPassword(), auths);
     }
 }

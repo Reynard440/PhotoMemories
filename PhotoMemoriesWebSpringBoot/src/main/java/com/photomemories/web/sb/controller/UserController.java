@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.sql.SQLException;
 
 @RestController
@@ -37,9 +39,10 @@ public class UserController {
             @ApiParam(value = "Request body to create a new User", required = true)
             @RequestBody UserDto userDto) throws Exception {
         LOGGER.info("[User Controller log] addNewUser method, input object {} ", userDto);
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/v1/c1/addNewUser").toUriString());
         UserDto userResponse = userCRUDService.createNewUser(userDto);
         PhotoMemoriesResponse<UserDto> response = new PhotoMemoriesResponse<>(true, userResponse);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return ResponseEntity.created(uri).body(response);
     }
 
     @GetMapping("/userExists/{id}")
@@ -54,24 +57,6 @@ public class UserController {
             @PathVariable("id") Integer id) throws SQLException {
         LOGGER.info("[User Controller log] userExists method, input id {} ", id);
         boolean userResponse = userCRUDService.userExists(id);
-        PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, userResponse);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    @ApiOperation(value = "Checks if a user's login credentials are valid.", notes = "Checks if a user's login credentials are valid in the DB.")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "User logged in", response = PhotoMemoriesResponse.class),
-            @ApiResponse(code = 400, message = "Bad Request: could not resolve user login", response = PhotoMemoriesResponse.class),
-            @ApiResponse(code = 404, message = "User not found", response = PhotoMemoriesResponse.class),
-            @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
-    public ResponseEntity<PhotoMemoriesResponse<Boolean>> login(
-            @ApiParam(value = "The password of the user", example = "$2a$10$8SPELKOF4/Mva/QYtLGAZuKMyBKeeN7JkObqhYrLQ5Bwb1lB8Bi52", name = "password", required = true)
-            @RequestParam("password") String password,
-            @ApiParam(value = "The email of the user", example = "reynardnegels@gmail.com", name = "email", required = true)
-            @RequestParam("email") String email) throws Exception {
-        LOGGER.info("[User Controller log] login method, input username {} and password {} ", email, password);
-        boolean userResponse = userCRUDService.loginUser(password, email);
         PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, userResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
