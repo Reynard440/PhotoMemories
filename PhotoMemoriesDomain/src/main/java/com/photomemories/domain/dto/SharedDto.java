@@ -81,6 +81,14 @@ public class SharedDto implements Serializable {
         this.SharedId = sharedId;
     }
 
+    public SharedDto(LocalDate sharedDate, Integer sharedWith, Boolean sharedHasAccess, Integer userId, Integer photoId) {
+        this.SharedDate = sharedDate;
+        this.SharedWith = sharedWith;
+        this.SharedHasAccess = sharedHasAccess;
+        this.UserId = userId;
+        this.PhotoId = photoId;
+    }
+
     public SharedDto(Integer sharedId, LocalDate sharedDate, Integer sharedWith, Boolean sharedHasAccess, Integer userId, Integer photoId) {
         this.SharedId = sharedId;
         this.SharedDate = sharedDate;

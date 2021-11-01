@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @RestController
 @RequestMapping(path ="/v1/c4")
@@ -30,9 +31,17 @@ public class AwsController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public void uploadPhoto(@RequestParam("email") String email,
-                            @RequestParam("photo") MultipartFile photo) throws IOException {
+                            @RequestParam("photos") MultipartFile[] photos) throws IOException {
         LOGGER.info("[AWS Controller log] uploadPhoto method, input email {} ", email);
-        awsCRUDService.uploadToS3(email, photo);
+
+        Arrays.asList(photos).stream().forEach(photo -> {
+            try {
+                awsCRUDService.uploadToS3(email, photo);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        LOGGER.info("[AWS Controller log] uploadPhoto method, photos uploaded to {}'s folder", email);
     }
 
     @GetMapping(path = "/{email}/image/{imageName}/download")

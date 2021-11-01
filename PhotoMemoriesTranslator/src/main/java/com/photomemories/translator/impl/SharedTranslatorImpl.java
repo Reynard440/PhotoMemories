@@ -34,6 +34,11 @@ public class SharedTranslatorImpl implements SharedTranslator {
         return sharedRepository.findByUserId_UserId(id);
     }
 
+    @Override
+    public Shared sharePhoto(Shared sharePhoto) throws Exception {
+        LOGGER.info("[Shared Translator log] sharePhoto method, input object's date: {}", sharePhoto.getSharedDate());
+        return sharedRepository.save(sharePhoto);
+    }
+
     //TODO: Delete methods (must cascade from parent entities)
-    //TODO: Update methods for sh_has_access and sh_shared_with columns
 }

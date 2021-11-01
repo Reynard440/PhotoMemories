@@ -66,19 +66,27 @@ public class PhotoController {
             @RequestParam("photoCapturedBy") String photoCapturedBy,
             @RequestParam("photoId") Integer photoId,
             @RequestParam("email") String email,
-            @RequestParam("photo") MultipartFile photo) throws Exception {
+            @RequestParam("photo") List<MultipartFile> photos) throws Exception {
         UserDto user = userCRUDService.getUserDtoByEmail(email);
         if (user != null) {
-            PhotoDto photoDto = new PhotoDto(photoId, photoName, photoSize, photoUploadDate, modifiedDate, photoLink, photoLocation, photoFormat, photoCapturedBy);
-            PhotoDto photoResponse = photoCRUDService.createPhotoDto(photoDto);
-            SharedDto sharedDto = new SharedDto();
-            sharedDto.setSharedHasAccess(false);
-            sharedDto.setPhotoId(photoResponse.getPhotoId());
-            sharedDto.setSharedDate(LocalDate.now());
-            sharedDto.setUserId(user.getUserId());
-            sharedDto.setSharedWith(0);
-            SharedDto dto = sharedCRUDService.createSharedDto(sharedDto);
-            awsCRUDService.uploadToS3(user.getEmail(), photo);
+            PhotoDto photoResponse = null;
+            int counter = 0;
+            for (MultipartFile photo : photos) {
+                PhotoDto photoDto = new PhotoDto(photoId, photoName, photoSize, photoUploadDate, modifiedDate, photoLink, photoLocation, photoFormat, photoCapturedBy);
+                photoResponse = photoCRUDService.createPhotoDto(photoDto);
+                SharedDto sharedDto = new SharedDto();
+                sharedDto.setSharedHasAccess(false);
+                sharedDto.setPhotoId(photoResponse.getPhotoId());
+                sharedDto.setSharedDate(LocalDate.now());
+                sharedDto.setUserId(user.getUserId());
+                sharedDto.setSharedWith(0);
+                SharedDto dto = sharedCRUDService.createSharedDto(sharedDto);
+
+                awsCRUDService.uploadToS3(email, photo);
+                counter++;
+            }
+            LOGGER.info("[Photo Controller log] addNewPhoto method, {} photos uploaded to {}'s folder", counter, email);
+
             PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         }

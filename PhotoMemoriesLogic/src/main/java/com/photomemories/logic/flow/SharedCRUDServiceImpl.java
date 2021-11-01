@@ -1,6 +1,7 @@
 package com.photomemories.logic.flow;
 
 import com.photomemories.domain.dto.SharedDto;
+import com.photomemories.domain.dto.UserDto;
 import com.photomemories.domain.persistence.Shared;
 import com.photomemories.logic.SharedCRUDService;
 import com.photomemories.translator.SharedTranslator;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 @Component("sharedServiceFlow")
 public class SharedCRUDServiceImpl implements SharedCRUDService {
@@ -48,5 +50,27 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
     public SharedDto getSharedByUserId(Integer id) {
         LOGGER.info("[Shared Logic log] getSharedByUserId method, input id {}", id);
         return new SharedDto(sharedTranslator.getSharedByUserId(id));
+    }
+
+    @Override
+    public String sharePhoto(String sharingEmail, String receivingEmail, boolean accessRights, Integer id) throws Exception {
+        try {
+            if (!userTranslator.userExistsWithEmail(receivingEmail)) {
+                LOGGER.error("[Shared Logic log] sharePhoto method, Could not share the photo with email {}", receivingEmail);
+                throw new RuntimeException("[Shared Logic Error] sharePhoto method");
+            }
+            UserDto receivingUserDto = new UserDto(userTranslator.getUserByEmail(receivingEmail));
+            UserDto sendUserDto = new UserDto(userTranslator.getUserByEmail(sharingEmail));
+
+            SharedDto sharedDto = new SharedDto(LocalDate.now(), receivingUserDto.getUserId(), accessRights, sendUserDto.getUserId(), id);
+            Shared shared = sharedDto.buildShared();
+            Shared addedSharePhoto = sharedTranslator.sharePhoto(shared);
+            SharedDto returnSharePhoto = new SharedDto(sharedTranslator.sharePhoto(addedSharePhoto));
+            LOGGER.info("[Shared Logic log] sharePhoto method, shared the photo with email {}", receivingEmail);
+            return "Photo shared";
+        } catch (Exception e) {
+            LOGGER.error("[Shared Logic log] sharePhoto method, Could not share the photo with email {}", receivingEmail);
+            throw new RuntimeException("Exception with error ", e.getCause());
+        }
     }
 }
