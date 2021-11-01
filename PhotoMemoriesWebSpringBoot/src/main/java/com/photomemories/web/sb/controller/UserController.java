@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.transaction.Transactional;
 import java.net.URI;
 import java.sql.SQLException;
 
@@ -61,6 +62,7 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
     @DeleteMapping("/deleteUser/{id}")
     @ApiOperation(value = "Deletes a user by id.", notes = "Removes a user from the DB.")
     @ApiResponses(value = {
@@ -77,7 +79,36 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //TODO: Update photo method
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @PutMapping("/updateAccount/{id}")
+    @ApiOperation(value = "Updates a user by id.", notes = "Changes a user from the DB.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "User updated", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not resolve updating the user by id", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 404, message = "Could not found the user with this id", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
+    public ResponseEntity<PhotoMemoriesResponse<UserDto>> updateUser(
+            @ApiParam(value = "The id of each user", example = "1", name = "id", required = true)
+            @PathVariable("id") Integer id,
+            @ApiParam(value = "The user's new first name.", example = "Riaan", name = "firstName", required = true)
+            @RequestParam("firstName") String firstName,
+            @ApiParam(value = "The user's new last name.", example = "Koggelmander", name = "lastName", required = true)
+            @RequestParam("lastName") String lastName,
+            @ApiParam(value = "The user's new email.", example = "riankoggelmander@gmail.com", name = "email", required = true)
+            @RequestParam("email") String email,
+            @ApiParam(value = "The user's new phone number.", example = "0765543174", name = "phoneNumber", required = true)
+            @RequestParam("phoneNumber") String phoneNumber) throws Exception {
+        LOGGER.info("[User Controller log] updateUser method, input id {} ", id);
+
+        if (userCRUDService.verifyUserByPhoneNumberAndEmail(phoneNumber, email)) {
+            LOGGER.error("[User Controller log] updateUser method, phone number {} and email {} not unique", phoneNumber, email);
+            throw new RuntimeException("[User Controller Error] updateUser method, phone number and email not unique");
+        }
+
+        UserDto userResponse = userCRUDService.updateUserDto(firstName, lastName, email, phoneNumber, id);
+        PhotoMemoriesResponse<UserDto> response = new PhotoMemoriesResponse<>(true, userResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @GetMapping("/getUserById/{id}")
     @ApiOperation(value = "Checks if a photo exists based on their id.", notes = "Tries to fetch a photo by id from the DB.")
@@ -91,6 +122,22 @@ public class UserController {
             @PathVariable("id") Integer id) throws SQLException {
         LOGGER.info("[User Controller log] getUserById method, input id {} ", id);
         UserDto userResponse = userCRUDService.getUserDtoById(id);
+        PhotoMemoriesResponse<UserDto> response = new PhotoMemoriesResponse<>(true, userResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/getUserByEmail/{email}")
+    @ApiOperation(value = "Checks if a photo exists based on their email.", notes = "Tries to fetch a photo by email from the DB.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "User found by email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 404, message = "Could not found a user with this email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
+    public ResponseEntity<PhotoMemoriesResponse<UserDto>> getUserByEmail(
+            @ApiParam(value = "The email of each user", example = "reynardengels@gmail.com", name = "email", required = true)
+            @PathVariable("email") String email) throws SQLException {
+        LOGGER.info("[User Controller log] getUserByEmail method, input email {} ", email);
+        UserDto userResponse = userCRUDService.getUserDtoByEmail(email);
         PhotoMemoriesResponse<UserDto> response = new PhotoMemoriesResponse<>(true, userResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

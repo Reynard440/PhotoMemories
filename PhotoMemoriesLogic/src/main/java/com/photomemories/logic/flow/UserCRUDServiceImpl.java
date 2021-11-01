@@ -14,6 +14,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -87,6 +89,7 @@ public class UserCRUDServiceImpl implements UserCRUDService, UserDetailsService 
         return returnLogicValue;
     }
 
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
     @Override
     public Integer deleteUser(Integer id) throws Exception {
         LOGGER.info("[User Logic log] deleteUser method, queried id: {}", id);
@@ -104,12 +107,30 @@ public class UserCRUDServiceImpl implements UserCRUDService, UserDetailsService 
         return userDelete;
     }
 
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @Override
+    public UserDto updateUserDto(String firstName, String lastName, String email, String phoneNumber, Integer userId) {
+        int returnValue = userTranslator.updateUser(firstName, lastName, email, phoneNumber, userId);
+
+        if (returnValue == 0) {
+            LOGGER.error("[User Logic log] updateUserDto method, did not update account: {}", false);
+            throw new RuntimeException("[User Logic Error] updateUserDto method, did not update account");
+        }
+
+        return new UserDto(userTranslator.getUserById(userId));
+    }
+
     @Override
     public boolean loginUser(String password, String email) throws Exception {
         LOGGER.info("[User Logic log] loginUser method, password: {} and email: {}", password, email);
         boolean userValid = userTranslator.loginUser(password, email);
         LOGGER.info("[User Logic log] loginUser method, (valid?): {}", userValid);
         return userValid;
+    }
+
+    @Override
+    public boolean verifyUserByPhoneNumberAndEmail(String phoneNumber, String email) throws Exception {
+        return userTranslator.registerCheck(phoneNumber, email);
     }
 
     @Override

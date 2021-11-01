@@ -37,7 +37,6 @@ public class UserTranslatorImpl implements UserTranslator {
 
     @Override
     public User getUserByEmail(String email) {
-        LOGGER.info("[User Translator log] getUserByEmail method, input email: {}", email);
         if (!userExistsWithEmail(email)) {
             LOGGER.warn("[User Translator log] getUserByEmail method, User with email {} does not exist", email);
             throw new RuntimeException("User with email " + email + " does not exist");
@@ -47,7 +46,6 @@ public class UserTranslatorImpl implements UserTranslator {
 
     @Override
     public boolean userExistsWithEmail(String email) {
-        LOGGER.info("[User Translator log] userExistsWithEmail method, input email: {}", email);
         boolean returnValue = userRepository.existsByEmail(email);
         LOGGER.info("[User Translator log] userExistsWithEmail method, email exists: {}", returnValue);
         return returnValue;
@@ -61,6 +59,7 @@ public class UserTranslatorImpl implements UserTranslator {
         return returnValue;
     }
 
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
     @Override
     public Integer deleteUser(Integer id) throws Exception {
         LOGGER.info("[User Translator log] deleteUser method, input id: {}", id);
@@ -69,7 +68,11 @@ public class UserTranslatorImpl implements UserTranslator {
         return deleteValue;
     }
 
-    //TODO: Update user method
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @Override
+    public Integer updateUser(String firstName, String lastName, String email, String phoneNumber, Integer userId) {
+        return userRepository.updateUser(firstName, lastName, email, phoneNumber, userId);
+    }
 
     @Override
     public boolean loginUser(String password, String email) throws Exception {
@@ -83,8 +86,8 @@ public class UserTranslatorImpl implements UserTranslator {
     public boolean registerCheck(String phoneNumber, String email) throws Exception {
         LOGGER.info("[User Translator log] registerCheck method, input phone number: {} and email: {}", phoneNumber, email);
         if (userRepository.existsByPhoneNumberAndEmail(phoneNumber, email)) {
-            LOGGER.info("[User Translator log] registerCheck method, user status: {}", true);
-            return true;
+            LOGGER.error("[User Translator log] registerCheck method, user with phone number: {} and email: {} already exists", phoneNumber, email);
+           throw new RuntimeException("[User Translator Error] registerCheck method, user already exists");
         }
         LOGGER.info("[User Translator log] registerCheck method, user status: {}", false);
         return false;

@@ -51,9 +51,16 @@ public class AwsFileServiceImpl implements AwsFileServices {
     }
 
     @Override
-    public void deletePhotoFromFolder(String fileName) {
-        DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(AwsBucket.PROFILE_IMAGE.getAwsBucket(), fileName);
+    public void deletePhotoFromFolder(String bucketName, String fileName) {
+        DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucketName, fileName);
         s3.deleteObject(deleteObjectRequest);
+    }
+
+    @Override
+    public void deleteUserFolder(String bucketName, String path) {
+        for (S3ObjectSummary file : s3.listObjects(bucketName, path).getObjectSummaries()){
+            s3.deleteObject(bucketName, file.getKey());
+        }
     }
 
     //TODO: Update photo method

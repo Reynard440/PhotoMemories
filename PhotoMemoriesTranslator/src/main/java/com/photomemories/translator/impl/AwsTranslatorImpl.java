@@ -50,13 +50,25 @@ public class AwsTranslatorImpl implements AwsTranslator {
     @Override
     public boolean deletePhotoFromFolder(String fileName) {
         try {
-            awsFileServices.deletePhotoFromFolder(fileName);
+            awsFileServices.deletePhotoFromFolder(AwsBucket.PROFILE_IMAGE.getAwsBucket(), fileName);
             LOGGER.info("[AWS Translator log] deletePhotoFromFolder method, successfully deleted photo from {}", fileName);
+            return true;
         } catch (RuntimeException e) {
             LOGGER.warn("[AWS Translator log] deletePhotoFromFolder method, Could not delete the photo with error {}", e.getMessage());
             throw new RuntimeException("Could not delete the photo", e);
         }
-        return false;
+    }
+
+    @Override
+    public boolean deleteUserFolder(String path) {
+        try {
+            awsFileServices.deleteUserFolder(AwsBucket.PROFILE_IMAGE.getAwsBucket(), path);
+            LOGGER.info("[AWS Translator log] deleteUserFolder method, successfully deleted folder from {}", path);
+            return true;
+        } catch (RuntimeException e) {
+            LOGGER.error("[AWS Translator log] deleteUserFolder method, Could not delete the folder with error {}", e.getMessage());
+            throw new RuntimeException("[AWS Translator Error] deleteUserFolder method, Could not delete the folder", e);
+        }
     }
 
     //TODO: Update photo method

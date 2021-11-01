@@ -13,5 +13,9 @@ public interface UserCRUDService {
 
     Integer deleteUser(Integer id) throws Exception;
 
+    UserDto updateUserDto(String firstName, String lastName, String email, String phoneNumber, Integer userId);
+
     boolean loginUser(String password, String email) throws Exception;
+
+    boolean verifyUserByPhoneNumberAndEmail (String phoneNumber, String email) throws Exception;
 }

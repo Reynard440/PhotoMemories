@@ -78,6 +78,18 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
         return "Photo was deleted successfully";
     }
 
+    @Override
+    public String deleteFolderForUser(String path, String email) {
+        UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
+        awsTranslator.deleteUserFolder(path + "/" + userDto.getUserId());
+        if (!awsTranslator.deleteUserFolder(path + "/" + userDto.getUserId())) {
+            LOGGER.warn("[AWS Logic log] deleteFolderForUser method, Folder could not be deleted");
+            return "Folder not deleted";
+        }
+        LOGGER.info("[AWS Logic log] deleteFolderForUser method, Folder was deleted successfully");
+        return "Folder deleted successfully";
+    }
+
     //TODO: Update photo method
 
     @Override
