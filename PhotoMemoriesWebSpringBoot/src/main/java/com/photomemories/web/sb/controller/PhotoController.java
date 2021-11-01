@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
@@ -44,7 +45,7 @@ public class PhotoController {
         this.sharedCRUDService = sharedCRUDService;
     }
 
-    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
+    @Transactional(rollbackOn = { SQLException.class, RuntimeException.class, Exception.class, IOException.class })
     @PostMapping(
             path = "/addNewPhoto",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -66,32 +67,37 @@ public class PhotoController {
             @RequestParam("photoCapturedBy") String photoCapturedBy,
             @RequestParam("photoId") Integer photoId,
             @RequestParam("email") String email,
-            @RequestParam("photo") List<MultipartFile> photos) throws Exception {
+            @RequestParam("photos") MultipartFile[] photos) throws Exception {
         UserDto user = userCRUDService.getUserDtoByEmail(email);
         if (user != null) {
             PhotoDto photoResponse = null;
-            int counter = 0;
-            for (MultipartFile photo : photos) {
-                PhotoDto photoDto = new PhotoDto(photoId, photoName, photoSize, photoUploadDate, modifiedDate, photoLink, photoLocation, photoFormat, photoCapturedBy);
-                photoResponse = photoCRUDService.createPhotoDto(photoDto);
-                SharedDto sharedDto = new SharedDto();
-                sharedDto.setSharedHasAccess(false);
-                sharedDto.setPhotoId(photoResponse.getPhotoId());
-                sharedDto.setSharedDate(LocalDate.now());
-                sharedDto.setUserId(user.getUserId());
-                sharedDto.setSharedWith(0);
-                SharedDto dto = sharedCRUDService.createSharedDto(sharedDto);
 
-                awsCRUDService.uploadToS3(email, photo);
-                counter++;
+            for (MultipartFile photo : photos) {
+                try {
+                    PhotoDto photoDto = new PhotoDto(photoId, photoName, photoSize, photoUploadDate, modifiedDate, photoLink, photoLocation, photoFormat, photoCapturedBy);
+                    photoResponse = photoCRUDService.createPhotoDto(photoDto);
+                    SharedDto sharedDto = new SharedDto();
+                    sharedDto.setSharedHasAccess(false);
+                    sharedDto.setPhotoId(photoResponse.getPhotoId());
+                    sharedDto.setSharedDate(LocalDate.now());
+                    sharedDto.setUserId(user.getUserId());
+                    sharedDto.setSharedWith(0);
+                    SharedDto dto = sharedCRUDService.createSharedDto(sharedDto);
+
+                    awsCRUDService.uploadToS3(email, photo);
+                } catch (IOException e) {
+                    throw new IOException("An error occurred: ", e.getCause());
+                }
             }
-            LOGGER.info("[Photo Controller log] addNewPhoto method, {} photos uploaded to {}'s folder", counter, email);
+
+            LOGGER.info("[Photo Controller log] addNewPhoto method, photos uploaded to {}'s folder", email);
 
             PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } else {
+            LOGGER.error("[Photo Controller log] addNewPhoto method, Photo could not be created");
+            throw new RuntimeException("Could not add the photo");
         }
-        LOGGER.warn("[Photo Controller log] addNewPhoto method, Photo could not be created");
-        throw new RuntimeException("Could not add the photo");
     }
 
     @GetMapping("/photoExists/{id}/{photoLink}")

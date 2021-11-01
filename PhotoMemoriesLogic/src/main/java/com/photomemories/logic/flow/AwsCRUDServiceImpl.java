@@ -14,12 +14,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-
-import static org.apache.http.entity.ContentType.*;
 
 @Component("awsServiceFlow")
 public class AwsCRUDServiceImpl implements AwsCRUDService {
@@ -96,15 +94,9 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
     }
 
     private void isPhoto(MultipartFile photo) {
-        if (!Arrays.asList(
-                IMAGE_JPEG.getMimeType(),
-                IMAGE_PNG.getMimeType(),
-                IMAGE_GIF.getMimeType(),
-                IMAGE_BMP.getMimeType(),
-                IMAGE_TIFF.getMimeType(),
-                IMAGE_WEBP.getMimeType()).contains(photo.getContentType())) {
-            LOGGER.warn("[AWS Logic log] isPhoto method, Photo must be an image of type [ {} ]", photo.getContentType());
-            throw new IllegalStateException("Photo must be an image of type [" + photo.getContentType() + "]");
+        if (!Objects.equals(photo.getContentType(), "image/png") || !Objects.equals(photo.getContentType(), "image/jpeg") || !Objects.equals(photo.getContentType(), "image/jpg") || !Objects.equals(photo.getContentType(), "image/bmp") || !Objects.equals(photo.getContentType(), "image/ico") || !Objects.equals(photo.getContentType(), "image/gif") || !Objects.equals(photo.getContentType(), "image/tiff")) {
+            LOGGER.warn("[AWS Logic log] isPhoto method, File type [ {} ] not allowed for uploading", photo.getContentType());
+            throw new IllegalStateException("[AWS Logic Error] isPhoto method, File type [" + photo.getContentType() + "] not allowed for uploading");
         }
     }
 
