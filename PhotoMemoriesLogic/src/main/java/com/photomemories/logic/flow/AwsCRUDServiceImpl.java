@@ -1,5 +1,6 @@
 package com.photomemories.logic.flow;
 
+import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.photomemories.domain.dto.UserDto;
 import com.photomemories.domain.persistence.AwsBucket;
@@ -14,10 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Component("awsServiceFlow")
 public class AwsCRUDServiceImpl implements AwsCRUDService {
@@ -79,10 +77,10 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
     }
 
     @Override
-    public String deleteFolderForUser(String path, String email) {
+    public String deleteFolderForUser(String email) {
         UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
-        awsTranslator.deleteUserFolder(path + "/" + userDto.getUserId());
-        if (!awsTranslator.deleteUserFolder(path + "/" + userDto.getUserId())) {
+        awsTranslator.deleteUserFolder("/" + userDto.getUserId());
+        if (!awsTranslator.deleteUserFolder("/" + userDto.getUserId())) {
             LOGGER.warn("[AWS Logic log] deleteFolderForUser method, Folder could not be deleted");
             return "Folder not deleted";
         }
@@ -95,7 +93,19 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
     @Override
     public ObjectListing getAllPhotosOfUser(String folderName) {
         LOGGER.info("[AWS Logic log] getAllPhotosOfUser method, Photos retrieved from {}", folderName);
-        return awsTranslator.getAllUserPhotos(folderName);
+        return awsTranslator.getAllUserPhotos(folderName + "/");
+    }
+
+    @Override
+    public ListObjectsRequest getAllPhotos(String email) {
+        UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
+        return awsTranslator.getAllPhotos(AwsBucket.PROFILE_IMAGE.getAwsBucket(), userDto.getUserId().toString());
+    }
+
+    @Override
+    public List listPhotos(String email) {
+        UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
+        return awsTranslator.listPhotos(AwsBucket.PROFILE_IMAGE.getAwsBucket(), userDto.getUserId().toString());
     }
 
     private void isPhotoEmpty(MultipartFile photo) {

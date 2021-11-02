@@ -59,11 +59,8 @@ public class PhotoController {
             @RequestParam("modifiedDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate modifiedDate,
             @RequestParam("photoLink") String photoLink,
             @RequestParam("photoLocation") String photoLocation,
-            @RequestParam("photoSize") double photoSize,
             @ApiParam(value = "Date of photo uploaded", example = "2021-10-28", name = "photoUploadDate", required = true)
             @RequestParam("photoUploadDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate photoUploadDate,
-            @RequestParam("photoName") String photoName,
-            @RequestParam("photoFormat") String photoFormat,
             @RequestParam("photoCapturedBy") String photoCapturedBy,
             @RequestParam("photoId") Integer photoId,
             @RequestParam("email") String email,
@@ -74,7 +71,7 @@ public class PhotoController {
 
             for (MultipartFile photo : photos) {
                 try {
-                    PhotoDto photoDto = new PhotoDto(photoId, photoName, photoSize, photoUploadDate, modifiedDate, photoLink, photoLocation, photoFormat, photoCapturedBy);
+                    PhotoDto photoDto = new PhotoDto(photoId, photo.getOriginalFilename(), (double)photo.getSize(), photoUploadDate, modifiedDate, photoLink, photoLocation, photo.getContentType(), photoCapturedBy);
                     photoResponse = photoCRUDService.createPhotoDto(photoDto);
                     SharedDto sharedDto = new SharedDto();
                     sharedDto.setSharedHasAccess(false);
@@ -150,9 +147,9 @@ public class PhotoController {
     @GetMapping("/getAllPhotosOfUser/{id}/{email}/")
     @ApiOperation(value = "Gets a list of photos exists based on its id and the users email.", notes = "Tries to fetch a photo by id from the DB.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Member found by email", response = PhotoMemoriesResponse.class),
-            @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by email", response = PhotoMemoriesResponse.class),
-            @ApiResponse(code = 404, message = "Could not found a member by this email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 200, message = "Photo found by user email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by user's email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 404, message = "Could not found the user by this email", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
     public ResponseEntity<PhotoMemoriesResponse<List<PhotoDto>>> getAllPhotosOfUser(
             @ApiParam(value = "The id of each photo", example = "1", name = "id", required = true)

@@ -1,5 +1,6 @@
 package com.photomemories.translator.impl;
 
+import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.photomemories.aws.AwsFileServices;
 import com.photomemories.domain.persistence.AwsBucket;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -77,5 +79,15 @@ public class AwsTranslatorImpl implements AwsTranslator {
     public ObjectListing getAllUserPhotos(String folderName) {
         LOGGER.info("Bucket name {} {} {}", AwsBucket.PROFILE_IMAGE.getAwsBucket(), folderName, "/");
         return awsFileServices.getAllPhotos(folderName);
+    }
+
+    @Override
+    public ListObjectsRequest getAllPhotos(String bucketName, String folderName) {
+        return awsFileServices.listAllPhotos(bucketName, folderName);
+    }
+
+    @Override
+    public List listPhotos(String bucketName, String folderName) {
+        return awsFileServices.listPhotos(bucketName, folderName);
     }
 }

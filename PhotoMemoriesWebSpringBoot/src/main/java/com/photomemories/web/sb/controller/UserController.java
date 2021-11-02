@@ -2,6 +2,7 @@ package com.photomemories.web.sb.controller;
 
 import com.photomemories.domain.dto.UserDto;
 import com.photomemories.domain.service.PhotoMemoriesResponse;
+import com.photomemories.logic.AwsCRUDService;
 import com.photomemories.logic.UserCRUDService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -24,10 +25,12 @@ import java.sql.SQLException;
 public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PhotoController.class);
     private final UserCRUDService userCRUDService;
+    private final AwsCRUDService awsCRUDService;
 
     @Autowired
-    public UserController(UserCRUDService userCRUDService) {
+    public UserController(UserCRUDService userCRUDService, AwsCRUDService awsCRUDService) {
         this.userCRUDService = userCRUDService;
+        this.awsCRUDService = awsCRUDService;
     }
 
     @PostMapping("/addNewUser")
@@ -74,6 +77,9 @@ public class UserController {
             @ApiParam(value = "The id of each user", example = "1", name = "id", required = true)
             @PathVariable("id") Integer id) throws Exception {
         LOGGER.info("[User Controller log] deleteUser method, input id {} ", id);
+        UserDto userDto = userCRUDService.getUserDtoById(id);
+        String awsDeleteFolder = awsCRUDService.deleteFolderForUser(userDto.getEmail());
+        LOGGER.info("[User Controller log] deleteUser method, aws {}", awsDeleteFolder);
         int userResponse = userCRUDService.deleteUser(id);
         PhotoMemoriesResponse<Integer> response = new PhotoMemoriesResponse<>(true, userResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);

@@ -1,5 +1,6 @@
 package com.photomemories.web.sb.controller;
 
+import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.photomemories.logic.AwsCRUDService;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping(path ="/v1/c4")
@@ -54,6 +56,18 @@ public class AwsController {
                 .header("Content-type", "application/octet-stream")
                 .header("Content-disposition", "attachment; filename=\"" + imageName + "\"")
                 .body(arrayResource);
+    }
+
+    @GetMapping(path = "/retrieveAllPhotos/{email}")
+    public ListObjectsRequest retrieveAllPhotos(@PathVariable("email")String email) {
+        LOGGER.info("[AWS Controller log] retrieveAllPhotos method, input email {}", email);
+        return awsCRUDService.getAllPhotos(email);
+    }
+
+    @GetMapping(path = "/viewAllUserPhotos/{email}")
+    public List viewAllUserPhotos(@PathVariable("email")String email) {
+        LOGGER.info("[AWS Controller log] viewAllUserPhotos method, input email {}", email);
+        return awsCRUDService.listPhotos(email);
     }
 
     @DeleteMapping(value = "/deletePhoto")

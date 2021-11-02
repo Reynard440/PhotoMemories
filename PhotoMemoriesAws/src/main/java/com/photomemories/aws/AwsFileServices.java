@@ -1,8 +1,10 @@
 package com.photomemories.aws;
 
+import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,4 +20,8 @@ public interface AwsFileServices {
     //TODO: Update photo method
 
     ObjectListing getAllPhotos (String folderName);
+
+    ListObjectsRequest listAllPhotos(String bucketName, String folderName);
+
+    List listPhotos(String bucketName, String folderName);
 }

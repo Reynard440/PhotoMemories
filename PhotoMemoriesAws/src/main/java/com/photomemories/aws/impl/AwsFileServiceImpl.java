@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -79,4 +80,43 @@ public class AwsFileServiceImpl implements AwsFileServices {
         }
         return objectListing;
     }
+
+    @Override
+    public ListObjectsRequest listAllPhotos(String bucketName, String folderName) {
+        ListObjectsRequest listObjectsRequest = new ListObjectsRequest().withBucketName(bucketName)
+                .withPrefix(folderName);
+        return listObjectsRequest;
+    }
+
+    @Override
+    public List listPhotos(String bucketName, String folderName) {
+
+        ListObjectsRequest listObjectsRequest =
+                new ListObjectsRequest()
+                        .withBucketName(bucketName)
+                        .withPrefix(folderName + "/");
+
+        List keys = new ArrayList<>();
+
+        ObjectListing objects = s3.listObjects(listObjectsRequest);
+
+        while (true) {
+            List<S3ObjectSummary> summaries = objects.getObjectSummaries();
+            if (summaries.size() < 1) {
+                break;
+            }
+
+            for (S3ObjectSummary item : summaries) {
+                if (!item.getKey().endsWith("/")) {
+                    keys.add(item.getKey());
+                }
+            }
+
+            objects = s3.listNextBatchOfObjects(objects);
+        }
+
+        return keys;
+    }
+
+
 }

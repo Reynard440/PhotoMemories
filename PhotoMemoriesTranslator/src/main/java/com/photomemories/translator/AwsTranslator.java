@@ -1,9 +1,11 @@
 package com.photomemories.translator;
 
+import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -20,4 +22,8 @@ public interface AwsTranslator {
     //TODO: Update photo method
 
     ObjectListing getAllUserPhotos(String folderName);
+
+    ListObjectsRequest getAllPhotos(String bucketName, String folderName);
+
+    List listPhotos(String bucketName, String folderName);
 }
