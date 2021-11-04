@@ -1,5 +1,6 @@
 package com.photomemories.logic.flow;
 
+import com.amazonaws.services.connect.model.UserNotFoundException;
 import com.photomemories.domain.dto.UserDto;
 import com.photomemories.domain.persistence.User;
 import com.photomemories.logic.UserCRUDService;
@@ -68,8 +69,8 @@ public class UserCRUDServiceImpl implements UserCRUDService, UserDetailsService 
     public UserDto getUserDtoByEmail(String email) {
         LOGGER.info("[User Logic log] getUserDtoById method, input email {}", email);
         if (!userTranslator.userExistsWithEmail(email)) {
-            LOGGER.warn("[User Logic log] getUserDtoByEmail method, User with email {} does not exist", email);
-            throw new RuntimeException("User with email " + email + " does not exist");
+            LOGGER.error("[User Logic log] getUserDtoByEmail method, User with email {} does not exist", email);
+            throw new UserNotFoundException("User with email " + email + " does not exist");
         }
         return new UserDto(userTranslator.getUserByEmail(email));
     }

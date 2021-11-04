@@ -1,8 +1,10 @@
 package com.photomemories.logic.flow;
 
+import com.amazonaws.services.connect.model.UserNotFoundException;
 import com.photomemories.domain.dto.SharedDto;
 import com.photomemories.domain.dto.UserDto;
 import com.photomemories.domain.persistence.Shared;
+import com.photomemories.logic.AwsCRUDService;
 import com.photomemories.logic.SharedCRUDService;
 import com.photomemories.translator.SharedTranslator;
 import com.photomemories.translator.UserTranslator;
@@ -10,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.sql.SQLException;
@@ -20,11 +23,13 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SharedCRUDServiceImpl.class);
     private final SharedTranslator sharedTranslator;
     private final UserTranslator userTranslator;
+    private final AwsCRUDService awsCRUDService;
 
     @Autowired
-    public SharedCRUDServiceImpl (SharedTranslator sharedTranslator, UserTranslator userTranslator) {
+    public SharedCRUDServiceImpl (SharedTranslator sharedTranslator, UserTranslator userTranslator, AwsCRUDService awsCRUDService) {
         this.sharedTranslator = sharedTranslator;
         this.userTranslator = userTranslator;
+        this.awsCRUDService = awsCRUDService;
     }
 
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
@@ -53,11 +58,11 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
     }
 
     @Override
-    public String sharePhoto(String sharingEmail, String receivingEmail, boolean accessRights, Integer id) throws Exception {
+    public String sharePhoto(String sharingEmail, String receivingEmail, boolean accessRights, Integer id, MultipartFile photo) throws Exception {
         try {
             if (!userTranslator.userExistsWithEmail(receivingEmail)) {
                 LOGGER.error("[Shared Logic log] sharePhoto method, Could not share the photo with email {}", receivingEmail);
-                throw new RuntimeException("[Shared Logic Error] sharePhoto method");
+                throw new UserNotFoundException("[Shared Logic Error] sharePhoto method");
             }
             UserDto receivingUserDto = new UserDto(userTranslator.getUserByEmail(receivingEmail));
             UserDto sendUserDto = new UserDto(userTranslator.getUserByEmail(sharingEmail));
@@ -66,6 +71,9 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
             Shared shared = sharedDto.buildShared();
             Shared addedSharePhoto = sharedTranslator.sharePhoto(shared);
             SharedDto returnSharePhoto = new SharedDto(sharedTranslator.sharePhoto(addedSharePhoto));
+
+            awsCRUDService.uploadToS3(receivingEmail, photo);
+
             LOGGER.info("[Shared Logic log] sharePhoto method, shared the photo with email {}", receivingEmail);
             return "Photo shared";
         } catch (Exception e) {

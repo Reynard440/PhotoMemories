@@ -46,6 +46,7 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
             String path = String.format("%s/%s", AwsBucket.PROFILE_IMAGE.getAwsBucket(), userDto.getUserId());
             String filename = photo.getOriginalFilename();
             awsTranslator.save(path, filename, Optional.of(extraData), photo.getInputStream());
+
             LOGGER.info("[AWS Logic log] uploadToS3 method, saved successfully");
         } catch (IOException e) {
             LOGGER.warn("[AWS Logic log] uploadToS3 method, exception {} ", e.getMessage());
@@ -116,7 +117,16 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
     }
 
     private void isPhoto(MultipartFile photo) {
-        if (!Objects.equals(photo.getContentType(), "image/png") || !Objects.equals(photo.getContentType(), "image/jpeg") || !Objects.equals(photo.getContentType(), "image/jpg") || !Objects.equals(photo.getContentType(), "image/bmp") || !Objects.equals(photo.getContentType(), "image/ico") || !Objects.equals(photo.getContentType(), "image/gif") || !Objects.equals(photo.getContentType(), "image/tiff")) {
+        List<String> contentTypes = new ArrayList<>();
+        contentTypes.add("image/png");
+        contentTypes.add("image/jpeg");
+        contentTypes.add("image/jpeg");
+        contentTypes.add("image/jpg");
+        contentTypes.add("image/bmp");
+        contentTypes.add("image/ico");
+        contentTypes.add("image/gif");
+        contentTypes.add("image/tiff");
+        if (!contentTypes.contains(photo.getContentType())) {
             LOGGER.warn("[AWS Logic log] isPhoto method, File type [ {} ] not allowed for uploading", photo.getContentType());
             throw new IllegalStateException("[AWS Logic Error] isPhoto method, File type [" + photo.getContentType() + "] not allowed for uploading");
         }

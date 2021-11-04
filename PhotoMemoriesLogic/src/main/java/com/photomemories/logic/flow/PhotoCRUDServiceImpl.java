@@ -1,13 +1,19 @@
 package com.photomemories.logic.flow;
 
 import com.photomemories.domain.dto.PhotoDto;
+import com.photomemories.domain.dto.SharedDto;
+import com.photomemories.domain.dto.UserDto;
 import com.photomemories.domain.persistence.Photo;
+import com.photomemories.logic.AwsCRUDService;
 import com.photomemories.logic.PhotoCRUDService;
+import com.photomemories.logic.SharedCRUDService;
+import com.photomemories.logic.UserCRUDService;
 import com.photomemories.translator.PhotoTranslator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.sql.SQLException;
@@ -20,16 +26,23 @@ import java.util.stream.Collectors;
 public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PhotoCRUDServiceImpl.class);
     private final PhotoTranslator photoTranslator;
+    private final UserCRUDService userCRUDService;
+    private final SharedCRUDService sharedCRUDService;
+    private final AwsCRUDService awsCRUDService;
 
     @Autowired
-    public PhotoCRUDServiceImpl(PhotoTranslator photoTranslator) {
+    public PhotoCRUDServiceImpl(PhotoTranslator photoTranslator, AwsCRUDService awsCRUDService, UserCRUDService userCRUDService, SharedCRUDService sharedCRUDService) {
         this.photoTranslator = photoTranslator;
+        this.userCRUDService = userCRUDService;
+        this.sharedCRUDService = sharedCRUDService;
+        this.awsCRUDService = awsCRUDService;
     }
 
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
     @Override
-    public PhotoDto createPhotoDto(PhotoDto photoDto) throws Exception {
+    public PhotoDto createPhotoDto(PhotoDto photoDto, String email, MultipartFile photoFile) throws Exception {
         try {
+            UserDto user = userCRUDService.getUserDtoByEmail(email);
             Photo photo = photoDto.buildPhoto();
             LOGGER.info("[Photo Logic log] createPhotoDto method, Dto Object converted to persistence is: {}", photo);
 
@@ -39,12 +52,23 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
             Photo addedPhoto = photoTranslator.addPhoto(photo);
             LOGGER.info("[Photo Logic log] createPhotoDto method, object saved to database: {}", addedPhoto);
 
+            awsCRUDService.uploadToS3(email, photoFile);
+
+            SharedDto sharedDto = new SharedDto();
+            sharedDto.setSharedHasAccess(false);
+            sharedDto.setPhotoId(addedPhoto.getPhotoId());
+            sharedDto.setSharedDate(LocalDate.now());
+            sharedDto.setUserId(user.getUserId());
+            sharedDto.setSharedWith(0);
+            SharedDto dto = sharedCRUDService.createSharedDto(sharedDto);
+
             PhotoDto returnDto = new PhotoDto(photoTranslator.addPhoto(addedPhoto));
             LOGGER.info("[Photo Logic log] createPhotoDto method, Dto returned: {}", returnDto);
+
             return returnDto;
         } catch (Exception e) {
-            LOGGER.warn("[Photo Logic log] createPhotoDto method, Photo could not be created with error {}", e.getMessage());
-            throw new RuntimeException("Photo could not be created!", e);
+            LOGGER.error("[Photo Logic log] createPhotoDto method, Photo could not be created with error {}", e.getMessage());
+            throw new RuntimeException("[Photo Logic Error] createPhotoDto method, Photo could not be created!", e);
         }
     }
 
@@ -85,7 +109,7 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
 
     @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
     @Override
-    public Integer deletePhoto(Integer id, String photoLink) throws Exception {
+    public Integer deletePhoto(Integer id, String photoLink, String email) throws Exception {
         boolean beforeDelete = photoTranslator.photoExists(id, photoLink);
         LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", beforeDelete);
 
@@ -94,6 +118,7 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
             throw new RuntimeException("Photo with id " + id + " does not exist!");
         }
         int photoDelete = photoTranslator.deletePhoto(id, photoLink);
+        awsCRUDService.deletePhoto(photoLink, email);
         boolean afterDelete = photoTranslator.photoExists(id, photoLink);
         LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", afterDelete);
 

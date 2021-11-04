@@ -1,13 +1,8 @@
 package com.photomemories.web.sb.controller;
 
 import com.photomemories.domain.dto.PhotoDto;
-import com.photomemories.domain.dto.SharedDto;
-import com.photomemories.domain.dto.UserDto;
 import com.photomemories.domain.service.PhotoMemoriesResponse;
-import com.photomemories.logic.AwsCRUDService;
 import com.photomemories.logic.PhotoCRUDService;
-import com.photomemories.logic.SharedCRUDService;
-import com.photomemories.logic.UserCRUDService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -33,21 +28,15 @@ import java.util.List;
 public class PhotoController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PhotoController.class);
     private final PhotoCRUDService photoCRUDService;
-    private final AwsCRUDService awsCRUDService;
-    private final UserCRUDService userCRUDService;
-    private final SharedCRUDService sharedCRUDService;
 
     @Autowired
-    public PhotoController(PhotoCRUDService photoCRUDService, SharedCRUDService sharedCRUDService, AwsCRUDService awsCRUDService, UserCRUDService userCRUDService) {
+    public PhotoController(PhotoCRUDService photoCRUDService) {
         this.photoCRUDService = photoCRUDService;
-        this.awsCRUDService = awsCRUDService;
-        this.userCRUDService = userCRUDService;
-        this.sharedCRUDService = sharedCRUDService;
     }
 
-    @Transactional(rollbackOn = { SQLException.class, RuntimeException.class, Exception.class, IOException.class })
     @PostMapping(
             path = "/addNewPhoto",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Create a new Photo.", notes = "Adds a new Photo in the DB.")
     @ApiResponses(value = {
@@ -59,42 +48,19 @@ public class PhotoController {
             @RequestParam("modifiedDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate modifiedDate,
             @RequestParam("photoLink") String photoLink,
             @RequestParam("photoLocation") String photoLocation,
-            @ApiParam(value = "Date of photo uploaded", example = "2021-10-28", name = "photoUploadDate", required = true)
-            @RequestParam("photoUploadDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate photoUploadDate,
             @RequestParam("photoCapturedBy") String photoCapturedBy,
-            @RequestParam("photoId") Integer photoId,
-            @RequestParam("email") String email,
-            @RequestParam("photos") MultipartFile[] photos) throws Exception {
-        UserDto user = userCRUDService.getUserDtoByEmail(email);
-        if (user != null) {
-            PhotoDto photoResponse = null;
+            @RequestParam(name = "email") String email,
+            @RequestParam(name = "photo") MultipartFile photo) throws Exception {
+            try {
+                PhotoDto photoDto = new PhotoDto(photo.getOriginalFilename(), (double)photo.getSize(), LocalDate.now(), modifiedDate, photoLink, photoLocation, photo.getContentType(), photoCapturedBy);
+                PhotoDto photoResponse = photoCRUDService.createPhotoDto(photoDto, email, photo);
+                LOGGER.info("[Photo Controller log] addNewPhoto method, photos uploaded to {}'s folder", email);
 
-            for (MultipartFile photo : photos) {
-                try {
-                    PhotoDto photoDto = new PhotoDto(photoId, photo.getOriginalFilename(), (double)photo.getSize(), photoUploadDate, modifiedDate, photoLink, photoLocation, photo.getContentType(), photoCapturedBy);
-                    photoResponse = photoCRUDService.createPhotoDto(photoDto);
-                    SharedDto sharedDto = new SharedDto();
-                    sharedDto.setSharedHasAccess(false);
-                    sharedDto.setPhotoId(photoResponse.getPhotoId());
-                    sharedDto.setSharedDate(LocalDate.now());
-                    sharedDto.setUserId(user.getUserId());
-                    sharedDto.setSharedWith(0);
-                    SharedDto dto = sharedCRUDService.createSharedDto(sharedDto);
-
-                    awsCRUDService.uploadToS3(email, photo);
-                } catch (IOException e) {
-                    throw new IOException("An error occurred: ", e.getCause());
-                }
+                PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
+                return new ResponseEntity<>(response, HttpStatus.CREATED);
+            } catch (IOException e) {
+                throw new IOException("[Photo Controller Error] addNewPhoto method, An error occurred: ", e.getCause());
             }
-
-            LOGGER.info("[Photo Controller log] addNewPhoto method, photos uploaded to {}'s folder", email);
-
-            PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } else {
-            LOGGER.error("[Photo Controller log] addNewPhoto method, Photo could not be created");
-            throw new RuntimeException("Could not add the photo");
-        }
     }
 
     @GetMapping("/photoExists/{id}/{photoLink}")
@@ -177,8 +143,7 @@ public class PhotoController {
             @ApiParam(value = "The id of the photo", example = "1", name = "id", required = true)
             @PathVariable("id") Integer id) throws Exception {
         LOGGER.info("[Photo Controller log] deletePhoto method, input id {} and email {} and photoLink {}", id, email, photoLink);
-        int photoResponse = photoCRUDService.deletePhoto(id, photoLink);
-        awsCRUDService.deletePhoto(photoLink, email);
+        int photoResponse = photoCRUDService.deletePhoto(id, photoLink, email);
         PhotoMemoriesResponse<Integer> response = new PhotoMemoriesResponse<>(true, photoResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

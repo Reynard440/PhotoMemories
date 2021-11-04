@@ -37,9 +37,10 @@ public class AwsController {
 
         for (MultipartFile photo : photos) {
             try {
+                LOGGER.info("Photo content-type {}", photo.getContentType());
                 awsCRUDService.uploadToS3(email, photo);
             } catch (IOException e) {
-                throw new IOException("An error occurred: ", e.getCause());
+                throw new IOException("AWS Controller error: ", e.getCause());
             }
         }
         LOGGER.info("[AWS Controller log] uploadPhoto method, photos uploaded to {}'s folder", email);
