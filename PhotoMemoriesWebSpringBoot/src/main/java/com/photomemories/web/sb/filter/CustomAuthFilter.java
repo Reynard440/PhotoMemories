@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,6 +31,9 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomAuthFilter.class);
     private final AuthenticationManager authenticationManager;
 
+    @Value("${security.token.secret}")
+    private String secret;
+
     @Autowired
     public CustomAuthFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
@@ -47,7 +51,7 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication auth) throws IOException, ServletException {
         User user = (User)auth.getPrincipal();
-        Algorithm algorithm = Algorithm.HMAC256("CMPG323".getBytes());
+        Algorithm algorithm = Algorithm.HMAC256(secret.getBytes());
 
         String access_token = getAccessToken(request, user, algorithm);
 
