@@ -11,6 +11,15 @@ import java.util.List;
 
 @Repository
 public interface PhotoRepository extends JpaRepository<Photo, Integer> {
+    @Query("select distinct p from Photo p left join p.shares shares where shares.UserId.UserId = ?1 and p.PhotoId = shares.PhotoId.PhotoId")
+    List<Photo> findByShares_UserId_UserId(Integer UserId);
+
+    @Query("select p from Photo p left join p.shares shares where shares.PhotoId.PhotoId = ?1 and shares.UserId.UserId = ?2")
+    List<Photo> findByPhotoIdAndUserId(Integer PhotoId, Integer UserId);
+
+    @Query("select p from Photo p left join p.shares shares where p.PhotoFormat = ?1 and shares.PhotoId.PhotoId = ?2 and shares.SharedHasAccess = ?3 and shares.SharedWith = ?4")
+    List<Photo> findByPhotoFormat(String PhotoFormat, Photo PhotoId, Boolean SharedHasAccess, Integer SharedWith);
+
     @Query("select p from Photo p left join p.shares shares where p.PhotoId = ?1 and shares.PhotoId.PhotoId = ?2 and shares.UserId.UserId = ?3 and shares.UserId.Email = ?4")
     List<Photo> findByPhotoIdAndShares_PhotoId_PhotoIdAndShares_UserId_UserIdAndShares_UserId_Email(Integer PhotoId, Integer PhotoId1, Integer UserId, String Email);
 

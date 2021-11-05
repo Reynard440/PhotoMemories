@@ -10,6 +10,10 @@ public interface PhotoCRUDService {
 
     PhotoDto getPhotoDtoById(Integer id);
 
+    List<PhotoDto> getAllPhotoDtosOfUser(Integer userId);
+
+    List<byte[]> getAllPhotosForUser(String email);
+
     PhotoDto getByPhotoNameAndPhotoFormat(String name, String format);
 
     List<PhotoDto> getByPhotoIdAndShares_UserId_Email(Integer id, String email);

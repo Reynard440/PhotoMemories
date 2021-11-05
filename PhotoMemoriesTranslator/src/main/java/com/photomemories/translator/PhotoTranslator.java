@@ -20,4 +20,6 @@ public interface PhotoTranslator {
     Integer deletePhoto(Integer id, String photoLink) throws Exception;
 
     List<Photo> getAllPhotos();
+
+    List<Photo> getAllPhotosOfUser(Integer userId);
 }

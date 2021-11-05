@@ -47,7 +47,7 @@ public class AwsFileServiceImpl implements AwsFileServices {
             S3ObjectInputStream inputStream = object.getObjectContent();
             return IOUtils.toByteArray(inputStream);
         } catch (AmazonServiceException | IOException e) {
-            throw new IllegalStateException("Could not download from the cloud", e);
+            throw new IllegalStateException("Could not download from the cloud", e.getCause());
         }
     }
 
@@ -116,6 +116,16 @@ public class AwsFileServiceImpl implements AwsFileServices {
         }
 
         return keys;
+    }
+
+    @Override
+    public byte[] getAllPhotosForUser(String path, String key) {
+        try {
+            S3Object object = s3.getObject(path, key);
+            return IOUtils.toByteArray(object.getObjectContent());
+        } catch (AmazonServiceException | IOException e) {
+            throw new IllegalStateException("Failed to download", e);
+        }
     }
 
 

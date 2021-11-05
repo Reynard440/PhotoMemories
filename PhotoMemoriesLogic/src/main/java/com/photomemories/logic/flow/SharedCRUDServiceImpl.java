@@ -57,6 +57,7 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
         return new SharedDto(sharedTranslator.getSharedByUserId(id));
     }
 
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
     @Override
     public String sharePhoto(String sharingEmail, String receivingEmail, boolean accessRights, Integer id, MultipartFile photo) throws Exception {
         try {

@@ -24,4 +24,6 @@ public interface AwsFileServices {
     ListObjectsRequest listAllPhotos(String bucketName, String folderName);
 
     List listPhotos(String bucketName, String folderName);
+
+    byte[] getAllPhotosForUser(String path, String key);
 }

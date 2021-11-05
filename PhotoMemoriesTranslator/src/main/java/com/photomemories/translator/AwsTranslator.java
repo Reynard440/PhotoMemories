@@ -26,4 +26,6 @@ public interface AwsTranslator {
     ListObjectsRequest getAllPhotos(String bucketName, String folderName);
 
     List listPhotos(String bucketName, String folderName);
+
+    byte[] getAllPhotosForUser(String path, String key);
 }

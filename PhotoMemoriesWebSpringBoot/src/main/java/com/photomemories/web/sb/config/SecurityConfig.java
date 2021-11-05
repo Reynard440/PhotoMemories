@@ -38,7 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         CustomAuthFilter customAuthFilter = overrideDefaultLoginPath();
 
-        httpBasicConfigurationAndPermission(http);
+//        httpBasicConfigurationAndPermission(http);
 
         controllerOneRestrictions(http);
         controllerTwoRestrictions(http);
@@ -60,7 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private void httpBasicConfigurationAndPermission(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(STATELESS);
-        http.authorizeRequests().antMatchers("/photo-memories/mvc/login/**").permitAll();
+        http.authorizeRequests().antMatchers("/**").authenticated();
     }
 
     private void controllerOneRestrictions(HttpSecurity http) throws Exception {

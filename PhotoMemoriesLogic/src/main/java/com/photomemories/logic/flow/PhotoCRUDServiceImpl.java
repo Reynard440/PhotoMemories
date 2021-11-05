@@ -79,6 +79,31 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     }
 
     @Override
+    public List<PhotoDto> getAllPhotoDtosOfUser(Integer userId) {
+        LOGGER.info("[Photo Logic log] getAllPhotoDtosOfUser method, user id {}", userId);
+        List<PhotoDto> list = new ArrayList<>();
+        Integer index = 0;
+        for (Photo photo : photoTranslator.getAllPhotosOfUser(userId)) {
+            PhotoDto photoDto = new PhotoDto(photo);
+            list.add(photoDto);
+            list.stream().distinct();
+        }
+        return list;
+    }
+
+    @Override
+    public List<byte[]> getAllPhotosForUser(String email) {
+        UserDto userDto = userCRUDService.getUserDtoByEmail(email);
+        List<byte[]> photos = new ArrayList<>();
+        for (PhotoDto photoDto : photoTranslator.getAllPhotosOfUser(userDto.getUserId()).stream().map(PhotoDto::new).collect(Collectors.toList())) {
+            photos.add(awsCRUDService.userPhotos(userDto.getUserId(), photoDto.getPhotoLink()));
+            LOGGER.info("[Photo Logic log] getAllPhotosForUser method, id {} imageName {}", userDto.getUserId(), photoDto.getPhotoLink());
+        }
+        LOGGER.info("[Photo Logic log] getAllPhotosForUser method, Photos retrieved successfully");
+        return photos;
+    }
+
+    @Override
     public PhotoDto getByPhotoNameAndPhotoFormat(String name, String format) {
         LOGGER.info("[Photo Logic log] getByPhotoNameAndPhotoFormat method, input name {} and format {}", name, format);
         return new PhotoDto(photoTranslator.findByPhotoNameAndPhotoFormat(name, format));

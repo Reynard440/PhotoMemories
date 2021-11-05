@@ -67,6 +67,12 @@ public class PhotoTranslatorImpl implements PhotoTranslator {
         return photoRepository.findAll();
     }
 
+    @Override
+    public List<Photo> getAllPhotosOfUser(Integer userId) {
+        LOGGER.info("[Photo Translator log] getAllPhotosOfUser method, user id {}", userId);
+        return photoRepository.findByShares_UserId_UserId(userId);
+    }
+
     //TODO: Update method
     //TODO: Get by metadata method
 }

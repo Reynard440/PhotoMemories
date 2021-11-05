@@ -66,6 +66,14 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
     }
 
     @Override
+    public byte[] userPhotos(Integer id, String imageName){
+        String key = String.format("%s/%s", id, imageName);
+        byte[] downloadValue = awsTranslator.download(AwsBucket.PROFILE_IMAGE.getAwsBucket() + "/", key);
+        LOGGER.info("[AWS Logic log] downloadPhoto method, Photo downloaded successfully");
+        return downloadValue;
+    }
+
+    @Override
     public String deletePhoto(String fileName, String email) {
         UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
         awsTranslator.deletePhotoFromFolder(userDto.getUserId() + "/" + fileName);

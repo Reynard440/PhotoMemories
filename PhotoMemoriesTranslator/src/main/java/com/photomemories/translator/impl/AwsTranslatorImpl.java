@@ -1,5 +1,6 @@
 package com.photomemories.translator.impl;
 
+import com.amazonaws.services.account.model.AWSAccountException;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.photomemories.aws.AwsFileServices;
@@ -40,12 +41,13 @@ public class AwsTranslatorImpl implements AwsTranslator {
     @Override
     public byte[] download(String path, String key) {
         try {
+            LOGGER.info("[AWS Translator log] download method, location {}{} ", path, key);
             byte[] downloadResult = awsFileServices.download(path, key);
             LOGGER.info("[AWS Translator log] download method, successful download");
             return downloadResult;
-        } catch (RuntimeException e) {
+        } catch (AWSAccountException e) {
             LOGGER.warn("[AWS Translator log] download method, Could not execute the download request with error {}", e.getMessage());
-            throw new RuntimeException("Could not download the photo", e);
+            throw new RuntimeException("Could not download the photo", e.getCause());
         }
     }
 
@@ -89,5 +91,10 @@ public class AwsTranslatorImpl implements AwsTranslator {
     @Override
     public List listPhotos(String bucketName, String folderName) {
         return awsFileServices.listPhotos(bucketName, folderName);
+    }
+
+    @Override
+    public byte[] getAllPhotosForUser(String path, String key) {
+        return awsFileServices.getAllPhotosForUser(path, key);
     }
 }

@@ -46,13 +46,13 @@ public class PhotoController {
     public ResponseEntity<PhotoMemoriesResponse<PhotoDto>> addNewPhoto(
             @ApiParam(value = "Date of photo uploaded", example = "2021-10-12", name = "modifiedDate", required = true)
             @RequestParam("modifiedDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate modifiedDate,
-            @RequestParam("photoLink") String photoLink,
+            @RequestParam("photoName") String photoName,
             @RequestParam("photoLocation") String photoLocation,
             @RequestParam("photoCapturedBy") String photoCapturedBy,
             @RequestParam(name = "email") String email,
             @RequestParam(name = "photo") MultipartFile photo) throws Exception {
             try {
-                PhotoDto photoDto = new PhotoDto(photo.getOriginalFilename(), (double)photo.getSize(), LocalDate.now(), modifiedDate, photoLink, photoLocation, photo.getContentType(), photoCapturedBy);
+                PhotoDto photoDto = new PhotoDto(photoName, (double)photo.getSize(), LocalDate.now(), modifiedDate, photo.getOriginalFilename(), photoLocation, photo.getContentType(), photoCapturedBy);
                 PhotoDto photoResponse = photoCRUDService.createPhotoDto(photoDto, email, photo);
                 LOGGER.info("[Photo Controller log] addNewPhoto method, photos uploaded to {}'s folder", email);
 
@@ -79,6 +79,34 @@ public class PhotoController {
         boolean photoResponse = photoCRUDService.photoExists(id, photoLink);
         PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, photoResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/getAllPhotosOfUser/{id}")
+    @ApiOperation(value = "Checks if a photo exists based on their id.", notes = "Tries to fetch a photo by id from the DB.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Member found by email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 404, message = "Could not found a member by this email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
+    public ResponseEntity<PhotoMemoriesResponse<List<PhotoDto>>> getAllPhotosOfUser(
+            @ApiParam(value = "The id of each photo", example = "1", name = "id", required = true)
+            @PathVariable("id") Integer id) throws SQLException {
+        LOGGER.info("[Photo Controller log] getAllPhotosOfUser method, input user id {}", id);
+        List<PhotoDto> photoResponse = photoCRUDService.getAllPhotoDtosOfUser(id);
+        PhotoMemoriesResponse<List<PhotoDto>> response = new PhotoMemoriesResponse<>(true, photoResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/getAllPhotosForUser/{email}")
+    @ApiOperation(value = "Checks if a user exists based on their email.", notes = "Tries to fetch a user by email from the DB.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "User found by email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 404, message = "Could not found a user by this email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
+    public List<byte[]> viewAllUserPhotos(@PathVariable("email")String email) {
+        LOGGER.info("[Photo Controller log] getAllPhotosForUser method, input email {}", email);
+        return photoCRUDService.getAllPhotosForUser(email);
     }
 
     @GetMapping("/getPhotoById/{id}")
