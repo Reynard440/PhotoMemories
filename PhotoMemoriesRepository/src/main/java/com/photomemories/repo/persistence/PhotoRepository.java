@@ -14,15 +14,6 @@ public interface PhotoRepository extends JpaRepository<Photo, Integer> {
     @Query("select distinct p from Photo p left join p.shares shares where shares.UserId.UserId = ?1 and p.PhotoId = shares.PhotoId.PhotoId")
     List<Photo> findByShares_UserId_UserId(Integer UserId);
 
-    @Query("select p from Photo p left join p.shares shares where shares.PhotoId.PhotoId = ?1 and shares.UserId.UserId = ?2")
-    List<Photo> findByPhotoIdAndUserId(Integer PhotoId, Integer UserId);
-
-    @Query("select p from Photo p left join p.shares shares where p.PhotoFormat = ?1 and shares.PhotoId.PhotoId = ?2 and shares.SharedHasAccess = ?3 and shares.SharedWith = ?4")
-    List<Photo> findByPhotoFormat(String PhotoFormat, Photo PhotoId, Boolean SharedHasAccess, Integer SharedWith);
-
-    @Query("select p from Photo p left join p.shares shares where p.PhotoId = ?1 and shares.PhotoId.PhotoId = ?2 and shares.UserId.UserId = ?3 and shares.UserId.Email = ?4")
-    List<Photo> findByPhotoIdAndShares_PhotoId_PhotoIdAndShares_UserId_UserIdAndShares_UserId_Email(Integer PhotoId, Integer PhotoId1, Integer UserId, String Email);
-
     @Query("select p from Photo p left join p.shares shares where p.PhotoId = ?1 and shares.UserId.Email = ?2")
     List<Photo> findByPhotoIdAndShares_UserId_Email(Integer PhotoId, String Email);
 
@@ -32,7 +23,10 @@ public interface PhotoRepository extends JpaRepository<Photo, Integer> {
     @Query("select p from Photo p where p.PhotoId = ?1")
     Photo findByPhotoId(Integer PhotoId);
 
-    //TODO: Update photo method
+    @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
+    @Modifying
+    @Query(value = "update Photo set PhotoName = ?1, PhotoLocation = ?2, PhotoCapturedBy = ?3 where PhotoId = ?4 ")
+    int updatePhoto(String pName, String pLocation, String pCapturedBy, Integer photoId);
 
     @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
     @Modifying

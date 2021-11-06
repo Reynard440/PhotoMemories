@@ -96,7 +96,7 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
         UserDto userDto = userCRUDService.getUserDtoByEmail(email);
         List<byte[]> photos = new ArrayList<>();
         for (PhotoDto photoDto : photoTranslator.getAllPhotosOfUser(userDto.getUserId()).stream().map(PhotoDto::new).collect(Collectors.toList())) {
-            photos.add(awsCRUDService.userPhotos(userDto.getUserId(), photoDto.getPhotoLink()));
+            photos.add(awsCRUDService.downloadPhoto(email, photoDto.getPhotoLink()));
             LOGGER.info("[Photo Logic log] getAllPhotosForUser method, id {} imageName {}", userDto.getUserId(), photoDto.getPhotoLink());
         }
         LOGGER.info("[Photo Logic log] getAllPhotosForUser method, Photos retrieved successfully");
@@ -134,7 +134,7 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
 
     @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
     @Override
-    public Integer deletePhoto(Integer id, String photoLink, String email) throws Exception {
+    public Integer deletePhotoDto(Integer id, String photoLink, String email) throws Exception {
         boolean beforeDelete = photoTranslator.photoExists(id, photoLink);
         LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", beforeDelete);
 
@@ -148,5 +148,18 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
         LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", afterDelete);
 
         return photoDelete;
+    }
+
+    @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
+    @Override
+    public PhotoDto updatePhotoDto(String pName, String pLocation, String pCapturedBy, Integer photoId) {
+        int returnValue = photoTranslator.updatePhoto(pName, pLocation, pCapturedBy, photoId);
+
+        if (returnValue == 0) {
+            LOGGER.error("[Photo Logic log] updatePhotoDto method, did not update photo metadata: {}", false);
+            throw new RuntimeException("[Photo Logic Error] updatePhotoDto method, did not update metadata");
+        }
+
+        return new PhotoDto(photoTranslator.getPhotoById(photoId));
     }
 }

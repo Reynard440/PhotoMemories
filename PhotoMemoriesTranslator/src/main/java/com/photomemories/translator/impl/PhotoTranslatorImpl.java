@@ -73,6 +73,11 @@ public class PhotoTranslatorImpl implements PhotoTranslator {
         return photoRepository.findByShares_UserId_UserId(userId);
     }
 
-    //TODO: Update method
+    @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
+    @Override
+    public Integer updatePhoto(String pName, String pLocation, String pCapturedBy, Integer photoId) {
+        return photoRepository.updatePhoto(pName, pLocation, pCapturedBy, photoId);
+    }
+
     //TODO: Get by metadata method
 }

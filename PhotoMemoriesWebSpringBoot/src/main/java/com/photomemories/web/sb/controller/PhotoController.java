@@ -97,7 +97,7 @@ public class PhotoController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/getAllPhotosForUser/{email}")
+    @GetMapping(path = "/getAllPhotosForUser/{email}")
     @ApiOperation(value = "Checks if a user exists based on their email.", notes = "Tries to fetch a user by email from the DB.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "User found by email", response = PhotoMemoriesResponse.class),
@@ -106,7 +106,9 @@ public class PhotoController {
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
     public List<byte[]> viewAllUserPhotos(@PathVariable("email")String email) {
         LOGGER.info("[Photo Controller log] getAllPhotosForUser method, input email {}", email);
-        return photoCRUDService.getAllPhotosForUser(email);
+        List<byte[]> listOfPhotos = photoCRUDService.getAllPhotosForUser(email);
+        LOGGER.info("[Photo Controller log] getAllPhotosForUser method, {} photos were retrieved", listOfPhotos.size());
+        return listOfPhotos;
     }
 
     @GetMapping("/getPhotoById/{id}")
@@ -171,8 +173,37 @@ public class PhotoController {
             @ApiParam(value = "The id of the photo", example = "1", name = "id", required = true)
             @PathVariable("id") Integer id) throws Exception {
         LOGGER.info("[Photo Controller log] deletePhoto method, input id {} and email {} and photoLink {}", id, email, photoLink);
-        int photoResponse = photoCRUDService.deletePhoto(id, photoLink, email);
+        int photoResponse = photoCRUDService.deletePhotoDto(id, photoLink, email);
         PhotoMemoriesResponse<Integer> response = new PhotoMemoriesResponse<>(true, photoResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @PutMapping("/updateMetadata/{id}")
+    @ApiOperation(value = "Updates a photo's metadata by id.", notes = "Changes a photo's metadata in the DB.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Photo updated", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not resolve updating the photo by id", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 404, message = "Could not found the photo with this id", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
+    public ResponseEntity<PhotoMemoriesResponse<PhotoDto>> updateMetadata(
+            @ApiParam(value = "The id of the photo", example = "1", name = "id", required = true)
+            @PathVariable("id") Integer id,
+            @ApiParam(value = "The photo's new  name.", example = "ReynardEngels.jpeg", name = "pName", required = true)
+            @RequestParam("pName") String pName,
+            @ApiParam(value = "The photo's new location.", example = "Vaalpark", name = "pLocation", required = true)
+            @RequestParam("pLocation") String pLocation,
+            @ApiParam(value = "The photo's new owner.", example = "Reyno Engels", name = "pCaptured", required = true)
+            @RequestParam("pCaptured") String pCaptured) throws Exception {
+        LOGGER.info("[Photo Controller log] updateMetadata method, input id {} ", id);
+
+        if (photoCRUDService.photoExists(id, pName)) {
+            LOGGER.error("[Photo Controller log] updateMetadata method, photo {} does not exist", pName);
+            throw new RuntimeException("[Photo Controller Error] updateMetadata method, photo " + pName + " does not exist");
+        }
+
+        PhotoDto photoResponse = photoCRUDService.updatePhotoDto(pName, pLocation, pCaptured, id);
+        PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

@@ -12,8 +12,6 @@ public interface AwsCRUDService {
 
     byte[] downloadPhoto(String email, String imageName);
 
-    byte[] userPhotos(Integer id, String imageName);
-
     String deletePhoto(String fileName, String email);
 
     String deleteFolderForUser(String email);

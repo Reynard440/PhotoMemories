@@ -22,4 +22,6 @@ public interface PhotoTranslator {
     List<Photo> getAllPhotos();
 
     List<Photo> getAllPhotosOfUser(Integer userId);
+
+    Integer updatePhoto(String pName, String pLocation, String pCapturedBy, Integer photoId);
 }

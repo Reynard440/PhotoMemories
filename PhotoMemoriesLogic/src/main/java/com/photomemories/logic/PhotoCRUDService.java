@@ -22,5 +22,7 @@ public interface PhotoCRUDService {
 
     boolean photoExists(Integer id, String photoLink);
 
-    Integer deletePhoto(Integer id, String photoLink, String email) throws Exception;
+    Integer deletePhotoDto(Integer id, String photoLink, String email) throws Exception;
+
+    PhotoDto updatePhotoDto(String pName, String pLocation, String pCapturedBy, Integer photoId);
 }
