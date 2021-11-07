@@ -82,4 +82,15 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
             throw new RuntimeException("Exception with error ", e.getCause());
         }
     }
+
+//    @Override
+//    public SharedDto findBySharedDtoVerifiedIds(Integer sharedWitdId, Integer userId, Integer photoId) {
+//        LOGGER.info("[Shared Logic log] findBySharedDtoVerifiedIds method, photo id {} shared With Id {} by userId {}", userId, userId, photoId);
+//        SharedDto verifyAccess = new SharedDto(sharedTranslator.findBySharedVerifiedIds(sharedWitdId, userId, photoId));
+//        if (verifyAccess == null) {
+//            LOGGER.error("[Shared Logic log] findBySharedDtoVerifiedIds method, no such record exists");
+//            throw new RuntimeException("[Shared Logic log] findBySharedDtoVerifiedIds method, no such record exists");
+//        }
+//        return verifyAccess;
+//    }
 }

@@ -9,4 +9,6 @@ public interface SharedCRUDService {
     SharedDto getSharedByUserId(Integer id);
 
     String sharePhoto(String sharingEmail, String receivingEmail, boolean accessRights, Integer photoId, MultipartFile photo) throws Exception;
+
+//    SharedDto findBySharedDtoVerifiedIds(Integer sharedWitdId, Integer userId, Integer photoId);
 }

@@ -16,7 +16,7 @@ public interface PhotoCRUDService {
 
     PhotoDto getByPhotoNameAndPhotoFormat(String name, String format);
 
-    List<PhotoDto> getByUserEmail(String email);
+    List<PhotoDto> getPhotosByUserEmail(String email);
 
     List<PhotoDto> getAllPhotos();
 
@@ -24,5 +24,5 @@ public interface PhotoCRUDService {
 
     Integer deletePhotoDto(Integer id, String photoLink, String email) throws Exception;
 
-    PhotoDto updatePhotoDto(String pName, String pLocation, String pCapturedBy, Integer photoId);
+    PhotoDto updatePhotoDto(String pName, String pLocation, String pCapturedBy, Integer photoId, String email);
 }

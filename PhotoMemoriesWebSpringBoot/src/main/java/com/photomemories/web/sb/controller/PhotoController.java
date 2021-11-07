@@ -151,7 +151,7 @@ public class PhotoController {
     public ResponseEntity<PhotoMemoriesResponse<List<PhotoDto>>> loadAllPhotosOfUser(
             @PathVariable("email") String email) throws SQLException {
         LOGGER.info("[Photo Controller log] getAllPhotosOfUser method, email {} ", email);
-        List<PhotoDto> photoResponse = photoCRUDService.getByUserEmail(email);
+        List<PhotoDto> photoResponse = photoCRUDService.getPhotosByUserEmail(email);
         PhotoMemoriesResponse<List<PhotoDto>> response = new PhotoMemoriesResponse<>(true, photoResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -193,7 +193,9 @@ public class PhotoController {
             @ApiParam(value = "The photo's new location.", example = "Vaalpark", name = "pLocation", required = true)
             @RequestParam("pLocation") String pLocation,
             @ApiParam(value = "The photo's new owner.", example = "Reyno Engels", name = "pCaptured", required = true)
-            @RequestParam("pCaptured") String pCaptured) throws Exception {
+            @RequestParam("pCaptured") String pCaptured,
+            @ApiParam(value = "The email of the user trying to update the photo.", example = "reynardengels@gmail.com", name = "email", required = true)
+            @RequestParam("email") String email) throws Exception {
         LOGGER.info("[Photo Controller log] updateMetadata method, input id {} ", id);
 
         if (photoCRUDService.photoExists(id, pName)) {
@@ -201,7 +203,7 @@ public class PhotoController {
             throw new RuntimeException("[Photo Controller Error] updateMetadata method, photo " + pName + " does not exist");
         }
 
-        PhotoDto photoResponse = photoCRUDService.updatePhotoDto(pName, pLocation, pCaptured, id);
+        PhotoDto photoResponse = photoCRUDService.updatePhotoDto(pName, pLocation, pCaptured, id, email);
         PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

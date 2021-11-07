@@ -40,7 +40,7 @@ public class PhotoTranslatorImpl implements PhotoTranslator {
     }
 
     @Override
-    public List<Photo> findByPhotoIdAndShares_UserId_Email(String email) {
+    public List<Photo> findByUserEmail(String email) {
         LOGGER.info("[Photo Translator log] findByPhotoIdAndShares_UserId_Email method, user email {}", email);
         return photoRepository.findByUserEmail(email);
     }

@@ -10,4 +10,6 @@ public interface SharedTranslator {
     Shared getSharedByUserId(Integer id);
 
     Shared sharePhoto (Shared sharePhoto) throws Exception;
+
+//    Shared findBySharedVerifiedIds(Integer sharedWitdId, Integer UserId, Integer PhotoId);
 }

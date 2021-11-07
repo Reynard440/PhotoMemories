@@ -110,9 +110,9 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     }
 
     @Override
-    public List<PhotoDto> getByUserEmail(String email) {
+    public List<PhotoDto> getPhotosByUserEmail(String email) {
         LOGGER.info("[Photo Logic log] getByPhotoIdAndShares_UserId_Email method, email {}", email);
-        return photoTranslator.findByPhotoIdAndShares_UserId_Email(email).stream().map(PhotoDto::new).collect(Collectors.toList());
+        return photoTranslator.findByUserEmail(email).stream().map(PhotoDto::new).collect(Collectors.toList());
     }
 
     @Override
@@ -139,9 +139,14 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
         LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", beforeDelete);
 
         if (!photoExists(id, photoLink)) {
-            LOGGER.warn("Photo with id {} does not exists", id);
-            throw new RuntimeException("Photo with id " + id + " does not exist!");
+            LOGGER.error("[Photo Logic log] deletePhoto method, Photo with id {} does not exists", id);
+            throw new RuntimeException("[Photo Logic Error] deletePhoto method, Photo with id " + id + " does not exist!");
         }
+
+//        UserDto userDto = userCRUDService.getUserDtoByEmail(email);
+
+//        LOGGER.info("[Photo Logic log] deletePhotoDto method, You have valid access rights. Access Rights for photo modification {} ", true);
+
         int photoDelete = photoTranslator.deletePhoto(id, photoLink);
         awsCRUDService.deletePhoto(photoLink, email);
         boolean afterDelete = photoTranslator.photoExists(id, photoLink);
@@ -152,7 +157,11 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
 
     @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
     @Override
-    public PhotoDto updatePhotoDto(String pName, String pLocation, String pCapturedBy, Integer photoId) {
+    public PhotoDto updatePhotoDto(String pName, String pLocation, String pCapturedBy, Integer photoId, String email) {
+
+//        UserDto userDto = userCRUDService.getUserDtoByEmail(email);
+
+//        LOGGER.info("[Photo Logic log] updatePhotoDto method, You have valid access rights. Access Rights for photo modification {} ", true);
         int returnValue = photoTranslator.updatePhoto(pName, pLocation, pCapturedBy, photoId);
 
         if (returnValue == 0) {

@@ -65,16 +65,6 @@ export default class PhotoPadPhotoList extends Component {
                                     </td>
                                 </tr>
                             ))
-                            // <tr>
-                            //     <th>1</th>
-                            //     <th>2012-02-10</th>
-                            //     <th>Reyno Engels</th>
-                            //     <th>jpeg</th>
-                            //     <th>Vaalpark</th>
-                            //     <th>ReynardEngels.jpeg</th>
-                            //     <th>1113487</th>
-                            //     <th>2021-10-28</th>
-                            // </tr>
                         }
                         </tbody>
                     </Table>
