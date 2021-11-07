@@ -14,8 +14,8 @@ public interface PhotoRepository extends JpaRepository<Photo, Integer> {
     @Query("select distinct p from Photo p left join p.shares shares where shares.UserId.UserId = ?1 and p.PhotoId = shares.PhotoId.PhotoId")
     List<Photo> findByShares_UserId_UserId(Integer UserId);
 
-    @Query("select p from Photo p left join p.shares shares where p.PhotoId = ?1 and shares.UserId.Email = ?2")
-    List<Photo> findByPhotoIdAndShares_UserId_Email(Integer PhotoId, String Email);
+    @Query("select p from Photo p left join p.shares shares where shares.UserId.Email = ?1")
+    List<Photo> findByUserEmail(String Email);
 
     @Query("select p from Photo p where p.PhotoName = ?1 and p.PhotoFormat = ?2")
     Photo findByPhotoNameAndPhotoFormat(String PhotoName, String PhotoFormat);

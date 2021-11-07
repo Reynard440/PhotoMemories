@@ -4,7 +4,7 @@ import {Alert} from "react-bootstrap";
 export default class PhotoPadWelcome extends Component {
     render() {
         return (
-            <Alert variant="secondary">
+            <Alert variant="success">
                 <Alert.Heading>Hi and welcome to my project 2 website</Alert.Heading>
                 <blockquote className="blockquote mb-0">
                     <p>

@@ -22,6 +22,7 @@ import java.sql.SQLException;
 
 @RestController
 @RequestMapping(path="/v1/c1")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PhotoController.class);
     private final UserCRUDService userCRUDService;

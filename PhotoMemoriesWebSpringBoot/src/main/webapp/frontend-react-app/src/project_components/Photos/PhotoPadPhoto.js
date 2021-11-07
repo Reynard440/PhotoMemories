@@ -1,6 +1,8 @@
 import React, {Component} from "react";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import CardHeader from "react-bootstrap/CardHeader";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faPlusSquare, faSave} from '@fortawesome/free-solid-svg-icons';
 
 export default  class PhotoPadPhoto extends Component {
     constructor(props) {
@@ -29,7 +31,7 @@ export default  class PhotoPadPhoto extends Component {
     render(){
         return (
             <Card className={"border border-secondary bg-secondary text-white"}>
-                <CardHeader>Add a Photo</CardHeader>
+                <CardHeader><FontAwesomeIcon icon={faPlusSquare}/> Add a Photo</CardHeader>
                     <Form onSubmit={this.addPhoto} id={"photoForm"}>
                         <Card.Body>
                         <Row>
@@ -66,9 +68,9 @@ export default  class PhotoPadPhoto extends Component {
                                 </Form.Group>
                             </Row>
                         </Card.Body>
-                        <Card.Footer style={{ "textAlign":"center"}}>
-                            <Button size="md" type="Submit" variant="primary" type="submit">
-                                Add Photo
+                        <Card.Footer style={{ "textAlign":"left"}}>
+                            <Button size="md" type="Submit" variant="success" type="submit">
+                                <FontAwesomeIcon icon={faSave}/> Add Photo
                             </Button>
                         </Card.Footer>
                     </Form>

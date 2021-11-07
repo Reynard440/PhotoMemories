@@ -110,9 +110,9 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     }
 
     @Override
-    public List<PhotoDto> getByPhotoIdAndShares_UserId_Email(Integer id, String email) {
-        LOGGER.info("[Photo Logic log] getByPhotoIdAndShares_UserId_Email method, input id {} and email {}", id, email);
-        return photoTranslator.findByPhotoIdAndShares_UserId_Email(id, email).stream().map(PhotoDto::new).collect(Collectors.toList());
+    public List<PhotoDto> getByUserEmail(String email) {
+        LOGGER.info("[Photo Logic log] getByPhotoIdAndShares_UserId_Email method, email {}", email);
+        return photoTranslator.findByPhotoIdAndShares_UserId_Email(email).stream().map(PhotoDto::new).collect(Collectors.toList());
     }
 
     @Override

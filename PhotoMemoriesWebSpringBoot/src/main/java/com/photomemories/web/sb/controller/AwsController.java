@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path ="/v1/c4")
-@CrossOrigin("*")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AwsController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AwsController.class);
     private final AwsCRUDService awsCRUDService;

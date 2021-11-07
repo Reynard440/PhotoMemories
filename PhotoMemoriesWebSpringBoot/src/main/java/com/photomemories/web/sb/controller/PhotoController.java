@@ -25,6 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path="/v1/c2")
+@CrossOrigin(origins = "http://localhost:3000")
 public class PhotoController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PhotoController.class);
     private final PhotoCRUDService photoCRUDService;
@@ -140,19 +141,17 @@ public class PhotoController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/getAllPhotosOfUser/{id}/{email}/")
+    @GetMapping("/loadAllPhotosOfUser/{email}/")
     @ApiOperation(value = "Gets a list of photos exists based on its id and the users email.", notes = "Tries to fetch a photo by id from the DB.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Photo found by user email", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by user's email", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 404, message = "Could not found the user by this email", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
-    public ResponseEntity<PhotoMemoriesResponse<List<PhotoDto>>> getAllPhotosOfUser(
-            @ApiParam(value = "The id of each photo", example = "1", name = "id", required = true)
-            @PathVariable("id") Integer id,
+    public ResponseEntity<PhotoMemoriesResponse<List<PhotoDto>>> loadAllPhotosOfUser(
             @PathVariable("email") String email) throws SQLException {
-        LOGGER.info("[Photo Controller log] getAllPhotosOfUser method, input id {} and email {} ", id, email);
-        List<PhotoDto> photoResponse = photoCRUDService.getByPhotoIdAndShares_UserId_Email(id, email);
+        LOGGER.info("[Photo Controller log] getAllPhotosOfUser method, email {} ", email);
+        List<PhotoDto> photoResponse = photoCRUDService.getByUserEmail(email);
         PhotoMemoriesResponse<List<PhotoDto>> response = new PhotoMemoriesResponse<>(true, photoResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

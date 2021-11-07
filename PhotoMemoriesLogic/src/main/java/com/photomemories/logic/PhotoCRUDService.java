@@ -16,7 +16,7 @@ public interface PhotoCRUDService {
 
     PhotoDto getByPhotoNameAndPhotoFormat(String name, String format);
 
-    List<PhotoDto> getByPhotoIdAndShares_UserId_Email(Integer id, String email);
+    List<PhotoDto> getByUserEmail(String email);
 
     List<PhotoDto> getAllPhotos();
 
