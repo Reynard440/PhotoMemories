@@ -25,6 +25,7 @@ export default function App() {
                     <Switch>
                         <Route path="/" exact component={PhotoPadWelcome}/>
                         <Route path="/add" exact component={PhotoPadPhoto}/>
+                        <Route path="/edit/:photoId" exact component={PhotoPadPhoto}/>
                         <Route path="/list" exact component={PhotoPadPhotoList}/>
                         <Route path="/register" exact component={PhotoPadRegister}/>
                         <Route path="/login" exact component={PhotoPadLogin}/>

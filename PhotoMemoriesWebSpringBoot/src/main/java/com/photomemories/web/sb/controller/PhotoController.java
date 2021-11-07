@@ -37,7 +37,7 @@ public class PhotoController {
 
     @PostMapping(
             path = "/addNewPhoto",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            consumes = { MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE },
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Create a new Photo.", notes = "Adds a new Photo in the DB.")
     @ApiResponses(value = {
@@ -45,13 +45,13 @@ public class PhotoController {
             @ApiResponse(code = 400, message = "Bad Request: could not resolve the creation of the new photo.", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
     public ResponseEntity<PhotoMemoriesResponse<PhotoDto>> addNewPhoto(
-            @ApiParam(value = "Date of photo uploaded", example = "2021-10-12", name = "modifiedDate", required = true)
+            @ApiParam(value = "Date of photo uploaded", example = "2021-10-12", name = "modifiedDate")
             @RequestParam("modifiedDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate modifiedDate,
             @RequestParam("photoName") String photoName,
             @RequestParam("photoLocation") String photoLocation,
             @RequestParam("photoCapturedBy") String photoCapturedBy,
-            @RequestParam(name = "email") String email,
-            @RequestParam(name = "photo") MultipartFile photo) throws Exception {
+            @RequestParam("email") String email,
+            @RequestParam("photo") MultipartFile photo) throws Exception {
             try {
                 PhotoDto photoDto = new PhotoDto(photoName, (double)photo.getSize(), LocalDate.now(), modifiedDate, photo.getOriginalFilename(), photoLocation, photo.getContentType(), photoCapturedBy);
                 PhotoDto photoResponse = photoCRUDService.createPhotoDto(photoDto, email, photo);

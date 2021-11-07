@@ -28,15 +28,15 @@ export default class PhotoPadLogin extends Component {
         return (
             <Row className="justify-content-md-center">
                 <Col xs={5}>
-                    <Card className={"border border-secondary bg-secondary text-white"}>
+                    <Card className={"border border-white bg-white text-dark"}>
                         <Card.Header>
-                            <FontAwesomeIcon icon={faSignInAlt}/>Login
+                            <FontAwesomeIcon icon={faSignInAlt}/>  Login
                         </Card.Header>
                         <Card.Body>
                             <Form>
                                 <Form.Group className="mb-3" controlId="formBasicEmail">
                                     <Form.Label>Email address</Form.Label>
-                                    <Form.Control type="text" className={"bg-secondary text-white"} placeholder="Enter email here" />
+                                    <Form.Control type="text" className={"bg-white text-dark"} placeholder="Enter email here" />
                                     <Form.Text className="text-muted">
                                         We'll never share your email with anyone else.
                                     </Form.Text>
@@ -44,7 +44,7 @@ export default class PhotoPadLogin extends Component {
 
                                 <Form.Group className="mb-3" controlId="formBasicPassword">
                                     <Form.Label>Password</Form.Label>
-                                    <Form.Control type="password" className={"bg-secondary text-white"} placeholder="Enter password here" />
+                                    <Form.Control type="password" className={"bg-white text-dark"} placeholder="Enter password here" />
                                 </Form.Group>
                             </Form>
                         {/*    <Row>*/}
@@ -70,10 +70,10 @@ export default class PhotoPadLogin extends Component {
                         </Card.Body>
                         <Card.Footer style={{"textAlign":"right"}}>
                             <Button size="sm" type="button" variant="success" disabled={this.state.email.length === 0 || this.state.password.length === 0}>
-                                <FontAwesomeIcon icon={faSignInAlt}/>Login
+                                <FontAwesomeIcon icon={faSignInAlt}/>  Login
                             </Button> {' '}
                             <Button size="sm" type="button" variant="info" onClick={this.resetPhotoPadLoginForm} disabled={this.state.email.length === 0 && this.state.password.length === 0}>
-                                <FontAwesomeIcon icon={faUndo}/>Reset
+                                <FontAwesomeIcon icon={faUndo}/>  Reset
                             </Button>
                         </Card.Footer>
                     </Card>

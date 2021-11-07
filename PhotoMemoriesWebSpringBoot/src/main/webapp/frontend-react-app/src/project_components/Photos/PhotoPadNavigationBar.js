@@ -8,7 +8,7 @@ export default class PhotoPadNavigationBar extends Component {
         return (
             <Navbar bg="primary" variant="dark">
                 <Link to={""} className="navbar-brand">
-                    <img src={logo} height="30" width="100" style={{"margin-left":"10px", "margin-bottom":"5px"}} alt={logo}/>
+                    <img src={logo} height="30" width="100" style={{"marginLeft":"10px", "marginBottom":"5px"}} alt={logo}/>
                 </Link>
                 <Container>
                     <Nav className="mr-auto">

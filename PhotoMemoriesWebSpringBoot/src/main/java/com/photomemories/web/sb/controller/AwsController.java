@@ -46,7 +46,7 @@ public class AwsController {
         LOGGER.info("[AWS Controller log] uploadPhoto method, photos uploaded to {}'s folder", email);
     }
 
-    @GetMapping(path = "/{email}/image/{imageName}/download")
+    @GetMapping(path = "/downloadPhoto/{email}/{imageName}")
     public ResponseEntity<ByteArrayResource> downloadPhoto(@PathVariable("email")String email, @PathVariable("imageName")String imageName) {
         LOGGER.info("[AWS Controller log] downloadPhoto method, input email {} and imageName {}", email, imageName);
         byte[] imageData = awsCRUDService.downloadPhoto(email, imageName);
