@@ -23,27 +23,27 @@ public class SharedTranslatorImpl implements SharedTranslator {
 
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
     @Override
-    public Shared addShared(Shared shared) throws SQLException {
-        LOGGER.info("[Shared Translator log] addShared method, input object's date: {}", shared.getSharedDate());
+    public Shared addShared(Shared shared) throws RuntimeException, SQLException {
+        LOGGER.info("[Shared Translator log] addShared method, input object's date {}", shared.getSharedDate());
         return sharedRepository.save(shared);
     }
 
     @Override
-    public Shared getSharedByUserId(Integer id) {
-        LOGGER.info("[Shared Translator log] getSharedByUserId method, input id: {}", id);
-        return sharedRepository.findByUserId_UserId(id);
+    public Shared getSharedBySharedId(Integer id) {
+        LOGGER.info("[Shared Translator log] getSharedByUserId method, shared id {}", id);
+        return sharedRepository.findBySharedId(id);
     }
 
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
     @Override
-    public Shared sharePhoto(Shared sharePhoto) throws Exception {
+    public Shared sharePhoto(Shared sharePhoto) throws SQLException, RuntimeException {
         LOGGER.info("[Shared Translator log] sharePhoto method, input object's date: {}", sharePhoto.getSharedDate());
         return sharedRepository.save(sharePhoto);
     }
 
-//    @Override
-//    public Shared findBySharedVerifiedIds(Integer sharedWitdId, Integer userId, Integer photoId) {
-//        LOGGER.info("[Shared Translator log] findBySharedVerifiedIds method, photo id {} shared With Id {} by userId {}", userId, userId, photoId);
-//        return sharedRepository.findBySharedVerifiedIds(sharedWitdId, userId, photoId);
-//    }
+    @Override
+    public Shared findBySharedIdAndUserId(Integer sharedId, Integer userId) {
+        LOGGER.info("[Shared Translator log] findBySharedIdAndUserId method, shared id {} and user id {}", sharedId, userId);
+        return sharedRepository.findBySharedIdAndUserId_UserId(sharedId, userId);
+    }
 }

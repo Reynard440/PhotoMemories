@@ -11,12 +11,15 @@ import PhotoPadRegister from './project_components/Users/PhotoPadRegister';
 import PhotoPadLogin from './project_components/Users/PhotoPadLogin';
 import PhotoPadGallery from "./project_components/Photos/PhotoPadGallery";
 import PhotoPadEdit from "./project_components/Photos/PhotoPadEdit";
+import userModal from "./project_components/modals/userModal";
 
 export default function App() {
     const marginTop = {
         marginTop: "20px",
         marginLeft: "10px"
     };
+
+    const { open, close, openModal, closeModal } = userModal();
 
   return (
     <Router>
@@ -35,8 +38,19 @@ export default function App() {
                         </Switch>
                     </Col>
                 </Row>
+                {/*<Row>*/}
+                {/*    <div className="App">*/}
+                {/*        <button onClick={openModal}>Load Modal</button>*/}
+                {/*        {open ? (*/}
+                {/*            <Modal*/}
+                {/*                close={closeModal}*/}
+                {/*                render={() => <h1>This is a Modal using Portals!</h1>}*/}
+                {/*            />*/}
+                {/*        ) : null}*/}
+                {/*    </div>*/}
+                {/*</Row>*/}
             </Container>
         <PhotoPadFooter/>
     </Router>
   );
-}
+};

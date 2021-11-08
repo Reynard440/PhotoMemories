@@ -55,11 +55,11 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
             awsCRUDService.uploadToS3(email, photoFile);
 
             SharedDto sharedDto = new SharedDto();
-            sharedDto.setSharedHasAccess(false);
+            sharedDto.setSharedHasAccess(true);
             sharedDto.setPhotoId(addedPhoto.getPhotoId());
             sharedDto.setSharedDate(LocalDate.now());
             sharedDto.setUserId(user.getUserId());
-            sharedDto.setSharedWith(0);
+            sharedDto.setSharedWith(user.getUserId());
             SharedDto dto = sharedCRUDService.createSharedDto(sharedDto);
 
             PhotoDto returnDto = new PhotoDto(photoTranslator.addPhoto(addedPhoto));
@@ -126,9 +126,8 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
 
     @Override
     public boolean photoExists(Integer id, String photoLink) {
-        LOGGER.info("[Photo Logic log] photoExists method, queried id: {}", id);
         boolean returnPhotoLogicValue = photoTranslator.photoExists(id, photoLink);
-        LOGGER.info("[Photo Logic log] photoExists method, result: {}", returnPhotoLogicValue);
+        LOGGER.info("[Photo Logic log] photoExists method, result {}", returnPhotoLogicValue);
         return returnPhotoLogicValue;
     }
 
@@ -158,10 +157,6 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
     @Override
     public PhotoDto updatePhotoDto(String pName, String pLocation, String pCapturedBy, Integer photoId, String email) {
-
-//        UserDto userDto = userCRUDService.getUserDtoByEmail(email);
-
-//        LOGGER.info("[Photo Logic log] updatePhotoDto method, You have valid access rights. Access Rights for photo modification {} ", true);
         int returnValue = photoTranslator.updatePhoto(pName, pLocation, pCapturedBy, photoId);
 
         if (returnValue == 0) {

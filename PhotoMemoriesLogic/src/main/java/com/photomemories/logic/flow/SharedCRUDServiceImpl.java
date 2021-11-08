@@ -34,7 +34,7 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
 
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
     @Override
-    public SharedDto createSharedDto(SharedDto sharedDto) throws Exception {
+    public SharedDto createSharedDto(SharedDto sharedDto) throws RuntimeException, SQLException, Exception {
         try {
             if (!userTranslator.userExists(sharedDto.getUserId())) {
                 LOGGER.warn("[Shared Logic log] createSharedDto method, input Dto contained invalid user id: {}", "invalid");
@@ -52,9 +52,9 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
     }
 
     @Override
-    public SharedDto getSharedByUserId(Integer id) {
-        LOGGER.info("[Shared Logic log] getSharedByUserId method, input id {}", id);
-        return new SharedDto(sharedTranslator.getSharedByUserId(id));
+    public SharedDto getSharedBySharedId(Integer id) {
+        LOGGER.info("[Shared Logic log] getSharedByUserId method, shared id {}", id);
+        return new SharedDto(sharedTranslator.getSharedBySharedId(id));
     }
 
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
@@ -83,14 +83,15 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
         }
     }
 
-//    @Override
-//    public SharedDto findBySharedDtoVerifiedIds(Integer sharedWitdId, Integer userId, Integer photoId) {
-//        LOGGER.info("[Shared Logic log] findBySharedDtoVerifiedIds method, photo id {} shared With Id {} by userId {}", userId, userId, photoId);
-//        SharedDto verifyAccess = new SharedDto(sharedTranslator.findBySharedVerifiedIds(sharedWitdId, userId, photoId));
-//        if (verifyAccess == null) {
-//            LOGGER.error("[Shared Logic log] findBySharedDtoVerifiedIds method, no such record exists");
-//            throw new RuntimeException("[Shared Logic log] findBySharedDtoVerifiedIds method, no such record exists");
-//        }
-//        return verifyAccess;
-//    }
+    @Override
+    public boolean findBySharedIdAndUserId(Integer sharedId, String email) throws RuntimeException, Exception, SQLException {
+        UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
+        LOGGER.info("[Shared Logic log] findBySharedIdAndUserId method, shared id {} and email {}", sharedId, email);
+        sharedTranslator.findBySharedIdAndUserId(sharedId, userDto.getUserId());
+        if (sharedTranslator.findBySharedIdAndUserId(sharedId, userDto.getUserId()) == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }

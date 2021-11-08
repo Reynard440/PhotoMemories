@@ -65,4 +65,22 @@ public class SharedController {
         PhotoMemoriesResponse<String> response = new PhotoMemoriesResponse<>(true, sharedResponse);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    @GetMapping("/getSharedByIdAndEmail/{id}/{email}")
+    @ApiOperation(value = "Checks if a photo exists based on their id.", notes = "Tries to fetch a photo by id from the DB.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Shared record found by id and user email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by id and email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 404, message = "Could not found a shared record with this id and user email", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
+    public ResponseEntity<PhotoMemoriesResponse<Boolean>> getSharedByIdAndEmail(
+            @ApiParam(value = "The id of the shared record", example = "1", name = "id", required = true)
+            @PathVariable("id") Integer id,
+            @ApiParam(value = "The email of the user", example = "1", name = "email", required = true)
+            @PathVariable("email") String email) throws Exception {
+        LOGGER.info("[Shared Controller log] getSharedByIdAndEmail method, input id {} and user email {}", id, email);
+        boolean isFound = sharedCRUDService.findBySharedIdAndUserId(id, email);
+        PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, isFound);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

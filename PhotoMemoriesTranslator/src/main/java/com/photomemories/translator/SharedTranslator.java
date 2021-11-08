@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 public interface SharedTranslator {
     Shared addShared (Shared shared) throws Exception;
 
-    Shared getSharedByUserId(Integer id);
+    Shared getSharedBySharedId(Integer id);
 
     Shared sharePhoto (Shared sharePhoto) throws Exception;
 
-//    Shared findBySharedVerifiedIds(Integer sharedWitdId, Integer UserId, Integer PhotoId);
+    Shared findBySharedIdAndUserId(Integer sharedId, Integer userId);
 }

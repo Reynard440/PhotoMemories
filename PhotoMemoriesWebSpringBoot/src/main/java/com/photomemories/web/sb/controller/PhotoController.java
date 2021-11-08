@@ -1,8 +1,12 @@
 package com.photomemories.web.sb.controller;
 
 import com.photomemories.domain.dto.PhotoDto;
+import com.photomemories.domain.dto.SharedDto;
+import com.photomemories.domain.dto.UserDto;
 import com.photomemories.domain.service.PhotoMemoriesResponse;
 import com.photomemories.logic.PhotoCRUDService;
+import com.photomemories.logic.SharedCRUDService;
+import com.photomemories.logic.UserCRUDService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -29,10 +33,14 @@ import java.util.List;
 public class PhotoController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PhotoController.class);
     private final PhotoCRUDService photoCRUDService;
+    private final SharedCRUDService sharedCRUDService;
+    private final UserCRUDService userCRUDService;
 
     @Autowired
-    public PhotoController(PhotoCRUDService photoCRUDService) {
+    public PhotoController(PhotoCRUDService photoCRUDService, UserCRUDService userCRUDService, SharedCRUDService sharedCRUDService) {
         this.photoCRUDService = photoCRUDService;
+        this.sharedCRUDService = sharedCRUDService;
+        this.userCRUDService = userCRUDService;
     }
 
     @PostMapping(
@@ -156,8 +164,8 @@ public class PhotoController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
-    @DeleteMapping("/deletePhoto/{photoLink}/{email}/{id}")
+    @Transactional(rollbackOn = { RuntimeException.class, Exception.class, SQLException.class })
+    @DeleteMapping("/deletePhoto/{photoLink}/{email}/{id}/{sharedId}")
     @ApiOperation(value = "Deletes a photo by id.", notes = "Removes a photo from the DB.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Photo deleted", response = PhotoMemoriesResponse.class),
@@ -170,15 +178,32 @@ public class PhotoController {
             @ApiParam(value = "The email of the user", example = "reynardengels@gmail.com", name = "email", required = true)
             @PathVariable(value = "email") String email,
             @ApiParam(value = "The id of the photo", example = "1", name = "id", required = true)
-            @PathVariable("id") Integer id) throws Exception {
+            @PathVariable("id") Integer id,
+            @ApiParam(value = "The id of the shared record", example = "1", name = "sharedId", required = true)
+            @PathVariable("sharedId") Integer sharedId) throws Exception {
         LOGGER.info("[Photo Controller log] deletePhoto method, input id {} and email {} and photoLink {}", id, email, photoLink);
-        int photoResponse = photoCRUDService.deletePhotoDto(id, photoLink, email);
-        PhotoMemoriesResponse<Integer> response = new PhotoMemoriesResponse<>(true, photoResponse);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        PhotoMemoriesResponse<Integer> response;
+        int photoResponse;
+
+        UserDto userDto = userCRUDService.getUserDtoByEmail(email);
+        SharedDto sharedDto = sharedCRUDService.getSharedBySharedId(sharedId);
+
+        if ((sharedCRUDService.findBySharedIdAndUserId(sharedId, email)) && (sharedDto.getSharedWith().equals(userDto.getUserId()))) {
+            photoResponse = photoCRUDService.deletePhotoDto(id, photoLink, email);
+            response = new PhotoMemoriesResponse<>(true, photoResponse);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else if ((sharedDto.getSharedWith().equals(userDto.getUserId())) && (sharedDto.getSharedHasAccess())) {
+            photoResponse = photoCRUDService.deletePhotoDto(id, photoLink, email);
+            response = new PhotoMemoriesResponse<>(true, photoResponse);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            LOGGER.error("[Photo Controller log] deletePhoto method, access rights are not sufficient");
+            throw new SQLException("[Photo Controller log] deletePhoto method, not permitted");
+        }
     }
 
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
-    @PutMapping("/updateMetadata/{id}")
+    @PutMapping("/updateMetadata/{id}/{sharedId}")
     @ApiOperation(value = "Updates a photo's metadata by id.", notes = "Changes a photo's metadata in the DB.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Photo updated", response = PhotoMemoriesResponse.class),
@@ -195,16 +220,33 @@ public class PhotoController {
             @ApiParam(value = "The photo's new owner.", example = "Reyno Engels", name = "pCaptured", required = true)
             @RequestParam("pCaptured") String pCaptured,
             @ApiParam(value = "The email of the user trying to update the photo.", example = "reynardengels@gmail.com", name = "email", required = true)
-            @RequestParam("email") String email) throws Exception {
+            @RequestParam("email") String email,
+            @ApiParam(value = "The id of the shared record", example = "1", name = "sharedId", required = true)
+            @PathVariable("sharedId") Integer sharedId) throws Exception {
         LOGGER.info("[Photo Controller log] updateMetadata method, input id {} ", id);
 
         if (photoCRUDService.photoExists(id, pName)) {
             LOGGER.error("[Photo Controller log] updateMetadata method, photo {} does not exist", pName);
-            throw new RuntimeException("[Photo Controller Error] updateMetadata method, photo " + pName + " does not exist");
+            throw new SQLException("[Photo Controller Error] updateMetadata method, photo " + pName + " does not exist");
         }
 
-        PhotoDto photoResponse = photoCRUDService.updatePhotoDto(pName, pLocation, pCaptured, id, email);
-        PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        PhotoMemoriesResponse<PhotoDto> response;
+        PhotoDto photoResponse;
+
+        UserDto userDto = userCRUDService.getUserDtoByEmail(email);
+        SharedDto sharedDto = sharedCRUDService.getSharedBySharedId(sharedId);
+
+        if ((sharedCRUDService.findBySharedIdAndUserId(sharedId, email)) && (sharedDto.getSharedWith().equals(userDto.getUserId()))) {
+            photoResponse = photoCRUDService.updatePhotoDto(pName, pLocation, pCaptured, id, email);
+            response = new PhotoMemoriesResponse<>(true, photoResponse);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else if ((sharedDto.getSharedWith().equals(userDto.getUserId())) && (sharedDto.getSharedHasAccess())) {
+            photoResponse = photoCRUDService.updatePhotoDto(pName, pLocation, pCaptured, id, email);
+            response = new PhotoMemoriesResponse<>(true, photoResponse);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            LOGGER.error("[Photo Controller log] updateMetadata method, access rights are not sufficient");
+            throw new SQLException("[Photo Controller Error] updateMetadata method, not permitted to change metadata");
+        }
     }
 }

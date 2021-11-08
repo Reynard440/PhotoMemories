@@ -36,10 +36,10 @@ public class UserTranslatorImpl implements UserTranslator {
     }
 
     @Override
-    public User getUserByEmail(String email) {
+    public User getUserByEmail(String email) throws UserNotFoundException {
         if (!userExistsWithEmail(email)) {
             LOGGER.warn("[User Translator log] getUserByEmail method, User with email {} does not exist", email);
-            throw new RuntimeException("User with email " + email + " does not exist");
+            throw new UserNotFoundException("User with email " + email + " does not exist");
         }
         return userRepository.findByEmail(email);
     }
@@ -53,7 +53,6 @@ public class UserTranslatorImpl implements UserTranslator {
 
     @Override
     public boolean userExists(Integer id) {
-        LOGGER.info("[User Translator log] userExists method, input id: {}", id);
         boolean returnValue = userRepository.existsByUserId(id);
         LOGGER.info("[User Translator log] userExists method, result: {}", returnValue);
         return returnValue;
