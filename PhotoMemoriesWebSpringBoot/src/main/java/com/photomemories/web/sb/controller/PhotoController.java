@@ -51,7 +51,7 @@ public class PhotoController {
             @RequestParam("photoLocation") String photoLocation,
             @RequestParam("photoCapturedBy") String photoCapturedBy,
             @RequestParam("email") String email,
-            @RequestParam("photo") MultipartFile photo) throws Exception {
+            @RequestPart("photo") MultipartFile photo) throws Exception {
             try {
                 PhotoDto photoDto = new PhotoDto(photoName, (double)photo.getSize(), LocalDate.now(), modifiedDate, photo.getOriginalFilename(), photoLocation, photo.getContentType(), photoCapturedBy);
                 PhotoDto photoResponse = photoCRUDService.createPhotoDto(photoDto, email, photo);

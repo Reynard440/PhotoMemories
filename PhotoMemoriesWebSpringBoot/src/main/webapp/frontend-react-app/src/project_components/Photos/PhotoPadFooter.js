@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import {Col, Container, Navbar} from "react-bootstrap";
+import {faAt} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 export default class PhotoPadFooter extends Component {
     render() {
@@ -9,7 +11,7 @@ export default class PhotoPadFooter extends Component {
                 <Container>
                     <Col lg={12} className="text-center text-white">
                         <div>
-                            All Rights Reserved by PhotoPad, {Year} - {Year+1}
+                            <FontAwesomeIcon icon={faAt}/>All Rights Reserved by PhotoPad, {Year} - {Year+1}
                         </div>
                     </Col>
                 </Container>

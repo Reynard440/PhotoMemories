@@ -25,11 +25,9 @@ export default class PhotoPadPhotoList extends Component {
             .then((data) => {
                 this.setState({photos: data.cargo});
             });
-    }
+    };
 
     deletePhoto = (photoLink, photoId) => {
-        // alert(photoLink);
-        // alert(photoId);
         axios.delete("http://localhost:8095/photo-memories/mvc/v1/c2/deletePhoto/"+photoLink+"/reynardengels@gmail.com/"+photoId)
             .then(res => {
                 if (res.data != null) {
@@ -60,7 +58,7 @@ export default class PhotoPadPhotoList extends Component {
         return (
             <div>
                 <div style={{"display": this.state.show ? "block": "none"}}>
-                    <PhotoPadToast show={this.state.show} message={"Photo deleted, this photo is no longer on the site for you."} type={"danger"}/>
+                    <PhotoPadToast show={this.state.show} message={"Photo deleted, this photo is no longer on the site for you."} type={"info"}/>
                 </div>
                 <Card className={"border border-dark bg-white text-dark"}>
                     <CardHeader className={"bg-white text-dark"}><FontAwesomeIcon icon={faList}/> Photo List</CardHeader>

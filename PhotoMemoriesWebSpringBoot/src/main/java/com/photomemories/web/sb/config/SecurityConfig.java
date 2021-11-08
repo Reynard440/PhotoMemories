@@ -1,7 +1,6 @@
 package com.photomemories.web.sb.config;
 
 import com.photomemories.web.sb.filter.CustomAuthFilter;
-import com.photomemories.web.sb.filter.CustomAuthorFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,7 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        http.authorizeRequests().anyRequest().authenticated();
         http.authorizeRequests().anyRequest().permitAll();
         http.addFilter(new CustomAuthFilter(authenticationManagerBean()));
-        http.addFilterBefore(new CustomAuthorFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(customAuthFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     private CustomAuthFilter overrideDefaultLoginPath() throws Exception {

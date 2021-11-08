@@ -9,6 +9,8 @@ import PhotoPadPhotoList from "./project_components/Photos/PhotoPadPhotoList";
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 import PhotoPadRegister from './project_components/Users/PhotoPadRegister';
 import PhotoPadLogin from './project_components/Users/PhotoPadLogin';
+import PhotoPadGallery from "./project_components/Photos/PhotoPadGallery";
+import PhotoPadEdit from "./project_components/Photos/PhotoPadEdit";
 
 export default function App() {
     const marginTop = {
@@ -18,21 +20,22 @@ export default function App() {
 
   return (
     <Router>
-        <PhotoPadNavigationBar/>
-        <Container>
-            <Row>
-                <Col lg={12} style={marginTop}>
-                    <Switch>
-                        <Route path="/" exact component={PhotoPadWelcome}/>
-                        <Route path="/add" exact component={PhotoPadPhoto}/>
-                        <Route path="/edit/:photoId" exact component={PhotoPadPhoto}/>
-                        <Route path="/list" exact component={PhotoPadPhotoList}/>
-                        <Route path="/register" exact component={PhotoPadRegister}/>
-                        <Route path="/login" exact component={PhotoPadLogin}/>
-                    </Switch>
-                </Col>
-            </Row>
-        </Container>
+        <PhotoPadNavigationBar/>>
+            <Container>
+                <Row>
+                    <Col lg={12} style={marginTop}>
+                        <Switch>
+                            <Route path="/" exact component={PhotoPadWelcome}/>
+                            <Route path="/add" exact component={PhotoPadPhoto}/>
+                            <Route path="/edit/:photoId" exact component={PhotoPadEdit}/>
+                            <Route path="/list" exact component={PhotoPadPhotoList}/>
+                            <Route path="/gallery" exact component={PhotoPadGallery}/>
+                            <Route path="/register" exact component={PhotoPadRegister}/>
+                            <Route path="/login" exact component={PhotoPadLogin}/>
+                        </Switch>
+                    </Col>
+                </Row>
+            </Container>
         <PhotoPadFooter/>
     </Router>
   );
