@@ -13,7 +13,7 @@ public interface PhotoTranslator {
 
     Photo findByPhotoNameAndPhotoFormat(String name, String format);
 
-    List<Photo> findByUserEmail(String email);
+    List<Photo> findByUserEmail(Integer sharedWith);
 
     boolean photoExists(Integer id, String photoLink);
 

@@ -8,7 +8,11 @@ public interface SharedCRUDService {
 
     SharedDto getSharedBySharedId(Integer id);
 
+    SharedDto findBySharedWithAndPhotoId(Integer sharedWith, Integer photoId);
+
     String sharePhoto(String sharingEmail, String receivingEmail, boolean accessRights, Integer photoId, MultipartFile photo) throws Exception;
 
-    boolean findBySharedIdAndUserId(Integer sharedId, String email) throws Exception;
+    boolean checkBySharedWithAndPhotoId(String email, Integer photoId) throws Exception;
+
+    boolean existsBySharedWithAndUserIdAndPhotoId(String email, Integer photoId) throws Exception;
 }

@@ -9,7 +9,11 @@ public interface SharedTranslator {
 
     Shared getSharedBySharedId(Integer id);
 
+    boolean existsBySharedWithAndPhotoId(Integer sharedWith, Integer photoId);
+
+    boolean existsBySharedWithAndUserIdAndPhotoId(Integer sharedWith, Integer userId, Integer photoId);
+
     Shared sharePhoto (Shared sharePhoto) throws Exception;
 
-    Shared findBySharedIdAndUserId(Integer sharedId, Integer userId);
+    Shared findBySharedWithAndPhotoId(Integer sharedWith, Integer photoId);
 }

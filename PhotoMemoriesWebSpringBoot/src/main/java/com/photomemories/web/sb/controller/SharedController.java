@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.SQLException;
+
 @RestController
 @RequestMapping(path="/v1/c3")
 @CrossOrigin(origins = "http://localhost:3000")
@@ -60,26 +62,32 @@ public class SharedController {
             @ApiParam(value = "The photo the user wants to share", required = true)
             @RequestParam("photo") MultipartFile photo) throws Exception {
         LOGGER.info("[Shared Controller log] sharePhotoWithAnotherUser method, input sharingEmail {} receivingEmail {} accessRights {} id {} ", sharingEmail, receivingEmail, accessRights, id);
+
+        if (sharedCRUDService.existsBySharedWithAndUserIdAndPhotoId(receivingEmail, id)) {
+            LOGGER.error("[Shared Controller log] sharePhotoWithAnotherUser method, user {} already has this photo", receivingEmail);
+            throw new SQLException("[Shared Controller Error] sharePhotoWithAnotherUser method, user already has this photo");
+        }
+
         String sharedResponse = sharedCRUDService.sharePhoto(sharingEmail, receivingEmail, accessRights, id, photo);
         LOGGER.info("[AWS Controller log] uploadPhoto method, photos uploaded to {}'s folder", receivingEmail);
         PhotoMemoriesResponse<String> response = new PhotoMemoriesResponse<>(true, sharedResponse);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping("/getSharedByIdAndEmail/{id}/{email}")
+    @GetMapping("/getSharedBySharedWithAndEmail/{email}/{id}")
     @ApiOperation(value = "Checks if a photo exists based on their id.", notes = "Tries to fetch a photo by id from the DB.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Shared record found by id and user email", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by id and email", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 404, message = "Could not found a shared record with this id and user email", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
-    public ResponseEntity<PhotoMemoriesResponse<Boolean>> getSharedByIdAndEmail(
-            @ApiParam(value = "The id of the shared record", example = "1", name = "id", required = true)
-            @PathVariable("id") Integer id,
+    public ResponseEntity<PhotoMemoriesResponse<Boolean>> getSharedBySharedWithAndEmail(
             @ApiParam(value = "The email of the user", example = "1", name = "email", required = true)
-            @PathVariable("email") String email) throws Exception {
-        LOGGER.info("[Shared Controller log] getSharedByIdAndEmail method, input id {} and user email {}", id, email);
-        boolean isFound = sharedCRUDService.findBySharedIdAndUserId(id, email);
+            @PathVariable("email") String email,
+            @ApiParam(value = "The id of the photo", example = "1", name = "id", required = true)
+            @PathVariable("id") Integer id) throws Exception {
+        LOGGER.info("[Shared Controller log] getSharedByIdAndEmail method, input photo id {} and user email {}", id, email);
+        boolean isFound = sharedCRUDService.checkBySharedWithAndPhotoId(email, id);
         PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, isFound);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

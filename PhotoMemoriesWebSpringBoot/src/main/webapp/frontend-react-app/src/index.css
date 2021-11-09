@@ -5,3 +5,9 @@ body{
     -o-background-size: cover;
     background-size: cover;
 }
+
+.imageDisplay {
+    max-width: 150px;
+    max-height: 150px;
+    position: relative;
+}

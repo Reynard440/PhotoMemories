@@ -1,7 +1,5 @@
 package com.photomemories.web.sb.controller;
 
-import com.amazonaws.services.s3.model.ListObjectsRequest;
-import com.amazonaws.services.s3.model.ObjectListing;
 import com.photomemories.logic.AwsCRUDService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping(path ="/v1/c4")
@@ -46,6 +43,18 @@ public class AwsController {
         LOGGER.info("[AWS Controller log] uploadPhoto method, photos uploaded to {}'s folder", email);
     }
 
+    @GetMapping(path = "/displayPhoto/{email}/{imageName}")
+    public ResponseEntity<ByteArrayResource> displayPhoto(@PathVariable("email")String email, @PathVariable("imageName")String imageName) {
+        LOGGER.info("[AWS Controller log] displayPhoto method, input email {} and imageName {}", email, imageName);
+        byte[] imageData = awsCRUDService.downloadPhoto(email, imageName);
+        ByteArrayResource arrayResource = new ByteArrayResource(imageData);
+        return ResponseEntity
+                .ok()
+                .contentLength(imageData.length)
+                .contentType(extractContentType(imageName))
+                .body(arrayResource);
+    }
+
     @GetMapping(path = "/downloadPhoto/{email}/{imageName}")
     public ResponseEntity<ByteArrayResource> downloadPhoto(@PathVariable("email")String email, @PathVariable("imageName")String imageName) {
         LOGGER.info("[AWS Controller log] downloadPhoto method, input email {} and imageName {}", email, imageName);
@@ -54,22 +63,22 @@ public class AwsController {
         return ResponseEntity
                 .ok()
                 .contentLength(imageData.length)
-                .header("Content-type", "application/octet-stream")
+                .contentType(extractContentType(imageName))
                 .header("Content-disposition", "attachment; filename=\"" + imageName + "\"")
                 .body(arrayResource);
     }
 
-    @GetMapping(path = "/retrieveAllPhotos/{email}")
-    public ListObjectsRequest retrieveAllPhotos(@PathVariable("email")String email) {
-        LOGGER.info("[AWS Controller log] retrieveAllPhotos method, input email {}", email);
-        return awsCRUDService.getAllPhotos(email);
-    }
-
-    @GetMapping(path = "/viewAllUserPhotos/{email}")
-    public List viewAllUserPhotos(@PathVariable("email")String email) {
-        LOGGER.info("[AWS Controller log] viewAllUserPhotos method, input email {}", email);
-        return awsCRUDService.listPhotos(email);
-    }
+//    @GetMapping(path = "/retrieveAllPhotos/{email}")
+//    public ListObjectsRequest retrieveAllPhotos(@PathVariable("email")String email) {
+//        LOGGER.info("[AWS Controller log] retrieveAllPhotos method, input email {}", email);
+//        return awsCRUDService.getAllPhotos(email);
+//    }
+//
+//    @GetMapping(path = "/viewAllUserPhotos/{email}")
+//    public List viewAllUserPhotos(@PathVariable("email")String email) {
+//        LOGGER.info("[AWS Controller log] viewAllUserPhotos method, input email {}", email);
+//        return awsCRUDService.listPhotos(email);
+//    }
 
     @DeleteMapping(value = "/deletePhoto")
     public void deletePhoto(
@@ -79,11 +88,22 @@ public class AwsController {
         awsCRUDService.deletePhoto(fileName, email);
     }
 
-    //TODO: Update photo method
+//    @GetMapping("{folderName}/user/photos")
+//    public ObjectListing getAllPhotos(@PathVariable("folderName")String folderName) {
+//        LOGGER.info("[AWS Controller log] getAllPhotos method, Photos retrieved from {}", folderName);
+//        return awsCRUDService.getAllPhotosOfUser(folderName);
+//    }
 
-    @GetMapping("{folderName}/user/photos")
-    public ObjectListing getAllPhotos(@PathVariable("folderName")String folderName) {
-        LOGGER.info("[AWS Controller log] getAllPhotos method, Photos retrieved from {}", folderName);
-        return awsCRUDService.getAllPhotosOfUser(folderName);
+    private MediaType extractContentType (String type) {
+        String[] newType = type.split("\\.");
+        switch (newType[1]) {
+            case "jpg": { return MediaType.valueOf("image/jpg");}
+            case "png": {return MediaType.valueOf("image/tiff");}
+            case "bmp": {return MediaType.valueOf("image/bmp");}
+            case "jpeg": {return MediaType.valueOf("image/jpeg");}
+            case "ico": {return MediaType.valueOf("image/ico");}
+            case "gif": {return MediaType.valueOf("image/gif");}
+            default: {return MediaType.valueOf("image/png");}
+        }
     }
 }

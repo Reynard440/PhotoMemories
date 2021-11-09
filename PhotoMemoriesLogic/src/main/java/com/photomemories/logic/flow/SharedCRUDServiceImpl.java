@@ -57,6 +57,12 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
         return new SharedDto(sharedTranslator.getSharedBySharedId(id));
     }
 
+    @Override
+    public SharedDto findBySharedWithAndPhotoId(Integer sharedWith, Integer photoId) {
+        LOGGER.info("[Shared Logic log] findBySharedWithAndPhotoId method, shared with id {} and photo id {}", sharedWith, photoId);
+        return new SharedDto(sharedTranslator.findBySharedWithAndPhotoId(sharedWith, photoId));
+    }
+
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
     @Override
     public String sharePhoto(String sharingEmail, String receivingEmail, boolean accessRights, Integer id, MultipartFile photo) throws Exception {
@@ -65,8 +71,8 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
                 LOGGER.error("[Shared Logic log] sharePhoto method, Could not share the photo with email {}", receivingEmail);
                 throw new UserNotFoundException("[Shared Logic Error] sharePhoto method");
             }
-            UserDto receivingUserDto = new UserDto(userTranslator.getUserByEmail(receivingEmail));
-            UserDto sendUserDto = new UserDto(userTranslator.getUserByEmail(sharingEmail));
+            UserDto receivingUserDto = getUserDtoByEmail(receivingEmail);
+            UserDto sendUserDto = getUserDtoByEmail(sharingEmail);
 
             SharedDto sharedDto = new SharedDto(LocalDate.now(), receivingUserDto.getUserId(), accessRights, sendUserDto.getUserId(), id);
             Shared shared = sharedDto.buildShared();
@@ -84,14 +90,29 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
     }
 
     @Override
-    public boolean findBySharedIdAndUserId(Integer sharedId, String email) throws RuntimeException, Exception, SQLException {
-        UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
-        LOGGER.info("[Shared Logic log] findBySharedIdAndUserId method, shared id {} and email {}", sharedId, email);
-        sharedTranslator.findBySharedIdAndUserId(sharedId, userDto.getUserId());
-        if (sharedTranslator.findBySharedIdAndUserId(sharedId, userDto.getUserId()) == null) {
-            return false;
-        } else {
+    public boolean checkBySharedWithAndPhotoId(String email, Integer photoId) throws RuntimeException, Exception, SQLException {
+        UserDto userDto = getUserDtoByEmail(email);
+        LOGGER.info("[Shared Logic log] checkBySharedWithAndPhotoId method, photo id {} and email {}", photoId, email);
+        if (sharedTranslator.existsBySharedWithAndPhotoId(userDto.getUserId(), photoId)) {
             return true;
+        } else {
+            LOGGER.error("[Shared Logic log] checkBySharedWithAndPhotoId method, user {} already has photo with id  {}", email, photoId);
+            throw new SQLException("[Shared Logic Error] checkBySharedWithAndPhotoId method, user already has this photo");
         }
+    }
+
+    @Override
+    public boolean existsBySharedWithAndUserIdAndPhotoId(String email, Integer photoId) throws RuntimeException, Exception, SQLException  {
+        UserDto userDto = getUserDtoByEmail(email);
+        LOGGER.info("[Shared Logic log] existsBySharedWithAndUserIdAndPhotoId method, photo id {} and email {}", photoId, email);
+        if (sharedTranslator.existsBySharedWithAndUserIdAndPhotoId(userDto.getUserId(), userDto.getUserId(), photoId)) {
+            LOGGER.error("[Shared Logic log] existsBySharedWithAndUserIdAndPhotoId method, user {} already has photo with id  {}", email, photoId);
+            throw new SQLException("[Shared Logic Error] existsBySharedWithAndUserIdAndPhotoId method, user already has this photo");
+        }
+        return false;
+    }
+
+    private UserDto getUserDtoByEmail(String email) {
+        return new UserDto(userTranslator.getUserByEmail(email));
     }
 }

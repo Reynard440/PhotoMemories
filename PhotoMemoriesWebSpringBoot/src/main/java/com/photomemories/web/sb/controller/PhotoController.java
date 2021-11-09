@@ -165,7 +165,7 @@ public class PhotoController {
     }
 
     @Transactional(rollbackOn = { RuntimeException.class, Exception.class, SQLException.class })
-    @DeleteMapping("/deletePhoto/{photoLink}/{email}/{id}/{sharedId}")
+    @DeleteMapping("/deletePhoto/{photoLink}/{email}/{id}")
     @ApiOperation(value = "Deletes a photo by id.", notes = "Removes a photo from the DB.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Photo deleted", response = PhotoMemoriesResponse.class),
@@ -178,21 +178,19 @@ public class PhotoController {
             @ApiParam(value = "The email of the user", example = "reynardengels@gmail.com", name = "email", required = true)
             @PathVariable(value = "email") String email,
             @ApiParam(value = "The id of the photo", example = "1", name = "id", required = true)
-            @PathVariable("id") Integer id,
-            @ApiParam(value = "The id of the shared record", example = "1", name = "sharedId", required = true)
-            @PathVariable("sharedId") Integer sharedId) throws Exception {
+            @PathVariable("id") Integer id) throws Exception {
         LOGGER.info("[Photo Controller log] deletePhoto method, input id {} and email {} and photoLink {}", id, email, photoLink);
         PhotoMemoriesResponse<Integer> response;
         int photoResponse;
 
         UserDto userDto = userCRUDService.getUserDtoByEmail(email);
-        SharedDto sharedDto = sharedCRUDService.getSharedBySharedId(sharedId);
+        SharedDto sharedDto = sharedCRUDService.findBySharedWithAndPhotoId(userDto.getUserId(), id);
 
-        if ((sharedCRUDService.findBySharedIdAndUserId(sharedId, email)) && (sharedDto.getSharedWith().equals(userDto.getUserId()))) {
+        if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedWith().equals(userDto.getUserId()))) {
             photoResponse = photoCRUDService.deletePhotoDto(id, photoLink, email);
             response = new PhotoMemoriesResponse<>(true, photoResponse);
             return new ResponseEntity<>(response, HttpStatus.OK);
-        } else if ((sharedDto.getSharedWith().equals(userDto.getUserId())) && (sharedDto.getSharedHasAccess())) {
+        } else if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedHasAccess())) {
             photoResponse = photoCRUDService.deletePhotoDto(id, photoLink, email);
             response = new PhotoMemoriesResponse<>(true, photoResponse);
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -203,7 +201,7 @@ public class PhotoController {
     }
 
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
-    @PutMapping("/updateMetadata/{id}/{sharedId}")
+    @PutMapping("/updateMetadata/{id}")
     @ApiOperation(value = "Updates a photo's metadata by id.", notes = "Changes a photo's metadata in the DB.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Photo updated", response = PhotoMemoriesResponse.class),
@@ -220,9 +218,7 @@ public class PhotoController {
             @ApiParam(value = "The photo's new owner.", example = "Reyno Engels", name = "pCaptured", required = true)
             @RequestParam("pCaptured") String pCaptured,
             @ApiParam(value = "The email of the user trying to update the photo.", example = "reynardengels@gmail.com", name = "email", required = true)
-            @RequestParam("email") String email,
-            @ApiParam(value = "The id of the shared record", example = "1", name = "sharedId", required = true)
-            @PathVariable("sharedId") Integer sharedId) throws Exception {
+            @RequestParam("email") String email) throws Exception {
         LOGGER.info("[Photo Controller log] updateMetadata method, input id {} ", id);
 
         if (photoCRUDService.photoExists(id, pName)) {
@@ -234,13 +230,13 @@ public class PhotoController {
         PhotoDto photoResponse;
 
         UserDto userDto = userCRUDService.getUserDtoByEmail(email);
-        SharedDto sharedDto = sharedCRUDService.getSharedBySharedId(sharedId);
+        SharedDto sharedDto = sharedCRUDService.findBySharedWithAndPhotoId(userDto.getUserId(), id);
 
-        if ((sharedCRUDService.findBySharedIdAndUserId(sharedId, email)) && (sharedDto.getSharedWith().equals(userDto.getUserId()))) {
+        if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedWith().equals(userDto.getUserId()))) {
             photoResponse = photoCRUDService.updatePhotoDto(pName, pLocation, pCaptured, id, email);
             response = new PhotoMemoriesResponse<>(true, photoResponse);
             return new ResponseEntity<>(response, HttpStatus.OK);
-        } else if ((sharedDto.getSharedWith().equals(userDto.getUserId())) && (sharedDto.getSharedHasAccess())) {
+        } else if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedHasAccess())) {
             photoResponse = photoCRUDService.updatePhotoDto(pName, pLocation, pCaptured, id, email);
             response = new PhotoMemoriesResponse<>(true, photoResponse);
             return new ResponseEntity<>(response, HttpStatus.OK);

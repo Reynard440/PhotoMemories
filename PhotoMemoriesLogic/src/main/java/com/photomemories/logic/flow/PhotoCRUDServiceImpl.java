@@ -112,7 +112,8 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     @Override
     public List<PhotoDto> getPhotosByUserEmail(String email) {
         LOGGER.info("[Photo Logic log] getByPhotoIdAndShares_UserId_Email method, email {}", email);
-        return photoTranslator.findByUserEmail(email).stream().map(PhotoDto::new).collect(Collectors.toList());
+        UserDto userDto = userCRUDService.getUserDtoByEmail(email);
+        return photoTranslator.findByUserEmail(userDto.getUserId()).stream().map(PhotoDto::new).collect(Collectors.toList());
     }
 
     @Override

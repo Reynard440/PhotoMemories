@@ -40,9 +40,9 @@ public class PhotoTranslatorImpl implements PhotoTranslator {
     }
 
     @Override
-    public List<Photo> findByUserEmail(String email) {
-        LOGGER.info("[Photo Translator log] findByPhotoIdAndShares_UserId_Email method, user email {}", email);
-        return photoRepository.findByUserEmail(email);
+    public List<Photo> findByUserEmail(Integer sharedWith) {
+        LOGGER.info("[Photo Translator log] findByPhotoIdAndShares_UserId_Email method, user shared with {}", sharedWith);
+        return photoRepository.findByUserPhotosBySharedWith(sharedWith);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class PhotoTranslatorImpl implements PhotoTranslator {
     @Override
     public List<Photo> getAllPhotosOfUser(Integer userId) {
         LOGGER.info("[Photo Translator log] getAllPhotosOfUser method, user id {}", userId);
-        return photoRepository.findByShares_UserId_UserId(userId);
+        return photoRepository.findBySharesBySharedWith(userId);
     }
 
     @Transactional(rollbackOn = {RuntimeException.class, Exception.class})

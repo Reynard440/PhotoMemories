@@ -34,6 +34,18 @@ public class SharedTranslatorImpl implements SharedTranslator {
         return sharedRepository.findBySharedId(id);
     }
 
+    @Override
+    public boolean existsBySharedWithAndPhotoId(Integer sharedWith, Integer photoId) {
+        LOGGER.info("[Shared Translator log] existsBySharedWithAndPhotoId method, shared with id {} and photoId {} ", sharedWith, photoId);
+        return sharedRepository.existsBySharedWithAndPhotoId_PhotoId(sharedWith, photoId);
+    }
+
+    @Override
+    public boolean existsBySharedWithAndUserIdAndPhotoId(Integer sharedWith, Integer userId, Integer photoId) {
+        LOGGER.info("[Shared Translator log] existsBySharedWithAndUserIdAndPhotoId method, shared with id {} by user id {} and photo id {}", sharedWith, userId, photoId);
+        return sharedRepository.existsBySharedWithAndUserId_UserIdAndPhotoId_PhotoId(sharedWith, userId, photoId);
+    }
+
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
     @Override
     public Shared sharePhoto(Shared sharePhoto) throws SQLException, RuntimeException {
@@ -42,8 +54,8 @@ public class SharedTranslatorImpl implements SharedTranslator {
     }
 
     @Override
-    public Shared findBySharedIdAndUserId(Integer sharedId, Integer userId) {
-        LOGGER.info("[Shared Translator log] findBySharedIdAndUserId method, shared id {} and user id {}", sharedId, userId);
-        return sharedRepository.findBySharedIdAndUserId_UserId(sharedId, userId);
+    public Shared findBySharedWithAndPhotoId(Integer sharedWith, Integer photoId) {
+        LOGGER.info("[Shared Translator log] findBySharedIdAndUserId method, shared with id {} and photo id {}", sharedWith, photoId);
+        return sharedRepository.findBySharedWithAndPhotoId(sharedWith, photoId);
     }
 }
