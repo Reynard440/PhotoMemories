@@ -23,6 +23,10 @@ export default  class PhotoPadPhoto extends Component {
         this.setState(() => this.initialState);
     };
 
+    photoList = () => {
+        return this.props.history.push("/list");
+    };
+
     addPhoto = event => {
         event.preventDefault();
 
@@ -33,8 +37,6 @@ export default  class PhotoPadPhoto extends Component {
         bodyInfo.append("photoCapturedBy", this.state.ph_captured);
         bodyInfo.append("email", this.state.email);
         bodyInfo.append("photo", this.state.photo);
-
-        console.log(bodyInfo.get("photo"));
 
         axios.post("http://localhost:8095/photo-memories/mvc/v1/c2/addNewPhoto", bodyInfo,
             {
@@ -59,10 +61,14 @@ export default  class PhotoPadPhoto extends Component {
         this.setState(this.initialState);
     };
 
-    photoChanged = event => {
-        this.setState({
-            [event.target.name] : event.target.value
-        });
+    photoChanged = (event) => {
+        if (event.target.name === "photo") {
+            this.state.photo = event.target.files[0];
+        } else {
+            this.setState({
+                [event.target.name] : event.target.value
+            });
+        }
     };
 
     render(){
@@ -105,7 +111,7 @@ export default  class PhotoPadPhoto extends Component {
                                 </Form.Group>
 
                                 <Form.Group as={Col} controlId="formGridPhoto">
-                                    <Form.Label>Default file input example</Form.Label>
+                                    <Form.Label>Import the photo here...</Form.Label>
                                     <Form.Control type="file" name="photo" value={photo} onChange={this.photoChanged} required autoComplete="off" className={"bg-white text-dark"} />
                                 </Form.Group>
                             </Row>
@@ -114,7 +120,7 @@ export default  class PhotoPadPhoto extends Component {
                             <Button size="md" type="reset" variant="info">
                                 <FontAwesomeIcon icon={faUndo}/> Clear
                             </Button>{' '}
-                            <Button size="md" type="submit" variant="success" disabled={this.state.photo.length === 0 || this.state.email.length === 0 || this.state.ph_name.length === 0 || this.state.ph_captured.length === 0 || this.state.location.length === 0}  onClick={this.addPhoto}>
+                            <Button size="md" type="submit" variant="success" disabled={this.state.email.length === 0 || this.state.ph_name.length === 0 || this.state.ph_captured.length === 0 || this.state.location.length === 0}  onClick={this.addPhoto}>
                                 <FontAwesomeIcon icon={faSave}/> Add Photo
                             </Button>
                         </Card.Footer>

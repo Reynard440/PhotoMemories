@@ -30,12 +30,11 @@ export default class PhotoPadEdit extends Component {
         axios.get("http://localhost:8095/photo-memories/mvc/v1/c2/getPhotoById/"+photoId)
             .then(res => {
                 if (res.data !== null) {
-                    console.log(res);
                     this.setState({
                         photoId: res.data.cargo.photoId,
-                        ph_name: res.data.cargo.ph_name,
-                        location: res.data.cargo.location,
-                        ph_captured: res.data.cargo.ph_captured
+                        ph_name: res.data.cargo.photoName,
+                        location: res.data.cargo.photoLocation,
+                        ph_captured: res.data.cargo.photoCapturedBy
                     });
                 }
             }).catch((error) => {
