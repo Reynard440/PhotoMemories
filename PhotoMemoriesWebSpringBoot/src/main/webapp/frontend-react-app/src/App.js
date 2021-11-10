@@ -11,6 +11,9 @@ import PhotoPadRegister from './project_components/Users/PhotoPadRegister';
 import PhotoPadLogin from './project_components/Users/PhotoPadLogin';
 import PhotoPadGallery from "./project_components/Photos/PhotoPadGallery";
 import PhotoPadEdit from "./project_components/Photos/PhotoPadEdit";
+import PhotoPadSharePhoto from "./project_components/Photos/PhotoPadSharePhoto";
+import PhotoPadUpdateUser from "./project_components/Users/PhotoPadUpdateUser";
+import PhotoPadDeleteUser from "./project_components/Users/PhotoPadDeleteUser";
 
 export default function App() {
     const marginTop = {
@@ -29,9 +32,12 @@ export default function App() {
                             <Route path="/add" exact component={PhotoPadPhoto}/>
                             <Route path="/edit/:photoId" exact component={PhotoPadEdit}/>
                             <Route path="/list" exact component={PhotoPadPhotoList}/>
+                            <Route path="/share" exact component={PhotoPadSharePhoto}/>
                             <Route path="/gallery" exact component={PhotoPadGallery}/>
                             <Route path="/register" exact component={PhotoPadRegister}/>
                             <Route path="/login" exact component={PhotoPadLogin}/>
+                            <Route path="/update" exact component={PhotoPadUpdateUser}/>
+                            <Route path="/delete" exact component={PhotoPadDeleteUser}/>
                         </Switch>
                     </Col>
                 </Row>

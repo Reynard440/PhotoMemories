@@ -2,7 +2,16 @@ import React, {Component} from 'react';
 import {Container, Nav, Navbar} from "react-bootstrap";
 import logo from '../../logo.png';
 import {Link} from 'react-router-dom';
-import {faHome, faImages, faKey, faList, faSave, faSignInAlt} from "@fortawesome/free-solid-svg-icons";
+import {
+    faHome,
+    faImages,
+    faKey,
+    faList,
+    faSave,
+    faSignInAlt,
+    faTrash,
+    faUserEdit
+} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 export default class PhotoPadNavigationBar extends Component {
@@ -22,6 +31,8 @@ export default class PhotoPadNavigationBar extends Component {
                     <Nav className="navbar-right">
                         <Link to={"register"} className="navbar-brand"><FontAwesomeIcon icon={faKey}/> Register</Link>
                         <Link to={"login"} className="navbar-brand"><FontAwesomeIcon icon={faSignInAlt}/> Login</Link>
+                        <Link to={"update"} className="navbar-brand"><FontAwesomeIcon icon={faUserEdit}/> Update</Link>
+                        <Link to={"delete"} className="navbar-brand"><FontAwesomeIcon icon={faTrash}/> Delete</Link>
                     </Nav>
                 </Container>
             </Navbar>

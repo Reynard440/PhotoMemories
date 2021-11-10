@@ -93,7 +93,7 @@ export default class PhotoPadPhotoList extends Component {
                                         <td>
                                             <ButtonGroup>
                                                 <Link to={"edit/"+photo.photoId} className="btn btn-sm btn-outline-primary"><FontAwesomeIcon icon={faEdit}/></Link> |
-                                                <Button size="sm" variant="outline-info"><FontAwesomeIcon icon={faShareSquare}/></Button> |
+                                                <Link to={"share"} className="btn btn-sm btn-outline-info"><FontAwesomeIcon icon={faShareSquare}/></Link> |
                                                 <Button size="sm" variant="outline-success" onClick={this.downloadPhoto.bind(this, photo.photoLink)}><FontAwesomeIcon icon={faDownload}/></Button> |
                                                 <Button size="sm" variant="outline-danger" onClick={this.deletePhoto.bind(this, photo.photoLink , photo.photoId)} ><FontAwesomeIcon icon={faTrash}/></Button>
                                             </ButtonGroup>
