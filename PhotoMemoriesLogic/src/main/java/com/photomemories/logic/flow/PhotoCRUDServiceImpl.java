@@ -1,9 +1,12 @@
 package com.photomemories.logic.flow;
 
+import com.amazonaws.services.connect.model.UserNotFoundException;
 import com.photomemories.domain.dto.PhotoDto;
 import com.photomemories.domain.dto.SharedDto;
 import com.photomemories.domain.dto.UserDto;
+import com.photomemories.domain.persistence.AwsBucket;
 import com.photomemories.domain.persistence.Photo;
+import com.photomemories.domain.persistence.Shared;
 import com.photomemories.logic.AwsCRUDService;
 import com.photomemories.logic.PhotoCRUDService;
 import com.photomemories.logic.SharedCRUDService;
@@ -89,6 +92,33 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
             list.stream().distinct();
         }
         return list;
+    }
+
+    @Override
+    public String sendPhoto(String sharingEmail, String receivingEmail, boolean accessRights, Integer photoId) {
+        try {
+            if (!userCRUDService.userExistsByEmail(receivingEmail)) {
+                LOGGER.error("[Photo Logic log] sendPhoto method, Could not share the photo with email {}", receivingEmail);
+                throw new UserNotFoundException("[Photo Logic Error] sendPhoto method");
+            }
+            UserDto receivingUserDto = userCRUDService.getUserDtoByEmail(receivingEmail);
+            UserDto sendUserDto = userCRUDService.getUserDtoByEmail(sharingEmail);
+            PhotoDto photoDto = new PhotoDto(photoTranslator.getPhotoById(photoId));
+
+            SharedDto sharedDto = new SharedDto(LocalDate.now(), receivingUserDto.getUserId(), accessRights, sendUserDto.getUserId(), photoId);
+            Shared shared = sharedDto.buildShared();
+            SharedDto addedSharePhoto = sharedCRUDService.createSharedDto(sharedDto);
+            String fromBucket = AwsBucket.PROFILE_IMAGE.getAwsBucket() + "/" + sendUserDto.getUserId();
+            String toBucket = AwsBucket.PROFILE_IMAGE.getAwsBucket() + "/" + receivingUserDto.getUserId();
+
+            awsCRUDService.sharePhoto(fromBucket, toBucket, photoDto.getPhotoLink());
+
+            LOGGER.info("[Photo Logic log] sendPhoto method, shared the photo with email {}", receivingEmail);
+            return "Photo shared";
+        } catch (Exception e) {
+            LOGGER.error("[Photo Logic log] sendPhoto method, Could not share the photo with email {}", receivingEmail);
+            throw new RuntimeException("Exception with error ", e.getCause());
+        }
     }
 
     @Override

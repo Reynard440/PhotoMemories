@@ -164,6 +164,34 @@ public class PhotoController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PostMapping("/sharePhotoWithAnotherUser")
+    @ApiOperation(value = "Shares a photo with another user.", notes = "Shares a photo with another user to the S3 bucket and database.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Shared record successfully created", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not resolve the creation of a new shared record.", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
+    public ResponseEntity<PhotoMemoriesResponse<String>> sharePhotoWithAnotherUser(
+            @ApiParam(value = "Email of the sharing user", required = true, example = "reynardengels@gmail.com")
+            @RequestParam("sharingEmail") String sharingEmail,
+            @ApiParam(value = "Email of the receiving user", required = true, example = "rudidreyer6@gmail.com")
+            @RequestParam("receivingEmail") String receivingEmail,
+            @ApiParam(value = "Access rights to delete the photo", required = true, example = "true")
+            @RequestParam("accessRights") boolean accessRights,
+            @ApiParam(value = "Id of the sharing photo", required = true, example = "2")
+            @RequestParam("id") Integer id) throws Exception {
+        LOGGER.info("[Photo Controller log] sharePhotoWithAnotherUser method, input sharingEmail {} receivingEmail {} accessRights {} id {} ", sharingEmail, receivingEmail, accessRights, id);
+
+        if (sharedCRUDService.existsBySharedWithAndUserIdAndPhotoId(receivingEmail, id)) {
+            LOGGER.error("[Photo Controller log] sharePhotoWithAnotherUser method, user {} already has this photo", receivingEmail);
+            throw new SQLException("[Photo Controller Error] sharePhotoWithAnotherUser method, user already has this photo");
+        }
+
+        String photoResponse = photoCRUDService.sendPhoto(sharingEmail, receivingEmail, accessRights, id);
+        LOGGER.info("[Photo Controller log] uploadPhoto method, photos uploaded to {}'s folder", receivingEmail);
+        PhotoMemoriesResponse<String> response = new PhotoMemoriesResponse<>(true, photoResponse);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
     @Transactional(rollbackOn = { RuntimeException.class, Exception.class, SQLException.class })
     @DeleteMapping("/deletePhoto/{photoLink}/{email}/{id}")
     @ApiOperation(value = "Deletes a photo by id.", notes = "Removes a photo from the DB.")

@@ -64,7 +64,14 @@ public class AwsFileServiceImpl implements AwsFileServices {
         }
     }
 
-    //TODO: Update photo method
+    @Override
+    public void sharePhoto(String fromBucketName, String toBucketName, String key) {
+        try {
+            s3.copyObject(fromBucketName, key, toBucketName, key);
+        } catch (AmazonServiceException e) {
+            throw new IllegalStateException("Could not share the photo on the cloud", e.getCause());
+        }
+    }
 
     @Override
     public ObjectListing getAllPhotos(String folderName) {

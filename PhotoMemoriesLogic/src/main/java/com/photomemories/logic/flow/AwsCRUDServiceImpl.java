@@ -89,6 +89,12 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
         return "Folder deleted successfully";
     }
 
+    @Override
+    public String sharePhoto(String fromBucketName, String toBucketName, String key) {
+        awsTranslator.sharePhoto(fromBucketName, toBucketName, key);
+        return "Success";
+    }
+
     //TODO: Update photo method
 
     @Override

@@ -16,7 +16,7 @@ public interface AwsCRUDService {
 
     String deleteFolderForUser(String email);
 
-    //TODO: Update photo method
+    String sharePhoto(String bucketName, String toBucketName, String key);
 
     ObjectListing getAllPhotosOfUser(String folderName);
 

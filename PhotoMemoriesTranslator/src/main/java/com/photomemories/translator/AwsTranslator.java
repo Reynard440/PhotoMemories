@@ -19,6 +19,8 @@ public interface AwsTranslator {
 
     boolean deleteUserFolder(String path);
 
+    boolean sharePhoto(String bucketName, String toBucketName, String key);
+
     //TODO: Update photo method
 
     ObjectListing getAllUserPhotos(String folderName);

@@ -17,6 +17,8 @@ public interface AwsFileServices {
 
     void deleteUserFolder(String bucketName, String path);
 
+    void sharePhoto(String bucketName, String toBucketName, String key);
+
     //TODO: Update photo method
 
     ObjectListing getAllPhotos (String folderName);

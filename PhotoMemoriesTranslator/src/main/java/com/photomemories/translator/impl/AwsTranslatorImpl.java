@@ -75,6 +75,18 @@ public class AwsTranslatorImpl implements AwsTranslator {
         }
     }
 
+    @Override
+    public boolean sharePhoto(String fromBucketName, String toBucketName, String key) {
+        try {
+            awsFileServices.sharePhoto(fromBucketName, toBucketName, key);
+            LOGGER.info("[AWS Translator log] sharePhoto method, successfully shared photo from {}", key);
+            return true;
+        } catch (RuntimeException e) {
+            LOGGER.error("[AWS Translator log] sharePhoto method, Could not share the photo with error {}", e.getMessage());
+            throw new RuntimeException("[AWS Translator Error] sharePhoto method, Could not share the photo", e);
+        }
+    }
+
     //TODO: Update photo method
 
     @Override

@@ -90,6 +90,14 @@ public class UserCRUDServiceImpl implements UserCRUDService, UserDetailsService 
         return returnLogicValue;
     }
 
+    @Override
+    public boolean userExistsByEmail(String email) {
+        LOGGER.info("[User Logic log] userExists method, queried email {}", email);
+        boolean returnLogicValue = userTranslator.userExistsWithEmail(email);
+        LOGGER.info("[User Logic log] userExists method, result {}", returnLogicValue);
+        return returnLogicValue;
+    }
+
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
     @Override
     public Integer deleteUser(Integer id) throws Exception {

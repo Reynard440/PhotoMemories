@@ -11,6 +11,8 @@ public interface UserCRUDService {
 
     boolean userExists(Integer id);
 
+    boolean userExistsByEmail(String email);
+
     Integer deleteUser(Integer id) throws Exception;
 
     UserDto updateUserDto(String firstName, String lastName, String email, String phoneNumber, Integer userId);
