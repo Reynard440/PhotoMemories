@@ -17,7 +17,7 @@ import PhotoPadDeleteUser from "./project_components/Users/PhotoPadDeleteUser";
 
 export default function App() {
     const marginTop = {
-        marginTop: "20px",
+        marginTop: "5px",
         marginLeft: "10px"
     };
 
