@@ -5,14 +5,11 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
 import com.photomemories.aws.AwsFileServices;
-import com.photomemories.domain.persistence.AwsBucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -72,68 +69,4 @@ public class AwsFileServiceImpl implements AwsFileServices {
             throw new IllegalStateException("Could not share the photo on the cloud", e.getCause());
         }
     }
-
-    @Override
-    public ObjectListing getAllPhotos(String folderName) {
-        ObjectListing objectListing = s3.listObjects(AwsBucket.PROFILE_IMAGE.getAwsBucket(), folderName + "/");
-        if (objectListing != null) {
-            List<S3ObjectSummary> s3ObjectSummariesList = objectListing.getObjectSummaries();
-            if (!s3ObjectSummariesList.isEmpty()) {
-                for (S3ObjectSummary objectSummary : s3ObjectSummariesList) {
-                    System.out.println("file name:"+objectSummary.getKey());
-                }
-                return objectListing;
-            }
-        }
-        return objectListing;
-    }
-
-    @Override
-    public ListObjectsRequest listAllPhotos(String bucketName, String folderName) {
-        ListObjectsRequest listObjectsRequest = new ListObjectsRequest().withBucketName(bucketName)
-                .withPrefix(folderName);
-        return listObjectsRequest;
-    }
-
-    @Override
-    public List listPhotos(String bucketName, String folderName) {
-
-        ListObjectsRequest listObjectsRequest =
-                new ListObjectsRequest()
-                        .withBucketName(bucketName)
-                        .withPrefix(folderName + "/");
-
-        List keys = new ArrayList<>();
-
-        ObjectListing objects = s3.listObjects(listObjectsRequest);
-
-        while (true) {
-            List<S3ObjectSummary> summaries = objects.getObjectSummaries();
-            if (summaries.size() < 1) {
-                break;
-            }
-
-            for (S3ObjectSummary item : summaries) {
-                if (!item.getKey().endsWith("/")) {
-                    keys.add(item.getKey());
-                }
-            }
-
-            objects = s3.listNextBatchOfObjects(objects);
-        }
-
-        return keys;
-    }
-
-    @Override
-    public byte[] getAllPhotosForUser(String path, String key) {
-        try {
-            S3Object object = s3.getObject(path, key);
-            return IOUtils.toByteArray(object.getObjectContent());
-        } catch (AmazonServiceException | IOException e) {
-            throw new IllegalStateException("Failed to download", e);
-        }
-    }
-
-
 }

@@ -12,8 +12,6 @@ public interface PhotoCRUDService {
 
     List<PhotoDto> getAllPhotoDtosOfUser(Integer userId);
 
-    List<byte[]> getAllPhotosForUser(String email);
-
     PhotoDto getByPhotoNameAndPhotoFormat(String name, String format);
 
     String sendPhoto(String sharingEmail, String receivingEmail, boolean accessRights, Integer photoId);

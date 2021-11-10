@@ -29,6 +29,21 @@ public class UserTranslatorImpl implements UserTranslator {
         return userRepository.save(user);
     }
 
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @Override
+    public Integer deleteUser(Integer id) throws Exception {
+        LOGGER.info("[User Translator log] deleteUser method, input id: {}", id);
+        int deleteValue = userRepository.deleteByUserId(id);
+        LOGGER.info("[User Translator log] deleteUser method, (exists?): {}", deleteValue);
+        return deleteValue;
+    }
+
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @Override
+    public Integer updateUser(String firstName, String lastName, String email, String phoneNumber, Integer userId) {
+        return userRepository.updateUser(firstName, lastName, email, phoneNumber, userId);
+    }
+
     @Override
     public User getUserById(Integer id) {
         LOGGER.info("[User Translator log] getUserById method, input id: {}", id);
@@ -56,21 +71,6 @@ public class UserTranslatorImpl implements UserTranslator {
         boolean returnValue = userRepository.existsByUserId(id);
         LOGGER.info("[User Translator log] userExists method, result: {}", returnValue);
         return returnValue;
-    }
-
-    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
-    @Override
-    public Integer deleteUser(Integer id) throws Exception {
-        LOGGER.info("[User Translator log] deleteUser method, input id: {}", id);
-        int deleteValue = userRepository.deleteByUserId(id);
-        LOGGER.info("[User Translator log] deleteUser method, (exists?): {}", deleteValue);
-        return deleteValue;
-    }
-
-    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
-    @Override
-    public Integer updateUser(String firstName, String lastName, String email, String phoneNumber, Integer userId) {
-        return userRepository.updateUser(firstName, lastName, email, phoneNumber, userId);
     }
 
     @Override

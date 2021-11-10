@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.sql.SQLException;
 import java.util.List;
 
 @Component
@@ -21,10 +22,27 @@ public class PhotoTranslatorImpl implements PhotoTranslator {
         this.photoRepository = photoRepository;
     }
 
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
     @Override
     public Photo addPhoto(Photo photo) throws Exception {
         LOGGER.info("[Photo Translator log] addPhoto method, input object's name: {}", photo.getPhotoName());
         return photoRepository.save(photo);
+    }
+
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
+    @Override
+    public Integer deletePhoto(Integer id, String photoLink) throws Exception {
+        LOGGER.info("[Photo Translator log] deletePhoto method, input id: {}", id);
+        int deleteValue = photoRepository.deleteByPhotoIdAndPhotoLink(id, photoLink);
+        LOGGER.info("[Photo Translator log] deletePhoto method, (exists?): {}", deleteValue);
+        return deleteValue;
+    }
+
+
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
+    @Override
+    public Integer updatePhoto(String pName, String pLocation, String pCapturedBy, Integer photoId) {
+        return photoRepository.updatePhoto(pName, pLocation, pCapturedBy, photoId);
     }
 
     @Override
@@ -41,7 +59,7 @@ public class PhotoTranslatorImpl implements PhotoTranslator {
 
     @Override
     public List<Photo> findByUserEmail(Integer sharedWith) {
-        LOGGER.info("[Photo Translator log] findByPhotoIdAndShares_UserId_Email method, user shared with {}", sharedWith);
+        LOGGER.info("[Photo Translator log] findByUserEmail method, user shared with {}", sharedWith);
         return photoRepository.findByUserPhotosBySharedWith(sharedWith);
     }
 
@@ -51,15 +69,6 @@ public class PhotoTranslatorImpl implements PhotoTranslator {
         boolean returnValue = photoRepository.existsByPhotoIdAndPhotoLink(id, photoLink);
         LOGGER.info("[Photo Translator log] photoExists method, result: {}", returnValue);
         return returnValue;
-    }
-
-    @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
-    @Override
-    public Integer deletePhoto(Integer id, String photoLink) throws Exception {
-        LOGGER.info("[Photo Translator log] deletePhoto method, input id: {}", id);
-        int deleteValue = photoRepository.deleteByPhotoIdAndPhotoLink(id, photoLink);
-        LOGGER.info("[Photo Translator log] deletePhoto method, (exists?): {}", deleteValue);
-        return deleteValue;
     }
 
     @Override
@@ -72,12 +81,4 @@ public class PhotoTranslatorImpl implements PhotoTranslator {
         LOGGER.info("[Photo Translator log] getAllPhotosOfUser method, user id {}", userId);
         return photoRepository.findBySharesBySharedWith(userId);
     }
-
-    @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
-    @Override
-    public Integer updatePhoto(String pName, String pLocation, String pCapturedBy, Integer photoId) {
-        return photoRepository.updatePhoto(pName, pLocation, pCapturedBy, photoId);
-    }
-
-    //TODO: Get by metadata method
 }

@@ -50,20 +50,30 @@ public class UserController {
         return ResponseEntity.created(uri).body(response);
     }
 
-    @GetMapping("/userExists/{id}")
-    @ApiOperation(value = "Checks if a user exists based on their id.", notes = "Tries to fetch a user by id from the DB.")
+    @PostMapping("/loginUser")
+    @ApiOperation(value = "Logs a user in.", notes = "Logs a user in.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "User exists", response = PhotoMemoriesResponse.class),
-            @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by id", response = PhotoMemoriesResponse.class),
-            @ApiResponse(code = 404, message = "Could not found the user with this id", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 200, message = "User login successful", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not log the user in.", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 401, message = "Unauthorized: invalid credentials provided.", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
-    public ResponseEntity<PhotoMemoriesResponse<Boolean>> userExists(
-            @ApiParam(value = "The id of each user", example = "1", name = "id", required = true)
-            @PathVariable("id") Integer id) throws SQLException {
-        LOGGER.info("[User Controller log] userExists method, input id {} ", id);
-        boolean userResponse = userCRUDService.userExists(id);
+    public ResponseEntity<PhotoMemoriesResponse<Boolean>> loginUser(
+            @ApiParam(value = "Email of the user", example = "reynardengels@gmail.com", name = "email", required = true)
+            @RequestParam String email,
+            @RequestParam String password) throws Exception {
+        if (!userCRUDService.userExistsByEmail(email)) {
+            boolean userResponse = userCRUDService.userExistsByEmail(email);
+            PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(false, userResponse);
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+        LOGGER.info("[User Controller log] loginUser method, user email {} ", email);
+        boolean userResponse = userCRUDService.loginUser(email, password);
+        if (!userResponse) {
+            PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(false, userResponse);
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
         PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, userResponse);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
@@ -80,7 +90,7 @@ public class UserController {
         LOGGER.info("[User Controller log] deleteUser method, input id {} ", id);
         UserDto userDto = userCRUDService.getUserDtoById(id);
         String awsDeleteFolder = awsCRUDService.deleteFolderForUser(userDto.getEmail());
-        LOGGER.info("[User Controller log] deleteUser method, aws {}", awsDeleteFolder);
+        LOGGER.info("[User Controller log] deleteUser method, from folder {}", awsDeleteFolder);
         int userResponse = userCRUDService.deleteUser(id);
         PhotoMemoriesResponse<Integer> response = new PhotoMemoriesResponse<>(true, userResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -114,6 +124,22 @@ public class UserController {
 
         UserDto userResponse = userCRUDService.updateUserDto(firstName, lastName, email, phoneNumber, id);
         PhotoMemoriesResponse<UserDto> response = new PhotoMemoriesResponse<>(true, userResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/userExists/{id}")
+    @ApiOperation(value = "Checks if a user exists based on their id.", notes = "Tries to fetch a user by id from the DB.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "User exists", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 400, message = "Bad Request: could not resolve the search by id", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 404, message = "Could not found the user with this id", response = PhotoMemoriesResponse.class),
+            @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
+    public ResponseEntity<PhotoMemoriesResponse<Boolean>> userExists(
+            @ApiParam(value = "The id of each user", example = "1", name = "id", required = true)
+            @PathVariable("id") Integer id) throws SQLException {
+        LOGGER.info("[User Controller log] userExists method, input id {} ", id);
+        boolean userResponse = userCRUDService.userExists(id);
+        PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, userResponse);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

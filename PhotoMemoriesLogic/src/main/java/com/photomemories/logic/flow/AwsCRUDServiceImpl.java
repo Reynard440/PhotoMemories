@@ -1,7 +1,5 @@
 package com.photomemories.logic.flow;
 
-import com.amazonaws.services.s3.model.ListObjectsRequest;
-import com.amazonaws.services.s3.model.ObjectListing;
 import com.photomemories.domain.dto.UserDto;
 import com.photomemories.domain.persistence.AwsBucket;
 import com.photomemories.logic.AwsCRUDService;
@@ -93,26 +91,6 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
     public String sharePhoto(String fromBucketName, String toBucketName, String key) {
         awsTranslator.sharePhoto(fromBucketName, toBucketName, key);
         return "Success";
-    }
-
-    //TODO: Update photo method
-
-    @Override
-    public ObjectListing getAllPhotosOfUser(String folderName) {
-        LOGGER.info("[AWS Logic log] getAllPhotosOfUser method, Photos retrieved from {}", folderName);
-        return awsTranslator.getAllUserPhotos(folderName + "/");
-    }
-
-    @Override
-    public ListObjectsRequest getAllPhotos(String email) {
-        UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
-        return awsTranslator.getAllPhotos(AwsBucket.PROFILE_IMAGE.getAwsBucket(), userDto.getUserId().toString());
-    }
-
-    @Override
-    public List listPhotos(String email) {
-        UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
-        return awsTranslator.listPhotos(AwsBucket.PROFILE_IMAGE.getAwsBucket(), userDto.getUserId().toString());
     }
 
     private void isPhotoEmpty(MultipartFile photo) {

@@ -71,8 +71,44 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
             return returnDto;
         } catch (Exception e) {
             LOGGER.error("[Photo Logic log] createPhotoDto method, Photo could not be created with error {}", e.getMessage());
-            throw new RuntimeException("[Photo Logic Error] createPhotoDto method, Photo could not be created!", e);
+            throw new SQLException("[Photo Logic Error] createPhotoDto method, Photo could not be created!", e);
         }
+    }
+
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
+    @Override
+    public Integer deletePhotoDto(Integer id, String photoLink, String email) throws Exception {
+        boolean beforeDelete = photoTranslator.photoExists(id, photoLink);
+        LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", beforeDelete);
+
+        if (!photoExists(id, photoLink)) {
+            LOGGER.error("[Photo Logic log] deletePhoto method, Photo with id {} does not exists", id);
+            throw new RuntimeException("[Photo Logic Error] deletePhoto method, Photo with id " + id + " does not exist!");
+        }
+
+//        UserDto userDto = userCRUDService.getUserDtoByEmail(email);
+
+//        LOGGER.info("[Photo Logic log] deletePhotoDto method, You have valid access rights. Access Rights for photo modification {} ", true);
+
+        int photoDelete = photoTranslator.deletePhoto(id, photoLink);
+        awsCRUDService.deletePhoto(photoLink, email);
+        boolean afterDelete = photoTranslator.photoExists(id, photoLink);
+        LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", afterDelete);
+
+        return photoDelete;
+    }
+
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
+    @Override
+    public PhotoDto updatePhotoDto(String pName, String pLocation, String pCapturedBy, Integer photoId, String email) {
+        int returnValue = photoTranslator.updatePhoto(pName, pLocation, pCapturedBy, photoId);
+
+        if (returnValue == 0) {
+            LOGGER.error("[Photo Logic log] updatePhotoDto method, did not update photo metadata: {}", false);
+            throw new RuntimeException("[Photo Logic Error] updatePhotoDto method, did not update metadata");
+        }
+
+        return new PhotoDto(photoTranslator.getPhotoById(photoId));
     }
 
     @Override
@@ -122,18 +158,6 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     }
 
     @Override
-    public List<byte[]> getAllPhotosForUser(String email) {
-        UserDto userDto = userCRUDService.getUserDtoByEmail(email);
-        List<byte[]> photos = new ArrayList<>();
-        for (PhotoDto photoDto : photoTranslator.getAllPhotosOfUser(userDto.getUserId()).stream().map(PhotoDto::new).collect(Collectors.toList())) {
-            photos.add(awsCRUDService.downloadPhoto(email, photoDto.getPhotoLink()));
-            LOGGER.info("[Photo Logic log] getAllPhotosForUser method, id {} imageName {}", userDto.getUserId(), photoDto.getPhotoLink());
-        }
-        LOGGER.info("[Photo Logic log] getAllPhotosForUser method, Photos retrieved successfully");
-        return photos;
-    }
-
-    @Override
     public PhotoDto getByPhotoNameAndPhotoFormat(String name, String format) {
         LOGGER.info("[Photo Logic log] getByPhotoNameAndPhotoFormat method, input name {} and format {}", name, format);
         return new PhotoDto(photoTranslator.findByPhotoNameAndPhotoFormat(name, format));
@@ -141,8 +165,9 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
 
     @Override
     public List<PhotoDto> getPhotosByUserEmail(String email) {
-        LOGGER.info("[Photo Logic log] getByPhotoIdAndShares_UserId_Email method, email {}", email);
+        LOGGER.info("[Photo Logic log] getPhotosByUserEmail method, email {}", email);
         UserDto userDto = userCRUDService.getUserDtoByEmail(email);
+        LOGGER.info("[Photo Logic log] getPhotosByUserEmail method, id {}", userDto.getUserId());
         return photoTranslator.findByUserEmail(userDto.getUserId()).stream().map(PhotoDto::new).collect(Collectors.toList());
     }
 
@@ -160,41 +185,5 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
         boolean returnPhotoLogicValue = photoTranslator.photoExists(id, photoLink);
         LOGGER.info("[Photo Logic log] photoExists method, result {}", returnPhotoLogicValue);
         return returnPhotoLogicValue;
-    }
-
-    @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
-    @Override
-    public Integer deletePhotoDto(Integer id, String photoLink, String email) throws Exception {
-        boolean beforeDelete = photoTranslator.photoExists(id, photoLink);
-        LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", beforeDelete);
-
-        if (!photoExists(id, photoLink)) {
-            LOGGER.error("[Photo Logic log] deletePhoto method, Photo with id {} does not exists", id);
-            throw new RuntimeException("[Photo Logic Error] deletePhoto method, Photo with id " + id + " does not exist!");
-        }
-
-//        UserDto userDto = userCRUDService.getUserDtoByEmail(email);
-
-//        LOGGER.info("[Photo Logic log] deletePhotoDto method, You have valid access rights. Access Rights for photo modification {} ", true);
-
-        int photoDelete = photoTranslator.deletePhoto(id, photoLink);
-        awsCRUDService.deletePhoto(photoLink, email);
-        boolean afterDelete = photoTranslator.photoExists(id, photoLink);
-        LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", afterDelete);
-
-        return photoDelete;
-    }
-
-    @Transactional(rollbackOn = {RuntimeException.class, Exception.class})
-    @Override
-    public PhotoDto updatePhotoDto(String pName, String pLocation, String pCapturedBy, Integer photoId, String email) {
-        int returnValue = photoTranslator.updatePhoto(pName, pLocation, pCapturedBy, photoId);
-
-        if (returnValue == 0) {
-            LOGGER.error("[Photo Logic log] updatePhotoDto method, did not update photo metadata: {}", false);
-            throw new RuntimeException("[Photo Logic Error] updatePhotoDto method, did not update metadata");
-        }
-
-        return new PhotoDto(photoTranslator.getPhotoById(photoId));
     }
 }

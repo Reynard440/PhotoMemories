@@ -7,6 +7,10 @@ import org.springframework.stereotype.Component;
 public interface UserTranslator {
     User newUser(User user) throws Exception;
 
+    Integer deleteUser(Integer id) throws Exception;
+
+    Integer updateUser(String firstName, String lastName, String email, String phoneNumber, Integer userId);
+
     User getUserById(Integer id);
 
     User getUserByEmail(String email);
@@ -14,10 +18,6 @@ public interface UserTranslator {
     boolean userExistsWithEmail(String email);
 
     boolean userExists(Integer id);
-
-    Integer deleteUser(Integer id) throws Exception;
-
-    Integer updateUser(String firstName, String lastName, String email, String phoneNumber, Integer userId);
 
     boolean loginUser(String password, String email) throws Exception;
 

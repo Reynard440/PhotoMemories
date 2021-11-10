@@ -68,17 +68,6 @@ public class AwsController {
                 .body(arrayResource);
     }
 
-//    @GetMapping(path = "/retrieveAllPhotos/{email}")
-//    public ListObjectsRequest retrieveAllPhotos(@PathVariable("email")String email) {
-//        LOGGER.info("[AWS Controller log] retrieveAllPhotos method, input email {}", email);
-//        return awsCRUDService.getAllPhotos(email);
-//    }
-//
-//    @GetMapping(path = "/viewAllUserPhotos/{email}")
-//    public List viewAllUserPhotos(@PathVariable("email")String email) {
-//        LOGGER.info("[AWS Controller log] viewAllUserPhotos method, input email {}", email);
-//        return awsCRUDService.listPhotos(email);
-//    }
 
     @DeleteMapping(value = "/deletePhoto")
     public void deletePhoto(
@@ -87,12 +76,6 @@ public class AwsController {
         LOGGER.info("[AWS Controller log] deletePhoto method, input fileName {} and email {}", fileName, email);
         awsCRUDService.deletePhoto(fileName, email);
     }
-
-//    @GetMapping("{folderName}/user/photos")
-//    public ObjectListing getAllPhotos(@PathVariable("folderName")String folderName) {
-//        LOGGER.info("[AWS Controller log] getAllPhotos method, Photos retrieved from {}", folderName);
-//        return awsCRUDService.getAllPhotosOfUser(folderName);
-//    }
 
     private MediaType extractContentType (String type) {
         String[] newType = type.split("\\.");

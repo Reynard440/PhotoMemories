@@ -33,6 +33,7 @@ public class UserCRUDServiceImpl implements UserCRUDService, UserDetailsService 
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
     @Override
     public UserDto createNewUser(UserDto userDto) throws Exception {
         try {
@@ -57,6 +58,37 @@ public class UserCRUDServiceImpl implements UserCRUDService, UserDetailsService 
             LOGGER.warn("[User Logic log] createNewUser method, exception with error {}", e.getMessage());
             throw new RuntimeException("User could not be created!", e);
         }
+    }
+
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @Override
+    public Integer deleteUser(Integer id) throws Exception {
+        LOGGER.info("[User Logic log] deleteUser method, queried id: {}", id);
+        boolean beforeDelete = userTranslator.userExists(id);
+        LOGGER.info("[User Logic log] deleteUser method, (exists?): {}", beforeDelete);
+
+        if (!userExists(id)) {
+            LOGGER.warn("User with id {} does not exists", id);
+            throw new RuntimeException("User deletion error.");
+        }
+
+        int userDelete = userTranslator.deleteUser(id);
+        boolean afterDelete = userTranslator.userExists(id);
+        LOGGER.info("[User Logic log] deleteUser method, (exists?): {}", afterDelete);
+        return userDelete;
+    }
+
+    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @Override
+    public UserDto updateUserDto(String firstName, String lastName, String email, String phoneNumber, Integer userId) {
+        int returnValue = userTranslator.updateUser(firstName, lastName, email, phoneNumber, userId);
+
+        if (returnValue == 0) {
+            LOGGER.error("[User Logic log] updateUserDto method, did not update account: {}", false);
+            throw new RuntimeException("[User Logic Error] updateUserDto method, did not update account");
+        }
+
+        return new UserDto(userTranslator.getUserById(userId));
     }
 
     @Override
@@ -96,37 +128,6 @@ public class UserCRUDServiceImpl implements UserCRUDService, UserDetailsService 
         boolean returnLogicValue = userTranslator.userExistsWithEmail(email);
         LOGGER.info("[User Logic log] userExists method, result {}", returnLogicValue);
         return returnLogicValue;
-    }
-
-    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
-    @Override
-    public Integer deleteUser(Integer id) throws Exception {
-        LOGGER.info("[User Logic log] deleteUser method, queried id: {}", id);
-        boolean beforeDelete = userTranslator.userExists(id);
-        LOGGER.info("[User Logic log] deleteUser method, (exists?): {}", beforeDelete);
-
-        if (!userExists(id)) {
-            LOGGER.warn("User with id {} does not exists", id);
-            throw new RuntimeException("User deletion error.");
-        }
-
-        int userDelete = userTranslator.deleteUser(id);
-        boolean afterDelete = userTranslator.userExists(id);
-        LOGGER.info("[User Logic log] deleteUser method, (exists?): {}", afterDelete);
-        return userDelete;
-    }
-
-    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
-    @Override
-    public UserDto updateUserDto(String firstName, String lastName, String email, String phoneNumber, Integer userId) {
-        int returnValue = userTranslator.updateUser(firstName, lastName, email, phoneNumber, userId);
-
-        if (returnValue == 0) {
-            LOGGER.error("[User Logic log] updateUserDto method, did not update account: {}", false);
-            throw new RuntimeException("[User Logic Error] updateUserDto method, did not update account");
-        }
-
-        return new UserDto(userTranslator.getUserById(userId));
     }
 
     @Override

@@ -5,6 +5,10 @@ import com.photomemories.domain.dto.UserDto;
 public interface UserCRUDService {
     UserDto createNewUser(UserDto userDto) throws Exception;
 
+    Integer deleteUser(Integer id) throws Exception;
+
+    UserDto updateUserDto(String firstName, String lastName, String email, String phoneNumber, Integer userId);
+
     UserDto getUserDtoById(Integer id);
 
     UserDto getUserDtoByEmail(String email);
@@ -12,10 +16,6 @@ public interface UserCRUDService {
     boolean userExists(Integer id);
 
     boolean userExistsByEmail(String email);
-
-    Integer deleteUser(Integer id) throws Exception;
-
-    UserDto updateUserDto(String firstName, String lastName, String email, String phoneNumber, Integer userId);
 
     boolean loginUser(String password, String email) throws Exception;
 

@@ -9,6 +9,10 @@ import java.util.List;
 public interface PhotoTranslator {
     Photo addPhoto(Photo photo) throws Exception;
 
+    Integer updatePhoto(String pName, String pLocation, String pCapturedBy, Integer photoId);
+
+    Integer deletePhoto(Integer id, String photoLink) throws Exception;
+
     Photo getPhotoById(Integer id);
 
     Photo findByPhotoNameAndPhotoFormat(String name, String format);
@@ -17,11 +21,7 @@ public interface PhotoTranslator {
 
     boolean photoExists(Integer id, String photoLink);
 
-    Integer deletePhoto(Integer id, String photoLink) throws Exception;
-
     List<Photo> getAllPhotos();
 
     List<Photo> getAllPhotosOfUser(Integer userId);
-
-    Integer updatePhoto(String pName, String pLocation, String pCapturedBy, Integer photoId);
 }
