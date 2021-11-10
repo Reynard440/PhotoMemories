@@ -58,7 +58,10 @@ export default class PhotoPadPhotoList extends Component {
         return (
             <div>
                 <div style={{"display": this.state.show ? "block": "none"}}>
-                    <PhotoPadToast show={this.state.show} message={"Photo deleted, this photo is no longer on the site for you."} type={"info"}/>
+                    <PhotoPadToast show={this.state.show} message={"Photo deleted, this photo is no longer on the site for you."} type={"danger"}/>
+                </div>
+                <div style={{"display": this.state.show ? "block": "none"}}>
+                    <PhotoPadToast show={this.state.show} message={"Photo downloaded, photo successfully downloaded."} type={"success"}/>
                 </div>
                 <Card className={"border border-dark bg-white text-dark"}>
                     <CardHeader className={"bg-white text-dark"}><FontAwesomeIcon icon={faList}/> Photo List</CardHeader>

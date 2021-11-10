@@ -3,8 +3,19 @@ import CardHeader from "react-bootstrap/CardHeader";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBackward, faSave, faShareSquare, faUndo} from "@fortawesome/free-solid-svg-icons";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
+import axios from "axios";
 
 export default class PhotoPadSharePhoto extends Component {
+
+    sharePhoto() {
+        axios.get("http://localhost:8095/photo-memories/mvc/v1/c2/sharePhotoWithAnotherUser/reynardengels@gmail.com/")
+            .then(res => res.data)
+            .then((data) => {
+                console.log(data);
+                this.setState({photos: data.cargo});
+            });
+        console.log(this.state.photos);
+    };
 
     photoList = () => {
         return this.props.history.push("/list");

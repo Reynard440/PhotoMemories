@@ -17,9 +17,9 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 export default class PhotoPadNavigationBar extends Component {
     render() {
         return (
-            <Navbar bg="primary" variant="dark" expand="lg">
+            <Navbar bg="primary" expanded={"sm"} variant="dark" expand="lg">
                 <Link to={""} className="navbar-brand">
-                    <img src={logo} height="30" width="100" style={{"marginLeft":"10px", "marginBottom":"5px"}} alt={logo}/>
+                    <img src={logo} height="20" width="100" style={{"marginLeft":"10px"}} alt={logo}/>
                 </Link>
                 <Container fluid>
                     <Nav className="mr-auto">

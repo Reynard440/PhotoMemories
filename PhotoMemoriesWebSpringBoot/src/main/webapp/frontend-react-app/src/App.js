@@ -26,7 +26,7 @@ export default function App() {
         <PhotoPadNavigationBar/>>
             <Container>
                 <Row>
-                    <Col lg={12} style={marginTop}>
+                    <Col md={12} style={marginTop}>
                         <Switch>
                             <Route path="/" exact component={PhotoPadWelcome}/>
                             <Route path="/add" exact component={PhotoPadPhoto}/>

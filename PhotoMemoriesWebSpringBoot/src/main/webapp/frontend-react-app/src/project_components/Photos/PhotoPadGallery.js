@@ -28,16 +28,22 @@ export default class PhotoPadGallery extends Component {
     };
 
     render() {
-        // const [photos, setPhotos] = useState();
         return (
             <div>
-                <Card className={"border border-dark bg-white text-dark"} style={{ width: '100%' }}>
+                <Card className={"border border-dark bg-white text-dark"} style={{ width: '80em' }}>
                     <CardHeader className={"bg-white text-dark"}><FontAwesomeIcon icon={faImages}/> Your Gallery of Photos</CardHeader>
                     <Card.Body>
-                        {this.state.photos.map((photo) => (
-                            <img key={photo.photoId} src={`http://localhost:8095/photo-memories/mvc/v1/c4/displayPhoto/reynardengels@gmail.com/`+ photo.photoLink + `/`} height={"300px"} width={"300px"} alt={"default"}/>
-                        ))}
-                        {/*<PhotoPadImage/>*/}
+                        <div>
+                            {this.state.photos.map((photo) => (
+                                <div className={"grouping"}>
+                                    <img key={photo.photoId} src={`http://localhost:8095/photo-memories/mvc/v1/c4/displayPhoto/reynardengels@gmail.com/` + photo.photoLink + `/`} className={"containerImage"} height={"300px"} width={"300px"}  alt={"default"}/>
+                                    <div className={"divText"}>{photo.photoId}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </Card.Body>
+                    <Card.Body>
+                        <Card.Link href="#">Card Link</Card.Link>
                     </Card.Body>
                 </Card>
             </div>

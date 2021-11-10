@@ -11,3 +11,81 @@ body{
     max-height: 150px;
     position: relative;
 }
+
+.grouping {
+    display: inline-block;
+}
+
+.containerImage {
+    display: inline-flex;
+    margin-top: 5px;
+    width: 300px;
+    height: 300px;
+}
+
+.divText {
+    text-align: center;
+}
+
+/*.overlay {*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    width: 50%;*/
+/*    height: 50%;*/
+/*    background: rgba(0, 0, 0, 0);*/
+/*    transition: background 0.5s ease;*/
+/*}*/
+
+/*.container:hover .overlay {*/
+/*    display: flex;*/
+/*    background: rgba(0, 0, 0, .3);*/
+/*}*/
+
+/*.img {*/
+/*    position: absolute;*/
+/*    width: 300px;*/
+/*    height: 300px;*/
+/*    left: 0;*/
+/*}*/
+
+/*.title {*/
+/*    position: absolute;*/
+/*    width: 100px;*/
+/*    left: 0;*/
+/*    top: 120px;*/
+/*    font-weight: 700;*/
+/*    font-size: 30px;*/
+/*    text-align: center;*/
+/*    text-transform: uppercase;*/
+/*    color: white;*/
+/*    z-index: 1;*/
+/*    transition: top .5s ease;*/
+/*}*/
+
+/*.container:hover .title {*/
+/*    top: 90px;*/
+/*}*/
+
+/*.button {*/
+/*    position: relative;*/
+/*    width: 150px;*/
+/*    left:0;*/
+/*    top: 50px;*/
+/*    text-align: center;*/
+/*    opacity: 0;*/
+/*    transition: opacity .35s ease;*/
+/*}*/
+
+/*.button a {*/
+/*    width: 100px;*/
+/*    padding: 12px 48px;*/
+/*    text-align: center;*/
+/*    color: white;*/
+/*    border: solid 2px white;*/
+/*    z-index: 1;*/
+/*}*/
+
+/*.container:hover .button {*/
+/*    opacity: 1;*/
+/*}*/
