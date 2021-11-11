@@ -43,15 +43,16 @@ export default class PhotoPadPhotoList extends Component {
     };
 
     downloadPhoto = (photoLink) => {
-      axios.get("http://localhost:8095/photo-memories/mvc/v1/c4/downloadPhoto/reynardengels@gmail.com/"+photoLink)
-          .then(res => {
-              if (res.data !== null) {
-                  this.setState({"show": true});
-                  setTimeout(() => this.setState({"show": false}), 3000);
-              }else {
-                  this.setState({"show": false});
-              }
-          });
+        window.open("http://localhost:8095/photo-memories/mvc/v1/c4/downloadPhoto/reynardengels@gmail.com/"+photoLink);
+      // axios.get("http://localhost:8095/photo-memories/mvc/v1/c4/downloadPhoto/reynardengels@gmail.com/"+photoLink)
+      //     .then(res => {
+      //         if (res.data !== null) {
+      //             this.setState({"show": true});
+      //             setTimeout(() => this.setState({"show": false}), 3000);
+      //         }else {
+      //             this.setState({"show": false});
+      //         }
+      //     });
     };
 
     render(){
