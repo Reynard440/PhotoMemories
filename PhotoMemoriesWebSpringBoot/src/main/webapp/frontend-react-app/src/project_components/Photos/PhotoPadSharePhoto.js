@@ -5,8 +5,10 @@ import {faBackward, faSave, faShareSquare, faUndo} from "@fortawesome/free-solid
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import axios from "axios";
 import PhotoPadToast from "./PhotoPadToast";
+import {getPhoto} from "../services";
+import {connect} from "react-redux";
 
-export default class PhotoPadSharePhoto extends Component {
+class PhotoPadSharePhoto extends Component {
     constructor(props) {
         super(props);
         this.state = this.initialState;
@@ -21,22 +23,22 @@ export default class PhotoPadSharePhoto extends Component {
 
     componentDidMount() {
         const photoId = +this.props.match.params.photoId;
+        console.log("hello");
         if (photoId) {
             this.retrieveById(photoId);
         }
     };
 
     retrieveById = (photoId) => {
-        axios.get("http://localhost:8095/photo-memories/mvc/v1/c2/getPhotoById/"+photoId)
-            .then(res => {
-                if (res.data !== null) {
-                    this.setState({
-                        photoId: res.data.cargo.photoId,
-                    });
-                }
-            }).catch((error) => {
-            console.log("Error - " +error);
-        });
+        this.props.getPhoto(photoId);
+        setTimeout(() => {
+            let photo = this.props.photoObj.photos;
+            if (photo != null) {
+                this.setState({
+                    photoId: photo.photoId
+                });
+            }
+        },1500);
     };
 
     sharePhoto = event => {
@@ -149,3 +151,17 @@ export default class PhotoPadSharePhoto extends Component {
         );
     }
 };
+
+const mapStateToProps = state => {
+    return {
+        photoObj: state.photo
+    }
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        getPhoto: (photoId) => dispatch(getPhoto(photoId))
+    }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PhotoPadSharePhoto);

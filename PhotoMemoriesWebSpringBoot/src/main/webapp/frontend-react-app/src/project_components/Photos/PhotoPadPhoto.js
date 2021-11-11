@@ -1,12 +1,13 @@
 import React, {Component} from "react";
-import {Button, Card, Col, Form, Row} from "react-bootstrap";
+import {Button, Card, Col, Form, InputGroup, Row} from "react-bootstrap";
 import CardHeader from "react-bootstrap/CardHeader";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faImages, faList, faPlusSquare, faSave, faUndo} from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
 import PhotoPadToast from "./PhotoPadToast";
+import {connect} from "react-redux";
+import {savePhoto} from "../services/index";
 
-export default  class PhotoPadPhoto extends Component {
+class PhotoPadPhoto extends Component {
     constructor(props) {
         super(props);
         this.state = this.initialState;
@@ -38,26 +39,16 @@ export default  class PhotoPadPhoto extends Component {
         bodyInfo.append("email", this.state.email);
         bodyInfo.append("photo", this.state.photo);
 
-        axios.post("http://localhost:8095/photo-memories/mvc/v1/c2/addNewPhoto", bodyInfo,
-            {
-                headers:{
-                    "Access-Control-Allow-Origin": "*",
-                    "Authorization": "Carier eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyZXluYXJkZW5nZWxzQGdtYWlsLmNvbSIsInJvbGVzIjpbIlVTRVJfUk9MRSJdLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwOTUvcGhvdG8tbWVtb3JpZXMvbXZjL2xvZ2luIiwiZXhwIjoxNjM2MDIxMTk2fQ.6lvWZ4NtC9r3fvJWa72W3sRtk2rFJauBHioQkuoOyTg"
-                }
-            })
-            .then(res => {
-                if (res.data != null) {
-                    this.setState({"show": true});
-                    setTimeout(() => this.setState({"show": false}), 3000);
-                    setTimeout(() => this.photoList(), 3000);
-                } else {
-                    this.setState({"show": false});
-                }
-            })
-            .catch(error => {
-                console.log(error.response)
-            });
-
+        this.props.savePhoto(bodyInfo);
+        setTimeout(() => {
+            if (this.props.savedPhotoObj.photo != null) {
+                this.setState({"show": true, "method":"put"});
+                setTimeout(() => this.setState({"show": false}), 1500);
+                setTimeout(() => this.photoList(), 1500);
+            } else {
+                this.setState({"show": false});
+            }
+        }, 1000);
         this.setState(this.initialState);
     };
 
@@ -115,8 +106,10 @@ export default  class PhotoPadPhoto extends Component {
                                 </Form.Group>
 
                                 <Form.Group as={Col} controlId="formGridPhoto">
-                                    <Form.Label>Import the photo here...</Form.Label>
-                                    <Form.Control type="file" name="photo" value={photo} onChange={this.photoChanged} required autoComplete="off" className={"bg-white text-dark"} />
+                                    <InputGroup>
+                                        <Form.Label>Import the photo here...</Form.Label>
+                                        <Form.Control type="file" name="photo" value={photo} onChange={this.photoChanged} required autoComplete="off" className={"bg-white text-dark"} />
+                                    </InputGroup>
                                 </Form.Group>
                             </Row>
                         </Card.Body>
@@ -139,4 +132,18 @@ export default  class PhotoPadPhoto extends Component {
             </div>
         );
     }
-}
+};
+
+const mapStateToProps = state => {
+    return {
+        savedPhotoObj: state.photo
+    }
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        savePhoto: (photo) => dispatch(savePhoto(photo))
+    }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PhotoPadPhoto);

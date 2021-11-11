@@ -17,7 +17,7 @@ export default  class PhotoPadRegister extends Component {
         return (
             <Row className="justify-content-md-center">
                 <Col xs={5}>
-                    <Card className={"border border-white bg-white text-dark"}>
+                    <Card className={"border border-white bg-white text-dark registerMain"}>
                         <Card.Header>
                             <FontAwesomeIcon icon={faKey}/>  Register
                         </Card.Header>

@@ -26,6 +26,15 @@ body{
     margin-bottom: 60px;
 }
 
+.listMain {
+    text-align: left;
+    margin-bottom: 60px;
+}
+
+.registerMain{
+    margin-bottom: 60px;
+}
+
 .galleryCard {
     width: 100%;
 }

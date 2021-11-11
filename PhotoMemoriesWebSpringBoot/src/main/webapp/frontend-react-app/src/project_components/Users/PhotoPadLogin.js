@@ -36,15 +36,12 @@ export default class PhotoPadLogin extends Component {
                             <Form>
                                 <Form.Group className="mb-3" controlId="formBasicEmail">
                                     <Form.Label>Email address</Form.Label>
-                                    <Form.Control type="email" name="email" values="email" onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter email here" />
-                                    <Form.Text className="text-muted">
-                                        We'll never share your email with anyone else.
-                                    </Form.Text>
+                                    <Form.Control type="email" name="email" values={email} onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter email here" />
                                 </Form.Group>
 
                                 <Form.Group className="mb-3" controlId="formBasicPassword">
                                     <Form.Label>Password</Form.Label>
-                                    <Form.Control type="password" name="password" values="password" onChange={this.detailsChange} className={"bg-white text-dark"} placeholder="Enter password here" />
+                                    <Form.Control type="password" name="password" values={password} onChange={this.detailsChange} className={"bg-white text-dark"} placeholder="Enter password here" />
                                 </Form.Group>
                             </Form>
                         </Card.Body>

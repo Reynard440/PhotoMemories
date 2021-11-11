@@ -4,7 +4,9 @@ import {Toast} from "react-bootstrap";
 export default  class PhotoPadToast extends Component {
     render(){
         const details = {
-            position: 'center',
+            position: 'fixed',
+            top: '10px',
+            left: '10px',
             zIndex: '1',
             boxShadow: '0 4px 8px o rgba(0.5, 0.5, 0.5, 0.2), 0 6px 20px 0 rgba(0.8, 0.8, 0.8, 0.19)'
         };

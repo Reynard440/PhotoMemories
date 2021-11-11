@@ -3,10 +3,11 @@ import PhotoPadToast from "./PhotoPadToast";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import CardHeader from "react-bootstrap/CardHeader";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faBackward, faEdit, faPlusSquare, faUndo} from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
+import {faEdit, faImages, faList, faPlusSquare, faUndo} from "@fortawesome/free-solid-svg-icons";
+import {connect} from "react-redux";
+import {getPhoto, updatePhoto} from "../services/index";
 
-export default class PhotoPadEdit extends Component {
+class PhotoPadEdit extends Component {
     constructor(props) {
         super(props);
         this.state = this.initialState;
@@ -27,19 +28,18 @@ export default class PhotoPadEdit extends Component {
     };
 
     retrieveById = (photoId) => {
-        axios.get("http://localhost:8095/photo-memories/mvc/v1/c2/getPhotoById/"+photoId)
-            .then(res => {
-                if (res.data !== null) {
-                    this.setState({
-                        photoId: res.data.cargo.photoId,
-                        ph_name: res.data.cargo.photoName,
-                        location: res.data.cargo.photoLocation,
-                        ph_captured: res.data.cargo.photoCapturedBy
-                    });
-                }
-            }).catch((error) => {
-            console.log("Error - " +error);
-        });
+        this.props.getPhoto(photoId);
+        setTimeout(() => {
+            let photo = this.props.photoObj.photos;
+            if (photo != null) {
+                this.setState({
+                    photoId: photo.photoId,
+                    ph_name: photo.photoName,
+                    location: photo.photoLocation,
+                    ph_captured: photo.photoCapturedBy
+                });
+            }
+        },1500);
     };
 
     updatePhoto = event => {
@@ -49,27 +49,16 @@ export default class PhotoPadEdit extends Component {
         bodyInfo.append("pCaptured", this.state.ph_captured);
         bodyInfo.append("email", this.state.email);
 
-
-        axios.put("http://localhost:8095/photo-memories/mvc/v1/c2/updateMetadata/" + this.state.photoId, bodyInfo,
-            {
-                headers:{
-                    "Access-Control-Allow-Origin": "*",
-                    "Authorization": "Carier eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyZXluYXJkZW5nZWxzQGdtYWlsLmNvbSIsInJvbGVzIjpbIlVTRVJfUk9MRSJdLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwOTUvcGhvdG8tbWVtb3JpZXMvbXZjL2xvZ2luIiwiZXhwIjoxNjM2MDIxMTk2fQ.6lvWZ4NtC9r3fvJWa72W3sRtk2rFJauBHioQkuoOyTg"
-                }
-            })
-            .then(res => {
-                if (res.data != null) {
-                    this.setState({"show": true});
-                    setTimeout(() => this.setState({"show": false}), 3000);
-                    setTimeout(() => this.photoList(), 3000);
-                } else {
-                    this.setState({"show": false});
-                }
-            })
-            .catch(error => {
-                console.log(error.response)
-            });
-
+        this.props.updatePhoto(bodyInfo);
+        setTimeout(() => {
+            if (this.props.updatedPhotoObj.photo != null) {
+                this.setState({"show": true, "method":"put"});
+                setTimeout(() => this.setState({"show": false}), 1500);
+                setTimeout(() => this.photoList(), 1500);
+            } else {
+                this.setState({"show": false});
+            }
+        }, 1000);
         this.setState(this.initialState);
     }
 
@@ -83,6 +72,9 @@ export default class PhotoPadEdit extends Component {
         return this.props.history.push("/gallery");
     };
 
+    photoList = () => {
+        return this.props.history.push("/list");
+    };
 
     clearAllFields = () => {
         this.setState(() => this.initialState);
@@ -129,8 +121,11 @@ export default class PhotoPadEdit extends Component {
                             <Button size="md" type="submit" variant="success" disabled={this.state.email.length === 0 || this.state.location.length === 0 || this.state.ph_captured.length === 0 || this.state.ph_name.length === 0} onClick={this.updatePhoto}>
                                 <FontAwesomeIcon icon={faEdit}/> Update Photo
                             </Button>{' '}
+                            <Button size="md" type="button" variant="info" onClick={this.photoList.bind()}>
+                                <FontAwesomeIcon icon={faList}/> Photo List
+                            </Button>{' '}
                             <Button size="md" type="button" variant="primary" onClick={this.photoGallery.bind()}>
-                                <FontAwesomeIcon icon={faBackward}/> Photo Gallery
+                                <FontAwesomeIcon icon={faImages}/> Photo Gallery
                             </Button>
                         </Card.Footer>
                     </Form>
@@ -138,4 +133,20 @@ export default class PhotoPadEdit extends Component {
             </div>
         );
     }
-}
+};
+
+const mapStateToProps = state => {
+    return {
+        updatedPhotoObj: state.photo,
+        photoObj: state.photo
+    }
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        updatePhoto: (photo) => dispatch(updatePhoto(photo)),
+        getPhoto: (photoId) => dispatch(getPhoto(photoId))
+    }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PhotoPadEdit);

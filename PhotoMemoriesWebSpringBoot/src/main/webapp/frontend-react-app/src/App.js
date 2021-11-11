@@ -1,5 +1,6 @@
 import React from 'react';
 import './App.css';
+
 import PhotoPadNavigationBar from "./project_components/Photos/PhotoPadNavigationBar";
 import {Col, Container, Row} from "react-bootstrap";
 import PhotoPadWelcome from "./project_components/Photos/PhotoPadWelcome";
@@ -12,14 +13,18 @@ import PhotoPadLogin from './project_components/Users/PhotoPadLogin';
 import PhotoPadGallery from "./project_components/Photos/PhotoPadGallery";
 import PhotoPadEdit from "./project_components/Photos/PhotoPadEdit";
 import PhotoPadSharePhoto from "./project_components/Photos/PhotoPadSharePhoto";
-import PhotoPadUpdateUser from "./project_components/Users/PhotoPadUpdateUser";
-import PhotoPadDeleteUser from "./project_components/Users/PhotoPadDeleteUser";
 
 export default function App() {
     const marginTop = {
         marginTop: "5px",
         marginLeft: "10px"
     };
+
+    const title = "Hi and welcome to my project 2 website";
+    const msg = "Of all the things I've ever done, this was by far the most exciting, stressful, and rewarding\n" +
+        "                    task any of my modules (over the 3 years) has given me to complete. It was a lot of fun, and rewarding\n" +
+        "                    but challenging at the same time.";
+    const footer = "Reynard Engels"
 
   return (
     <Router>
@@ -28,7 +33,7 @@ export default function App() {
                 <Row>
                     <Col md={12} style={marginTop}>
                         <Switch>
-                            <Route path="/" exact component={PhotoPadWelcome}/>
+                            <Route path="/" exact component={() => <PhotoPadWelcome title={title} msg={msg} footer={footer}/>}/>
                             <Route path="/add" exact component={PhotoPadPhoto}/>
                             <Route path="/edit/:photoId" exact component={PhotoPadEdit}/>
                             <Route path="/list" exact component={PhotoPadPhotoList}/>
@@ -36,8 +41,6 @@ export default function App() {
                             <Route path="/gallery" exact component={PhotoPadGallery}/>
                             <Route path="/register" exact component={PhotoPadRegister}/>
                             <Route path="/login" exact component={PhotoPadLogin}/>
-                            <Route path="/update" exact component={PhotoPadUpdateUser}/>
-                            <Route path="/delete" exact component={PhotoPadDeleteUser}/>
                         </Switch>
                     </Col>
                 </Row>

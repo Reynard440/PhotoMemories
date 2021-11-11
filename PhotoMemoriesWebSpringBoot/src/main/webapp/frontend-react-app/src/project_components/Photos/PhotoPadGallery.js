@@ -3,10 +3,11 @@ import CardHeader from "react-bootstrap/CardHeader";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faDownload, faEdit, faImages, faSave, faShareSquare, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {Button, Card} from "react-bootstrap";
-import axios from 'axios';
 import {Link} from "react-router-dom";
+import {deletePhoto, getPhotos} from "../services";
+import {connect} from "react-redux";
 
-export default class PhotoPadGallery extends Component {
+class PhotoPadGallery extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -15,30 +16,20 @@ export default class PhotoPadGallery extends Component {
     }
 
     componentDidMount() {
-        this.loadPhotos();
+        this.props.getPhotos();
     }
 
-    loadPhotos() {
-        axios.get("http://localhost:8095/photo-memories/mvc/v1/c2/loadAllPhotosOfUser/reynardengels@gmail.com/")
-            .then(res => res.data)
-            .then((data) => {
-                this.setState({photos: data.cargo});
-            });
-    };
-
-    deletePhoto = (photoLink, photoId) => {
-        axios.delete("http://localhost:8095/photo-memories/mvc/v1/c2/deletePhoto/"+photoLink+"/reynardengels@gmail.com/"+photoId)
-            .then(res => {
-                if (res.data != null) {
-                    this.setState({"show": true});
-                    setTimeout(() => this.setState({"show": false}), 3000);
-                    this.setState({
-                        photos: this.state.photos.filter(photo => photo.photoId !== photoId)
-                    });
-                }else {
-                    this.setState({"show": false});
-                }
-            });
+    deletePhoto = (photoId, photoLink) => {
+        this.props.deletePhoto(photoLink, photoId);
+        setTimeout(() => {
+            if (this.props.deletedPhotoObj != null) {
+                this.setState({"show": true});
+                setTimeout(() => this.setState({"show": false}), 1500);
+                this.props.getPhotos();
+            }else {
+                this.setState({"show": false});
+            }
+        }, 1500);
     };
 
     downloadPhoto = (photoLink) => {
@@ -55,15 +46,17 @@ export default class PhotoPadGallery extends Component {
     };
 
     render() {
+        const photoData = this.props.photoData;
+        const photos = photoData.photos;
         return (
             <div className={"galleryMain"}>
                 <Card className={"border border-dark bg-white text-dark galleryCard"}>
                     <CardHeader className={"bg-white text-dark"} style={{textAlign: 'left'}}><FontAwesomeIcon icon={faImages}/> Your Gallery of Photos {'  '}
-                        <Link to={"add"} className="btn btn-sm btn-info" ><FontAwesomeIcon icon={faSave}/> Add Photo</Link>
+                        <Link to={"add"} className="btn btn-sm btn-outline-primary" ><FontAwesomeIcon icon={faSave}/> Add Photo</Link>
                     </CardHeader>
                     <Card.Body>
                         <div>
-                            {this.state.photos.map((photo) => (
+                            {photos.map((photo) => (
                                 <div key={photo.photoId} className={"grouping"}>
                                     <img src={`http://localhost:8095/photo-memories/mvc/v1/c4/displayPhoto/reynardengels@gmail.com/` + photo.photoLink + `/`} className={"containerImage"} alt={"default"}/>
                                     <div className={"divText"}>{photo.photoId}</div>
@@ -79,4 +72,20 @@ export default class PhotoPadGallery extends Component {
             </div>
         );
     }
-}
+};
+
+const mapStateToProps = state => {
+    return {
+        photoData: state.photos,
+        deletedPhotoObj: state.photo
+    }
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        getPhotos: () => dispatch(getPhotos()),
+        deletePhoto: (photoId, photoLink) => dispatch(deletePhoto(photoId, photoLink))
+    }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PhotoPadGallery);
