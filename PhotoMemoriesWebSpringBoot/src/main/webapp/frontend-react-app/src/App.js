@@ -32,7 +32,7 @@ export default function App() {
                             <Route path="/add" exact component={PhotoPadPhoto}/>
                             <Route path="/edit/:photoId" exact component={PhotoPadEdit}/>
                             <Route path="/list" exact component={PhotoPadPhotoList}/>
-                            <Route path="/share" exact component={PhotoPadSharePhoto}/>
+                            <Route path="/share/:photoId" exact component={PhotoPadSharePhoto}/>
                             <Route path="/gallery" exact component={PhotoPadGallery}/>
                             <Route path="/register" exact component={PhotoPadRegister}/>
                             <Route path="/login" exact component={PhotoPadLogin}/>

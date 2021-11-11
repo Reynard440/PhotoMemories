@@ -4,60 +4,143 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faBackward, faSave, faShareSquare, faUndo} from "@fortawesome/free-solid-svg-icons";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import axios from "axios";
+import PhotoPadToast from "./PhotoPadToast";
 
 export default class PhotoPadSharePhoto extends Component {
+    constructor(props) {
+        super(props);
+        this.state = this.initialState;
+        this.state.show = false;
+        this.detailsChanged = this.detailsChanged.bind(this);
+        this.sharePhoto = this.sharePhoto.bind(this);
+    }
 
-    sharePhoto() {
-        axios.get("http://localhost:8095/photo-memories/mvc/v1/c2/sharePhotoWithAnotherUser/reynardengels@gmail.com/")
-            .then(res => res.data)
-            .then((data) => {
-                console.log(data);
-                this.setState({photos: data.cargo});
-            });
-        console.log(this.state.photos);
+    initialState = {
+        photoId:+this.props.match.params.photoId, ph_access:false, recipientEmail:'', sendingEmail:''
     };
 
-    photoList = () => {
-        return this.props.history.push("/list");
+    componentDidMount() {
+        const photoId = +this.props.match.params.photoId;
+        if (photoId) {
+            this.retrieveById(photoId);
+        }
+    };
+
+    retrieveById = (photoId) => {
+        axios.get("http://localhost:8095/photo-memories/mvc/v1/c2/getPhotoById/"+photoId)
+            .then(res => {
+                if (res.data !== null) {
+                    this.setState({
+                        photoId: res.data.cargo.photoId,
+                    });
+                }
+            }).catch((error) => {
+            console.log("Error - " +error);
+        });
+    };
+
+    sharePhoto = event => {
+        event.preventDefault();
+
+        const bodyInfo = new FormData();
+        bodyInfo.append("receivingEmail", this.state.recipientEmail);
+        bodyInfo.append("accessRights", this.state.ph_access);
+        bodyInfo.append("accessRights", this.state.ph_access);
+        bodyInfo.append("id", this.state.photoId);
+        bodyInfo.append("sharingEmail", this.state.sendingEmail);
+
+        axios.post("http://localhost:8095/photo-memories/mvc/v1/c2/sharePhotoWithAnotherUser", bodyInfo,
+            {
+                headers:{
+                    "Access-Control-Allow-Origin": "*",
+                    "Authorization": "Carier eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyZXluYXJkZW5nZWxzQGdtYWlsLmNvbSIsInJvbGVzIjpbIlVTRVJfUk9MRSJdLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwOTUvcGhvdG8tbWVtb3JpZXMvbXZjL2xvZ2luIiwiZXhwIjoxNjM2MDIxMTk2fQ.6lvWZ4NtC9r3fvJWa72W3sRtk2rFJauBHioQkuoOyTg"
+                }
+            })
+            .then(res => {
+                if (res.data != null) {
+                    this.setState({"show": true});
+                    setTimeout(() => this.setState({"show": false}), 3000);
+                    setTimeout(() => this.photoGallery(), 3000);
+                } else {
+                    this.setState({"show": false});
+                }
+            })
+            .catch(error => {
+                console.log(error.response)
+            });
+
+        this.setState(this.initialState);
+    };
+
+    detailsChanged = event => {
+        console.log(event.target.name);
+
+        if (event.target.name === 'ph_access') {
+            if (this.state.ph_access === false) {
+                this.state.ph_access = true;
+            } else {
+                this.state.ph_access = false;
+            }
+            console.log(this.state.ph_access);
+        } else {
+            this.setState({
+                [event.target.name] : event.target.value
+            });
+        }
+    };
+
+    photoGallery = () => {
+        return this.props.history.push("/gallery");
+    };
+
+    clearAllFields = () => {
+        this.setState(() => this.initialState);
     };
 
     render() {
+        const {recipientEmail, sendingEmail, photoId, ph_access} = this.state;
         return (
             <div>
+                <div style={{"display": this.state.show ? "block": "none"}}>
+                    <PhotoPadToast show={this.state.show} message={"Photo shared, this photo was successfully shared with" + this.state.recipientEmail + "."} type={"info"}/>
+                </div>
                 <Card className={"border border-white bg-white text-dark"}>
                     <CardHeader><FontAwesomeIcon icon={faShareSquare}/> Share a Photo with Someone </CardHeader>
-                    <Form id={"photoForm"}>
+                    <Form onReset={this.clearAllFields} onSubmit={this.sharePhoto} id={"photoShareForm"}>
                         <Card.Body>
                             <Row>
                                 <Form.Group as={Col} controlId="formGridToEmail">
-                                    <Form.Label>Send to</Form.Label>
-                                    <Form.Control type="email" name="receivingEmail"  onChange={this.photoChanged} required autoComplete="off" placeholder="Enter modified date" className={"bg-white text-dark"} />
+                                    <Form.Label>To Email</Form.Label>
+                                    <Form.Control type="email" name="recipientEmail" value={recipientEmail} onChange={this.detailsChanged} required autoComplete="off" placeholder="Enter destination email here" className={"bg-white text-dark"} />
                                 </Form.Group>
 
-                                <Form.Group as={Col} controlId="formGridPhotoId">
-                                    <Form.Label>Photo Id</Form.Label>
-                                    <Form.Control type="text" name="location" onChange={this.photoChanged} required autoComplete="off" placeholder="Enter name of city" className={"bg-white text-dark"} />
+                                <Form.Group as={Col} controlId="formGridToEmail">
+                                    <Form.Label>From Email</Form.Label>
+                                    <Form.Control type="email" name="sendingEmail" value={sendingEmail} onChange={this.detailsChanged} required autoComplete="off" placeholder="Your email address" className={"bg-white text-dark"} />
                                 </Form.Group>
+
                             </Row>
                             <Row>
-                                <Form.Group as={Col} controlId="formGridPhotoAccessRights">
-                                    <Form.Label>Photo Access Rights</Form.Label>
-                                    <Form.Check type="checkbox" name="ph_name" onChange={this.photoChanged} required autoComplete="off" placeholder="Enter name of photo date" className={"bg-white text-dark"} />
-                                    <Form.Label>Full Access = checked</Form.Label>
-                                    <br/>
-                                    <Form.Label>Read Access = unchecked</Form.Label>
+                                <Form.Group as={Col} controlId="formGridPhotoId">
+                                    <Form.Label>Photo Id</Form.Label>
+                                    <Form.Control type="text" name="photoId" value={photoId} onChange={this.detailsChanged} required autoComplete="off" placeholder="Enter the id of the photo here" className={"bg-white text-dark"} disabled />
+                                </Form.Group>
+
+                                <Form.Group as={Col} controlId="formGridPhotoAccessRights"><Form.Label>Photo Access Rights</Form.Label>
+
+                                    <Form.Check type="checkbox" name="ph_access" value={ph_access} onChange={this.detailsChanged} required autoComplete="off" className={"bg-white text-dark"} />
                                 </Form.Group>
                             </Row>
                         </Card.Body>
                         <Card.Footer style={{ "textAlign":"right" }}>
-                            <Button size="md" type="reset" variant="info">
+                            <Button size="md" type="reset" variant="info" onClick={this.clearAllFields}>
                                 <FontAwesomeIcon icon={faUndo}/> Clear
                             </Button>{' '}
-                            <Button size="md" type="submit" variant="primary" >
+                            <Button size="md" type="submit" variant="primary" disabled={this.state.sendingEmail.length === 0 || this.state.recipientEmail.length === 0 || this.state.photoId.length === 0} onClick={this.sharePhoto}>
                                 <FontAwesomeIcon icon={faSave}/> Share Photo
                             </Button>{' '}
-                            <Button size="md" type="button" variant="info" onClick={this.photoList.bind()}>
-                                <FontAwesomeIcon icon={faBackward}/> Photo List
+                            <Button size="md" type="button" variant="info" onClick={this.photoGallery.bind()}>
+                                <FontAwesomeIcon icon={faBackward}/> Photo Gallery
                             </Button>
                         </Card.Footer>
                     </Form>

@@ -79,9 +79,10 @@ export default class PhotoPadEdit extends Component {
         });
     };
 
-    photoList = () => {
-        return this.props.history.push("/list");
+    photoGallery = () => {
+        return this.props.history.push("/gallery");
     };
+
 
     clearAllFields = () => {
         this.setState(() => this.initialState);
@@ -96,7 +97,7 @@ export default class PhotoPadEdit extends Component {
                 </div>
                 <Card className={"border border-white bg-white text-dark"}>
                     <CardHeader><FontAwesomeIcon icon={faPlusSquare}/> Update a Photo</CardHeader>
-                    <Form onReset={this.clearAllFields} onSubmit={this.updatePhoto} id={"photoForm"}>
+                    <Form onReset={this.clearAllFields} onSubmit={this.updatePhoto} id={"photoEditForm"}>
                         <Card.Body>
                             <Row>
                                 <Form.Group as={Col} controlId="formGridPhotoName">
@@ -122,14 +123,14 @@ export default class PhotoPadEdit extends Component {
                             </Row>
                         </Card.Body>
                         <Card.Footer style={{ "textAlign":"right" }}>
-                            <Button size="md" type="reset" variant="info">
+                            <Button size="md" type="reset" variant="info" onClick={this.clearAllFields}>
                                 <FontAwesomeIcon icon={faUndo}/> Clear
                             </Button>{' '}
-                            <Button size="md" type="submit" variant="success" disabled={this.state.email.length === 0 || this.state.location.length === 0 || this.state.ph_captured.length === 0 || this.state.ph_name.length === 0}  onClick={this.updatePhoto}>
+                            <Button size="md" type="submit" variant="success" disabled={this.state.email.length === 0 || this.state.location.length === 0 || this.state.ph_captured.length === 0 || this.state.ph_name.length === 0} onClick={this.updatePhoto}>
                                 <FontAwesomeIcon icon={faEdit}/> Update Photo
                             </Button>{' '}
-                            <Button size="md" type="button" variant="info" onClick={this.photoList.bind()}>
-                                <FontAwesomeIcon icon={faBackward}/> Photo List
+                            <Button size="md" type="button" variant="primary" onClick={this.photoGallery.bind()}>
+                                <FontAwesomeIcon icon={faBackward}/> Photo Gallery
                             </Button>
                         </Card.Footer>
                     </Form>

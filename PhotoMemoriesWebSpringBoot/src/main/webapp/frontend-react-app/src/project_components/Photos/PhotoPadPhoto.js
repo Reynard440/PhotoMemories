@@ -117,7 +117,7 @@ export default  class PhotoPadPhoto extends Component {
                             </Row>
                         </Card.Body>
                         <Card.Footer style={{ "textAlign":"right" }}>
-                            <Button size="md" type="reset" variant="info">
+                            <Button size="md" type="reset" variant="info" onClick={this.clearAllFields}>
                                 <FontAwesomeIcon icon={faUndo}/> Clear
                             </Button>{' '}
                             <Button size="md" type="submit" variant="success" disabled={this.state.email.length === 0 || this.state.ph_name.length === 0 || this.state.ph_captured.length === 0 || this.state.location.length === 0}  onClick={this.addPhoto}>
