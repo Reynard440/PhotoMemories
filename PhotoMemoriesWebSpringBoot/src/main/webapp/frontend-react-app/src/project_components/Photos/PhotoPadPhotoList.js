@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {Button, ButtonGroup, Card, Table} from "react-bootstrap";
 import CardHeader from "react-bootstrap/CardHeader";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faDownload, faEdit, faList, faShareSquare, faTrash} from '@fortawesome/free-solid-svg-icons';
+import {faDownload, faEdit, faList, faSave, faShareSquare, faTrash} from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import PhotoPadToast from "./PhotoPadToast";
 import {Link} from "react-router-dom";
@@ -61,19 +61,22 @@ export default class PhotoPadPhotoList extends Component {
                     <PhotoPadToast show={this.state.show} message={"Photo deleted, this photo is no longer on the site for you."} type={"danger"}/>
                 </div>
                 <Card className={"border border-dark bg-white text-dark"}>
-                    <CardHeader className={"bg-white text-dark"}><FontAwesomeIcon icon={faList}/> Photo List</CardHeader>
+                    <CardHeader className={"bg-white text-dark"}><FontAwesomeIcon icon={faList}/> Photo List {' '}
+                        <Link to={"add"} className="btn btn-sm btn-outline-primary"><FontAwesomeIcon icon={faSave}/> Add Photo</Link>
+                    </CardHeader>
                     <Card.Body>
                         <Table bordered hover striped variant={"bg-white"}>
                             <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Date Modified</th>
-                                <th>Captured By</th>
-                                <th>Format</th>
-                                <th>Link</th>
-                                <th>Location</th>
-                                <th>Date Uploaded</th>
-                                <td>Operations</td>
+                                <th>ID</th>
+                                <th>DATE MODIFIED</th>
+                                <th>CAPTURED BY</th>
+                                <th>FORMAT</th>
+                                <th>NAME</th>
+                                <th>LOCATION</th>
+                                <th>SIZE</th>
+                                <th>DATE UPLOADED</th>
+                                <td>OPERATIONS</td>
                             </tr>
                             </thead>
                             <tbody>
@@ -87,14 +90,15 @@ export default class PhotoPadPhotoList extends Component {
                                         <td>{photo.dateModified}</td>
                                         <td>{photo.photoCapturedBy}</td>
                                         <td>{photo.photoFormat}</td>
-                                        <td>{photo.photoLink}</td>
+                                        <td>{photo.photoName}</td>
                                         <td>{photo.photoLocation}</td>
+                                        <td>{(photo.photoSize / 1000000).toFixed(2)} MB</td>
                                         <td>{photo.uploadDate}</td>
                                         <td>
                                             <ButtonGroup>
-                                                <Link to={"edit/"+photo.photoId} className="btn btn-sm btn-outline-primary"><FontAwesomeIcon icon={faEdit}/></Link> |
-                                                <Link to={"share"} className="btn btn-sm btn-outline-info"><FontAwesomeIcon icon={faShareSquare}/></Link> |
-                                                <Button size="sm" variant="outline-success" onClick={this.downloadPhoto.bind(this, photo.photoLink)}><FontAwesomeIcon icon={faDownload}/></Button> |
+                                                <Link to={"edit/"+photo.photoId} className="btn btn-sm btn-outline-primary"><FontAwesomeIcon icon={faEdit}/></Link>|
+                                                <Link to={"share"} className="btn btn-sm btn-outline-info"><FontAwesomeIcon icon={faShareSquare}/></Link>|
+                                                <Button size="sm" variant="outline-success" onClick={this.downloadPhoto.bind(this, photo.photoLink)}><FontAwesomeIcon icon={faDownload}/></Button>|
                                                 <Button size="sm" variant="outline-danger" onClick={this.deletePhoto.bind(this, photo.photoLink , photo.photoId)} ><FontAwesomeIcon icon={faTrash}/></Button>
                                             </ButtonGroup>
                                         </td>

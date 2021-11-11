@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import CardHeader from "react-bootstrap/CardHeader";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faPlusSquare, faSave, faUndo} from '@fortawesome/free-solid-svg-icons';
+import {faImages, faList, faPlusSquare, faSave, faUndo} from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import PhotoPadToast from "./PhotoPadToast";
 
@@ -71,6 +71,10 @@ export default  class PhotoPadPhoto extends Component {
         }
     };
 
+    photoGallery = () => {
+        return this.props.history.push("/gallery");
+    };
+
     render(){
         const {modifiedDate, ph_name, location, ph_captured, email, photo} = this.state;
         return (
@@ -119,6 +123,12 @@ export default  class PhotoPadPhoto extends Component {
                         <Card.Footer style={{ "textAlign":"right" }}>
                             <Button size="md" type="reset" variant="info" onClick={this.clearAllFields}>
                                 <FontAwesomeIcon icon={faUndo}/> Clear
+                            </Button>{' '}
+                            <Button size="md" type="button" variant="primary" onClick={this.photoList.bind()}>
+                                <FontAwesomeIcon icon={faList}/> Photo List
+                            </Button>{' '}
+                            <Button size="md" type="button" variant="primary" onClick={this.photoGallery.bind()}>
+                                <FontAwesomeIcon icon={faImages}/> Photo Gallery
                             </Button>{' '}
                             <Button size="md" type="submit" variant="success" disabled={this.state.email.length === 0 || this.state.ph_name.length === 0 || this.state.ph_captured.length === 0 || this.state.location.length === 0}  onClick={this.addPhoto}>
                                 <FontAwesomeIcon icon={faSave}/> Add Photo
