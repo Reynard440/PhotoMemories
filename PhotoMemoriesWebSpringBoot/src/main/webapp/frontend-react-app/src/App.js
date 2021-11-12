@@ -41,6 +41,7 @@ export default function App() {
                             <Route path="/gallery" exact component={PhotoPadGallery}/>
                             <Route path="/register" exact component={PhotoPadRegister}/>
                             <Route path="/login" exact component={PhotoPadLogin}/>
+                            <Route path="/logout" exact component={PhotoPadLogin}/>
                         </Switch>
                     </Col>
                 </Row>

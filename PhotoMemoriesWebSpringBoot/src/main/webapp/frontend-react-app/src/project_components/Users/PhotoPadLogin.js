@@ -1,16 +1,18 @@
 import React, {Component} from 'react';
-import {Button, Card, Col, Form, Row} from 'react-bootstrap';
+import {Alert, Button, Card, Col, Form, Row} from 'react-bootstrap';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faSignInAlt, faUndo} from "@fortawesome/free-solid-svg-icons";
+import {connect} from "react-redux";
+import {authenticateUser} from "../services/index";
 
-export default class PhotoPadLogin extends Component {
+class PhotoPadLogin extends Component {
     constructor(props){
         super(props);
         this.state = this.initialState;
     }
 
     initialState = {
-        email:'', password:''
+        email:'', password:'', error:''
     };
 
     detailsChange = event => {
@@ -19,15 +21,28 @@ export default class PhotoPadLogin extends Component {
         });
     };
 
+    validateUser = () => {
+        this.props.authenticateUser(this.state.email, this.state.password);
+        setTimeout(() => {
+            if (this.props.auth.isLoggedIn) {
+                return this.props.history.push("/");
+            } else {
+                this.resetPhotoPadLoginForm();
+                this.setState({"error": "Invalid email and password"});
+            }
+        }, 500);
+    };
+
     resetPhotoPadLoginForm = () => {
       this.setState(() => this.initialState);
     };
 
     render() {
-        const {email, password} = this.state;
+        const {email, password, error} = this.state;
         return (
             <Row className="justify-content-md-center">
-                <Col xs={5}>
+                <Col xs={4}>
+                    {error && <Alert variant="danger">{error}</Alert>}
                     <Card className={"border border-white bg-white text-dark"}>
                         <Card.Header>
                             <FontAwesomeIcon icon={faSignInAlt}/>  Login
@@ -46,10 +61,10 @@ export default class PhotoPadLogin extends Component {
                             </Form>
                         </Card.Body>
                         <Card.Footer style={{"textAlign":"right"}}>
-                            <Button size="sm" type="button" variant="info" onClick={this.resetPhotoPadLoginForm} disabled={this.state.email.length === 0 || this.state.password.length === 0}>
+                            <Button size="sm" type="button" variant="info" onClick={this.resetPhotoPadLoginForm} disabled={this.state.email.length === 0 && this.state.password.length === 0 && this.state.error.length === 0}>
                                 <FontAwesomeIcon icon={faUndo}/>  Reset
                             </Button> {' '}
-                            <Button size="sm" type="button" variant="success" disabled={this.state.email.length === 0 || this.state.password.length === 0}>
+                            <Button size="sm" type="button" variant="success" onClick={this.validateUser} disabled={this.state.email.length === 0 || this.state.password.length === 0}>
                                 <FontAwesomeIcon icon={faSignInAlt}/>  Login
                             </Button>
                         </Card.Footer>
@@ -59,3 +74,17 @@ export default class PhotoPadLogin extends Component {
         );
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        auth: state.auth
+    }
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        authenticateUser: (email, password) => dispatch(authenticateUser(email, password))
+    }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PhotoPadLogin);

@@ -1,10 +1,10 @@
-import {FAILURE, LOGIN_REQUEST, SUCCESS} from './authTypes';
+import {FAILURE, LOGIN_REQUEST, LOGOUT_REQUEST, SUCCESS} from './authTypes';
 
 export const authenticateUser = (email, password) => {
   return dispatch => {
       dispatch(loginRequest());
       if (email === "reynardengels@gmail.com" && password ==="King6") {
-          dispatch(success());
+          dispatch(success(true));
       } else {
           dispatch(failure());
       }
@@ -17,10 +17,23 @@ const loginRequest = () => {
     };
 };
 
-const success = () => {
+export const logoutUser = () => {
+    return dispatch => {
+        dispatch(logoutRequest());
+        dispatch(success(false));
+    };
+};
+
+const logoutRequest = () => {
+    return {
+        type: LOGOUT_REQUEST
+    };
+};
+
+const success = isLoggedIn => {
     return {
         type: SUCCESS,
-        payload: true
+        payload: isLoggedIn
     };
 };
 
