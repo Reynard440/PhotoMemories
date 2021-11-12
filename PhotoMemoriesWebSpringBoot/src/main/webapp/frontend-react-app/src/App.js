@@ -17,7 +17,8 @@ import PhotoPadSharePhoto from "./project_components/Photos/PhotoPadSharePhoto";
 export default function App() {
     const marginTop = {
         marginTop: "5px",
-        marginLeft: "10px"
+        marginLeft: "10px",
+        marginRight: "30px"
     };
 
     const title = "Hi and welcome to my project 2 website";

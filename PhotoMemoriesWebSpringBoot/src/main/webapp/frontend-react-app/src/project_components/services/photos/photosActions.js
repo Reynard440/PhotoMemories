@@ -67,7 +67,7 @@ const deletePhotoRequest = () => {
 export const deletePhoto = (photoId, photoLink) => {
     return dispatch => {
         dispatch(deletePhotoRequest());
-        axios.delete("http://localhost:8095/v1/c2/deletePhoto/"+photoLink+"/reynardengels@gmail.com/"+photoId)
+        axios.delete("http://localhost:8095/v1/c2/deletePhoto/"+photoLink+ localStorage.getItem('userEmail') +photoId)
             .then(res => {
                 dispatch(photoSuccess(res.data.cargo));
             })

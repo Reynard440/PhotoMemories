@@ -22,11 +22,19 @@ class PhotoPadLogin extends Component {
     };
 
     validateUser = () => {
-        const bodyInfo = new FormData();
+        const bodyInfo = new URLSearchParams();
         bodyInfo.append("email", this.state.email);
         bodyInfo.append("UserHashPassword", this.state.password);
+        // axios.post("http://localhost:8095/v1/c1/login", bodyInfo)
+        //     .then(res => {
+        //         console.log(res);
+        //         // let access_key = res.data.access_key;
+        //     })
+        //     .catch(err => {
+        //         console.log(err.message);
+        //     });
 
-        this.props.authenticateUser(this.state.email, this.state.password);
+        this.props.authenticateUser(bodyInfo);
         setTimeout(() => {
             console.log(this.state.email);
             if (this.props.auth.isLoggedIn) {
@@ -45,8 +53,8 @@ class PhotoPadLogin extends Component {
     render() {
         const {email, password, error} = this.state;
         return (
-            <Row className="justify-content-md-center">
-                <Col xs={4}>
+            <Row className="justify-content-lg-center">
+                <Col xs={5} style={{"width":"75%"}}>
                     {error && <Alert variant="danger">{error}</Alert>}
                     <Card className={"border border-white bg-white text-dark"}>
                         <Card.Header>

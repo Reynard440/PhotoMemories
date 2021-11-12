@@ -16,11 +16,10 @@ class PhotoPadNavigationBar extends Component {
     render() {
         const notLoggedInLinks = (
             <>
-                <Nav className="mr-auto">
+                <Nav>
                     <Link to={""} className="navbar-brand"><FontAwesomeIcon icon={faHome}/> Home</Link>
                 </Nav>
-                <div className="mr-auto"></div>
-                <Nav className="navbar-right">
+                <Nav>
                     <Link to={"register"} className="navbar-brand"><FontAwesomeIcon icon={faKey}/> Register</Link>
                     <Link to={"login"} className="navbar-brand"><FontAwesomeIcon icon={faSignInAlt}/> Login</Link>
                 </Nav>
@@ -28,23 +27,28 @@ class PhotoPadNavigationBar extends Component {
         );
         const loggedInLinks = (
             <>
-                <Nav className="mr-auto">
+                <Nav>
                     <Link to={""} className="navbar-brand"><FontAwesomeIcon icon={faHome}/> Home</Link>
                     <Link to={"list"} className="navbar-brand"><FontAwesomeIcon icon={faList}/> Photo List</Link>
                     <Link to={"gallery"} className="navbar-brand"><FontAwesomeIcon icon={faImages}/> Gallery</Link>
                 </Nav>
-                <Nav className="navbar-right">
+                <Nav>
                     <Link to={"logout"} className="navbar-brand" onClick={this.logout}><FontAwesomeIcon icon={faSignOutAlt}/> Logout</Link>
                 </Nav>
             </>
         );
         return (
-            <Navbar bg="primary" expanded={"sm"} variant="dark" expand="lg">
-                <Link to={""} className="navbar-brand">
-                    <img src={logo} height="20" width="100" style={{"marginLeft":"10px"}} alt={logo}/>
-                </Link>
+            <Navbar bg="primary" variant="dark" expand="lg">
                 <Container fluid>
-                    {this.props.auth.isLoggedIn ? loggedInLinks : notLoggedInLinks}
+                    <Link to={""} className="navbar-brand">
+                        <img src={logo} height="20" width="100" style={{"marginLeft":"10px"}} alt={logo}/>
+                    </Link>
+                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
+                    <Navbar.Collapse id="basic-navbar-nav">
+                        <Nav className="mr-auto">
+                            {this.props.auth.isLoggedIn ? loggedInLinks : notLoggedInLinks}
+                        </Nav>
+                    </Navbar.Collapse>
                 </Container>
             </Navbar>
         );
