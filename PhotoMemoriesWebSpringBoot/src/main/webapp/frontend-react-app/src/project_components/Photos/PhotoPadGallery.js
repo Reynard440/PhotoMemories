@@ -33,7 +33,7 @@ class PhotoPadGallery extends Component {
     };
 
     downloadPhoto = (photoLink) => {
-        window.open("http://localhost:8095/photo-memories/mvc/v1/c4/downloadPhoto/reynardengels@gmail.com/"+photoLink);
+        window.open("http://localhost:8095/v1/c4/downloadPhoto/reynardengels@gmail.com/"+photoLink);
         // axios.get("http://localhost:8095/photo-memories/mvc/v1/c4/downloadPhoto/reynardengels@gmail.com/"+photoLink)
         //     .then(res => {
         //         if (res.data !== null) {

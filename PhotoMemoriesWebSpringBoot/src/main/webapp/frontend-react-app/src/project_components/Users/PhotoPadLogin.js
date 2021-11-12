@@ -22,8 +22,13 @@ class PhotoPadLogin extends Component {
     };
 
     validateUser = () => {
+        const bodyInfo = new FormData();
+        bodyInfo.append("email", this.state.email);
+        bodyInfo.append("UserHashPassword", this.state.password);
+
         this.props.authenticateUser(this.state.email, this.state.password);
         setTimeout(() => {
+            console.log(this.state.email);
             if (this.props.auth.isLoggedIn) {
                 return this.props.history.push("/");
             } else {

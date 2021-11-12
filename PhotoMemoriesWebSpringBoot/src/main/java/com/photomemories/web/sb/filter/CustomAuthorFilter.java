@@ -32,7 +32,7 @@ public class CustomAuthorFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
-        if (req.getServletPath().equals("/photo-memories/mvc/login")) {
+        if (req.getServletPath().equals("/v1/c1/login")) {
             filterChain.doFilter(req, res);
         } else {
             String authorHeader = req.getHeader(AUTHORIZATION);

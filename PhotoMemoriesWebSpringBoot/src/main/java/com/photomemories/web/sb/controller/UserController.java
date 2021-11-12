@@ -57,7 +57,7 @@ public class UserController {
             @ApiResponse(code = 400, message = "Bad Request: could not log the user in.", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 401, message = "Unauthorized: invalid credentials provided.", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
-    public ResponseEntity<PhotoMemoriesResponse<Boolean>> loginUser(
+    public ResponseEntity<PhotoMemoriesResponse<Boolean>> login(
             @ApiParam(value = "Email of the user", example = "reynardengels@gmail.com", name = "email", required = true)
             @RequestParam String email,
             @RequestParam String password) throws Exception {
@@ -66,7 +66,7 @@ public class UserController {
             PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(false, userResponse);
             return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
-        LOGGER.info("[User Controller log] loginUser method, user email {} ", email);
+        LOGGER.info("[User Controller log] login method, user email {} ", email);
         boolean userResponse = userCRUDService.loginUser(email, password);
         if (!userResponse) {
             PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(false, userResponse);

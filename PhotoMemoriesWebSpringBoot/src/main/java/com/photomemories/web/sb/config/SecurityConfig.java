@@ -1,6 +1,7 @@
 package com.photomemories.web.sb.config;
 
 import com.photomemories.web.sb.filter.CustomAuthFilter;
+import com.photomemories.web.sb.filter.CustomAuthorFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static org.springframework.http.HttpMethod.*;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -40,60 +42,40 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        CustomAuthFilter customAuthFilter = overrideDefaultLoginPath();
-
-        httpBasicConfigurationAndPermission(http);
-
-//        controllerOneRestrictions(http);
-//        controllerTwoRestrictions(http);
-//        controllerThreeRestrictions(http);
-//        controllerFourRestrictions(http);
-
-//        http.authorizeRequests().anyRequest().authenticated();
-        http.authorizeRequests().anyRequest().permitAll();
-        http.addFilter(new CustomAuthFilter(authenticationManagerBean()));
-        http.addFilterBefore(customAuthFilter, UsernamePasswordAuthenticationFilter.class);
-    }
-
-    private CustomAuthFilter overrideDefaultLoginPath() throws Exception {
         CustomAuthFilter customAuthFilter = new CustomAuthFilter(authenticationManagerBean());
-        customAuthFilter.setFilterProcessesUrl("/photo-memories/mvc/login");
-        return customAuthFilter;
-    }
-
-    private void httpBasicConfigurationAndPermission(HttpSecurity http) throws Exception {
+        CustomAuthorFilter customAuthorFilter = new CustomAuthorFilter();
+        customAuthFilter.setFilterProcessesUrl("/v1/c1/login");
+        http.cors();
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(STATELESS);
-        http.authorizeRequests().antMatchers("/photo-memories/mvc/login").permitAll();
+        http.authorizeRequests().antMatchers("/v1/c1/login").permitAll();
+//        http.authorizeRequests().antMatchers("/v1/c2/**").permitAll();
+
+        http.authorizeRequests().antMatchers(GET, "/v1/c1/**").hasAnyAuthority("USER_ROLE");
+        http.authorizeRequests().antMatchers(POST, "/v1/c1/**").hasAnyAuthority("USER_ROLE");
+        http.authorizeRequests().antMatchers(PUT, "/v1/c1/**").hasAnyAuthority("USER_ROLE");
+        http.authorizeRequests().antMatchers(DELETE, "/v1/c1/**").hasAnyAuthority("USER_ROLE");
+
+        http.authorizeRequests().antMatchers(GET, "/v1/c2/**").hasAnyAuthority("USER_ROLE");
+        http.authorizeRequests().antMatchers(POST, "/v1/c2/**").hasAnyAuthority("USER_ROLE");
+        http.authorizeRequests().antMatchers(PUT, "/v1/c2/**").hasAnyAuthority("USER_ROLE");
+        http.authorizeRequests().antMatchers(DELETE, "/v1/c2/**").hasAnyAuthority("USER_ROLE");
+
+        http.authorizeRequests().antMatchers(GET, "/v1/c3/**").permitAll();
+        http.authorizeRequests().antMatchers(POST, "/v1/c3/**").hasAnyAuthority("USER_ROLE");
+        http.authorizeRequests().antMatchers(PUT, "/v1/c3/**").hasAnyAuthority("USER_ROLE");
+        http.authorizeRequests().antMatchers(DELETE, "/v1/c3/**").hasAnyAuthority("USER_ROLE");
+
+        http.authorizeRequests().antMatchers(GET, "/v1/c4/**").permitAll();
+        http.authorizeRequests().antMatchers(POST, "/v1/c4/**").hasAnyAuthority("USER_ROLE");
+        http.authorizeRequests().antMatchers(PUT, "/v1/c4/**").hasAnyAuthority("USER_ROLE");
+        http.authorizeRequests().antMatchers(DELETE, "/v1/c4/**").hasAnyAuthority("USER_ROLE");
+
+        http.authorizeRequests().anyRequest().authenticated();
+        http.addFilter(customAuthFilter);
+        http.addFilterBefore(customAuthorFilter, UsernamePasswordAuthenticationFilter.class);
     }
-//
-//    private void controllerOneRestrictions(HttpSecurity http) throws Exception {
-//        http.authorizeRequests().antMatchers(GET, "/photo-memories/mvc/v1/c1/**").hasAnyAuthority("ROLE_USER");
-//        http.authorizeRequests().antMatchers(POST, "/photo-memories/mvc/v1/c1/**").hasAnyAuthority("ROLE_USER");
-//        http.authorizeRequests().antMatchers(PUT, "/photo-memories/mvc/v1/c1/**").hasAnyAuthority("ROLE_USER");
-//        http.authorizeRequests().antMatchers(DELETE, "/photo-memories/mvc/v1/c1/**").hasAnyAuthority("ROLE_USER");
-//    }
-//
-//    private void controllerTwoRestrictions(HttpSecurity http) throws Exception {
-//        http.authorizeRequests().antMatchers(GET, "/photo-memories/mvc/v1/c2/**").hasAnyAuthority("ROLE_USER");
-//        http.authorizeRequests().antMatchers(POST, "/photo-memories/mvc/v1/c2/**").hasAnyAuthority("ROLE_USER");
-//        http.authorizeRequests().antMatchers(PUT, "/photo-memories/mvc/v1/c2/**").hasAnyAuthority("ROLE_USER");
-//        http.authorizeRequests().antMatchers(DELETE, "/photo-memories/mvc/v1/c2/**").hasAnyAuthority("ROLE_USER");
-//    }
-//
-//    private void controllerThreeRestrictions(HttpSecurity http) throws Exception {
-//        http.authorizeRequests().antMatchers(GET, "/photo-memories/mvc/v1/c3/**").hasAnyAuthority("ROLE_USER");
-//        http.authorizeRequests().antMatchers(POST, "/photo-memories/mvc/v1/c3/**").hasAnyAuthority("ROLE_USER");
-//        http.authorizeRequests().antMatchers(PUT, "/photo-memories/mvc/v1/c3/**").hasAnyAuthority("ROLE_USER");
-//        http.authorizeRequests().antMatchers(DELETE, "/photo-memories/mvc/v1/c3/**").hasAnyAuthority("ROLE_USER");
-//    }
-//
-//    private void controllerFourRestrictions(HttpSecurity http) throws Exception {
-//        http.authorizeRequests().antMatchers(GET, "/photo-memories/mvc/v1/c4/**").hasAnyAuthority("ROLE_USER");
-//        http.authorizeRequests().antMatchers(POST, "/photo-memories/mvc/v1/c4/**").hasAnyAuthority("ROLE_USER");
-//        http.authorizeRequests().antMatchers(PUT, "/photo-memories/mvc/v1/c4/**").hasAnyAuthority("ROLE_USER");
-//        http.authorizeRequests().antMatchers(DELETE, "/photo-memories/mvc/v1/c4/**").hasAnyAuthority("ROLE_USER");
-//    }
+
 
     @Bean
     @Override

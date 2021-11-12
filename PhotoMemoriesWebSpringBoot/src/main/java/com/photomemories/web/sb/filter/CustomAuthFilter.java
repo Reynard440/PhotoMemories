@@ -37,11 +37,15 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        String email = request.getParameter("email");
-        String password = request.getParameter("UserHashPassword");
-        LOGGER.info("Email is {} and password is {} ", email, password);
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password);
-        return authenticationManager.authenticate(authToken);
+        try {
+            String email = request.getParameter("email");
+            String password = request.getParameter("UserHashPassword");
+            LOGGER.info("Email is {} and password is {} ", email, password);
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password);
+            return authenticationManager.authenticate(authToken);
+        } catch (AuthenticationException e) {
+            throw new RuntimeException("Authentication error", e.getCause());
+        }
     }
 
     @Override
@@ -60,7 +64,7 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
     private String getAccessToken(HttpServletRequest request, User user, Algorithm algorithm) {
         String access_token = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 100 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 5 * 24 * 60 * 60 * 1000))
                 .withIssuer(request.getRequestURL().toString())
                 .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .sign(algorithm);
@@ -70,7 +74,7 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
     private String getRefreshToken(HttpServletRequest request, User user, Algorithm algorithm) {
         String refresh_token = JWT.create()
                 .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 300 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 24 * 60 * 60 * 1000))
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
         return refresh_token;
