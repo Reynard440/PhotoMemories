@@ -14,7 +14,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping(path ="/v1/c4")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class AwsController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AwsController.class);
     private final AwsCRUDService awsCRUDService;

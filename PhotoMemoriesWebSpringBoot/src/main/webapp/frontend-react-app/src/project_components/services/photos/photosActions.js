@@ -1,11 +1,4 @@
-import {
-    DELETE_PHOTO_REQUEST,
-    GET_PHOTO_REQUEST,
-    PHOTO_FAILURE,
-    PHOTO_SUCCESS,
-    SAVE_PHOTO_REQUEST,
-    UPDATE_PHOTO_REQUEST
-} from './photosTypes';
+import * as photoTypes from './photosTypes';
 import axios from 'axios';
 
 export const savePhoto = photo => {
@@ -23,13 +16,13 @@ export const savePhoto = photo => {
 
 const savePhotoRequest = () => {
     return {
-        type: SAVE_PHOTO_REQUEST
+        type: photoTypes.SAVE_PHOTO_REQUEST
     };
 };
 
 const updatePhotoRequest = () => {
     return {
-        type: UPDATE_PHOTO_REQUEST
+        type: photoTypes.UPDATE_PHOTO_REQUEST
     };
 };
 
@@ -48,7 +41,7 @@ export const updatePhoto = photo => {
 
 const getPhotoRequest = () => {
     return {
-        type: GET_PHOTO_REQUEST
+        type: photoTypes.GET_PHOTO_REQUEST
     };
 };
 
@@ -67,7 +60,7 @@ export const getPhoto = photoId => {
 
 const deletePhotoRequest = () => {
     return {
-        type: DELETE_PHOTO_REQUEST
+        type: photoTypes.DELETE_PHOTO_REQUEST
     };
 };
 
@@ -86,14 +79,14 @@ export const deletePhoto = (photoId, photoLink) => {
 
 const photoSuccess = photo => {
     return {
-        type: PHOTO_SUCCESS,
+        type: photoTypes.PHOTO_SUCCESS,
         payload: photo
     };
 };
 
 const photoFailure = error => {
     return {
-        type: PHOTO_FAILURE,
+        type: photoTypes.PHOTO_FAILURE,
         payload: error
     };
 };

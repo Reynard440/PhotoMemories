@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path="/v1/c3")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class SharedController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SharedController.class);
     private final SharedCRUDService sharedCRUDService;

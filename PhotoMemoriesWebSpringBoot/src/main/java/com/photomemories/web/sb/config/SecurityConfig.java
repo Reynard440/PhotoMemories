@@ -2,8 +2,10 @@ package com.photomemories.web.sb.config;
 
 import com.photomemories.web.sb.filter.CustomAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,9 +19,13 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 
 @Configuration
 @EnableWebSecurity
+@PropertySource(value = "classpath:application.properties")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Value(value = "${security.token.secret}")
+    public String secret;
 
     @Autowired
     public SecurityConfig (UserDetailsService userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -58,7 +64,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private void httpBasicConfigurationAndPermission(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(STATELESS);
-        http.authorizeRequests().antMatchers("/**").permitAll();
+        http.authorizeRequests().antMatchers("/photo-memories/mvc/login").permitAll();
     }
 //
 //    private void controllerOneRestrictions(HttpSecurity http) throws Exception {

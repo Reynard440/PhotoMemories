@@ -22,7 +22,7 @@ import java.sql.SQLException;
 
 @RestController
 @RequestMapping(path="/v1/c1")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PhotoController.class);
     private final UserCRUDService userCRUDService;
@@ -50,7 +50,7 @@ public class UserController {
         return ResponseEntity.created(uri).body(response);
     }
 
-    @PostMapping("/loginUser")
+    @PostMapping("/login")
     @ApiOperation(value = "Logs a user in.", notes = "Logs a user in.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "User login successful", response = PhotoMemoriesResponse.class),

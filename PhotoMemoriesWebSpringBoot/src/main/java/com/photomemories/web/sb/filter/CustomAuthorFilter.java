@@ -7,7 +7,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,9 +29,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 public class CustomAuthorFilter extends OncePerRequestFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(CustomAuthorFilter.class);
-
-    @Value("${security.token.secret}")
-    private String secret;
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
@@ -60,7 +56,7 @@ public class CustomAuthorFilter extends OncePerRequestFilter {
 
     private void authorizingHttpRequestViaAccessKey(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain, String authorHeader) throws IOException, ServletException {
         String coin = authorHeader.substring("Carrier ".length());
-        Algorithm algorithm = Algorithm.HMAC256(secret.getBytes());
+        Algorithm algorithm = Algorithm.HMAC256("E)H@MbQeThWmZq4t7w!z%C*F-JaNdRfUjXn2r5u8x/A?D(G+KbPeShVkYp3s6v9y".getBytes());
         JWTVerifier jwtVerifier = JWT.require(algorithm).build();
         DecodedJWT decodedJWT = jwtVerifier.verify(coin);
         String email = decodedJWT.getSubject();

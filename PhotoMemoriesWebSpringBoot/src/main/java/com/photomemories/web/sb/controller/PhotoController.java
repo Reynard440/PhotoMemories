@@ -29,7 +29,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path="/v1/c2")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 public class PhotoController {
     private static final Logger LOGGER = LoggerFactory.getLogger(PhotoController.class);
     private final PhotoCRUDService photoCRUDService;
