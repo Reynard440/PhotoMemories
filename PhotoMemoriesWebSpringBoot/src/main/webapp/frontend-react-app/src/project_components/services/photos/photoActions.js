@@ -4,7 +4,7 @@ import axios from 'axios';
 export const getPhotos = () => {
     return dispatch => {
         dispatch(getPhotoRequest());
-        axios.get("http://localhost:8095/photo-memories/mvc/v1/c2/loadAllPhotosOfUser/reynardengels@gmail.com/")
+        axios.get("http://localhost:8095/v1/c2/loadAllPhotosOfUser/"+localStorage.userEmail+"/")
             .then(res => {
                 dispatch(getPhotoSuccess(res.data.cargo));
             })

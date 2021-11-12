@@ -40,7 +40,6 @@ public class CustomAuthFilter extends UsernamePasswordAuthenticationFilter {
         try {
             String email = request.getParameter("email");
             String password = request.getParameter("UserHashPassword");
-            LOGGER.info("Email is {} and password is {} ", email, password);
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password);
             return authenticationManager.authenticate(authToken);
         } catch (AuthenticationException e) {

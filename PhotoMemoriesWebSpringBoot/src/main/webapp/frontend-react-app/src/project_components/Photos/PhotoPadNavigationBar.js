@@ -8,7 +8,6 @@ import {connect} from "react-redux";
 import {logoutUser} from '../services/index';
 
 class PhotoPadNavigationBar extends Component {
-
     logout = () => {
       this.props.logoutUser();
     };
