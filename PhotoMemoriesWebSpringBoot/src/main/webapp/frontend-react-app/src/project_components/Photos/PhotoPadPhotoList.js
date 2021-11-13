@@ -56,7 +56,7 @@ class PhotoPadPhotoList extends Component {
                         <Card.Body>
                             <Row className="justify-content-md-center">
                                 <Col md={13}>
-                                    <Table bordered hover striped responsive="sm" responsive="md" responsive="lg" responsive="xl" variant={"bg-white"}>
+                                    <Table bordered hover striped responsive="sm" variant={"bg-white"}>
                                         <thead>
                                         <tr>
                                             <th>ID</th>

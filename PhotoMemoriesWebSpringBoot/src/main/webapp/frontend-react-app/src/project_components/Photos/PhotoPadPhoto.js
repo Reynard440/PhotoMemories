@@ -17,7 +17,7 @@ class PhotoPadPhoto extends Component {
     }
 
     initialState = {
-        modifiedDate:'', ph_name:'', location:'', ph_captured:'', email:'', photo:''
+        modifiedDate:'', ph_name:'', location:'', ph_captured:'', photo:''
     };
 
     clearAllFields = () => {
@@ -36,7 +36,7 @@ class PhotoPadPhoto extends Component {
         bodyInfo.append("photoName", this.state.ph_name);
         bodyInfo.append("photoLocation", this.state.location);
         bodyInfo.append("photoCapturedBy", this.state.ph_captured);
-        bodyInfo.append("email", this.state.email);
+        bodyInfo.append("email", localStorage.userEmail);
         bodyInfo.append("photo", this.state.photo);
 
         this.props.savePhoto(bodyInfo);
@@ -68,7 +68,7 @@ class PhotoPadPhoto extends Component {
     };
 
     render(){
-        const {modifiedDate, ph_name, location, ph_captured, email, photo} = this.state;
+        const {modifiedDate, ph_name, location, ph_captured, photo} = this.state;
         return (
             <div>
                 <div style={{"display": this.state.show ? "block": "none"}}>
@@ -101,11 +101,6 @@ class PhotoPadPhoto extends Component {
                                 </Form.Group>
                             </Row>
                             <Row>
-                                <Form.Group as={Col} controlId="formGridEmail">
-                                    <Form.Label>User email</Form.Label>
-                                    <Form.Control type="email" name="email" value={email} onChange={this.photoChanged} required autoComplete="off" placeholder="Enter your email" className={"bg-white text-dark"} />
-                                </Form.Group>
-
                                 <Form.Group as={Col} controlId="formGridPhoto">
                                         <Form.Label>Photo</Form.Label>
                                         <Form.Control type="file" name="photo" value={photo} onChange={this.photoChanged} required autoComplete="off" placeholder="Enter your email" className={"bg-white text-dark"} />
@@ -122,7 +117,7 @@ class PhotoPadPhoto extends Component {
                             <Button size="md" type="button" variant="primary" onClick={this.photoGallery.bind()}>
                                 <FontAwesomeIcon icon={faImages}/> Photo Gallery
                             </Button>{' '}
-                            <Button size="md" type="submit" variant="success" disabled={this.state.email.length === 0 || this.state.ph_name.length === 0 || this.state.ph_captured.length === 0 || this.state.location.length === 0}  onClick={this.addPhoto}>
+                            <Button size="md" type="submit" variant="success" disabled={this.state.ph_name.length === 0 || this.state.ph_captured.length === 0 || this.state.location.length === 0}  onClick={this.addPhoto}>
                                 <FontAwesomeIcon icon={faSave}/> Add Photo
                             </Button>
                         </Card.Footer>

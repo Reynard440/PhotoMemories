@@ -17,7 +17,7 @@ class PhotoPadEdit extends Component {
     }
 
     initialState = {
-        photoId:'', ph_name:'', location:'', ph_captured:'', email:''
+        photoId:'', ph_name:'', location:'', ph_captured:''
     };
 
     componentDidMount() {
@@ -51,7 +51,7 @@ class PhotoPadEdit extends Component {
         bodyInfo.append("pName", this.state.ph_name);
         bodyInfo.append("pLocation", this.state.location);
         bodyInfo.append("pCaptured", this.state.ph_captured);
-        bodyInfo.append("email", this.state.email);
+        bodyInfo.append("email", localStorage.userEmail);
 
         this.props.updatePhoto(bodyInfo);
         setTimeout(() => {
@@ -85,7 +85,7 @@ class PhotoPadEdit extends Component {
     };
 
     render() {
-        const {ph_name, location, ph_captured, email} = this.state;
+        const {ph_name, location, ph_captured} = this.state;
         return (
             <div>
                 <div style={{"display": this.state.show ? "block": "none"}}>
@@ -111,18 +111,13 @@ class PhotoPadEdit extends Component {
                                     <Form.Label>Capture By?</Form.Label>
                                     <Form.Control required type="text" name="ph_captured" value={ph_captured} onChange={this.photoChanged} autoComplete="off" placeholder="Enter name of person" className={"bg-white text-dark"} />
                                 </Form.Group>
-
-                                <Form.Group as={Col} controlId="formGridEmail">
-                                    <Form.Label>User email</Form.Label>
-                                    <Form.Control type="email" name="email" value={email} onChange={this.photoChanged} required autoComplete="off" placeholder="Enter your email" className={"bg-white text-dark"} />
-                                </Form.Group>
                             </Row>
                         </Card.Body>
                         <Card.Footer style={{ "textAlign":"right" }}>
                             <Button size="md" type="reset" variant="info" onClick={this.clearAllFields}>
                                 <FontAwesomeIcon icon={faUndo}/> Clear
                             </Button>{' '}
-                            <Button size="md" type="submit" variant="success" disabled={this.state.email.length === 0 || this.state.location.length === 0 || this.state.ph_captured.length === 0 || this.state.ph_name.length === 0} onClick={this.updatePhoto}>
+                            <Button size="md" type="submit" variant="success" disabled={this.state.location.length === 0 || this.state.ph_captured.length === 0 || this.state.ph_name.length === 0} onClick={this.updatePhoto}>
                                 <FontAwesomeIcon icon={faEdit}/> Update Photo
                             </Button>{' '}
                             <Button size="md" type="button" variant="info" onClick={this.photoList.bind()}>
