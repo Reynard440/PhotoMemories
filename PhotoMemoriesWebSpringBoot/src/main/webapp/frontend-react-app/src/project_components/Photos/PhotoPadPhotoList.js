@@ -35,16 +35,7 @@ class PhotoPadPhotoList extends Component {
     };
 
     downloadPhoto = (photoLink) => {
-        window.open("http://localhost:8095/v1/c4/downloadPhoto/reynardengels@gmail.com/"+photoLink);
-      // axios.get("http://localhost:8095/photo-memories/mvc/v1/c4/downloadPhoto/reynardengels@gmail.com/"+photoLink)
-      //     .then(res => {
-      //         if (res.data !== null) {
-      //             this.setState({"show": true});
-      //             setTimeout(() => this.setState({"show": false}), 3000);
-      //         }else {
-      //             this.setState({"show": false});
-      //         }
-      //     });
+        window.open("http://localhost:8095/v1/c4/downloadPhoto/" + localStorage.userEmail + "/"+ photoLink);
     };
 
     render(){
@@ -60,12 +51,12 @@ class PhotoPadPhotoList extends Component {
                         {photoData.error}
                     </Alert> :  <Card className={"border border-dark bg-white text-dark"}>
                         <CardHeader className={"bg-white text-dark"}><FontAwesomeIcon icon={faList}/> Photo List {' '}
-                            <Link to={"add"} className="btn btn-sm btn-outline-primary"><FontAwesomeIcon icon={faSave}/> Add Photo</Link>
+                            <Link to={"add"} className="btn btn-sm btn-outline-primary float-end"><FontAwesomeIcon icon={faSave}/> Add Photo</Link>
                         </CardHeader>
                         <Card.Body>
                             <Row className="justify-content-md-center">
-                                <Col md={12}>
-                                    <Table bordered hover striped variant={"bg-white"}>
+                                <Col md={13}>
+                                    <Table bordered hover striped responsive="sm" responsive="md" responsive="lg" responsive="xl" variant={"bg-white"}>
                                         <thead>
                                         <tr>
                                             <th>ID</th>
@@ -76,13 +67,13 @@ class PhotoPadPhotoList extends Component {
                                             <th>LOCATION</th>
                                             <th>SIZE</th>
                                             <th>DATE UPLOADED</th>
-                                            <td>OPERATIONS</td>
+                                            <th>OPERATIONS</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         {this.state.photos.length === 0 && this.state.photos.confirmation === true ?
                                             <tr align="center">
-                                                <td colSpan="7">No Photos Available</td>
+                                                <td colSpan="9">No Photos Available</td>
                                             </tr> :
                                             photos.map((photo) => (
                                                 <tr key={photo.photoId}>

@@ -11,49 +11,94 @@ import {
     faPhone,
     faUndo
 } from "@fortawesome/free-solid-svg-icons";
+import {connect} from "react-redux";
+import {addUser} from "../services/index";
+import PhotoPadToast from "../Photos/PhotoPadToast";
 
-export default  class PhotoPadRegister extends Component {
+class PhotoPadRegister extends Component {
+    constructor(props){
+        super(props);
+        this.state = this.initialState;
+        this.detailsChange = this.detailsChange.bind(this);
+        this.resetRegister = this.resetRegister.bind(this);
+        this.state.show  = false;
+        this.state.message = '';
+    }
+
+    initialState = {
+        email:'', password:'', fname:'', lname:'', cellphone:'', error:''
+    };
+
+    detailsChange = event => {
+        this.setState({
+            [event.target.name]: event.target.value
+        });
+    };
+
+    createNewUser = () => {
+
+        const newUser = new FormData();
+        newUser.append("email", this.state.email);
+        newUser.append("fname", this.state.fname);
+        newUser.append("lname", this.state.lname);
+        newUser.append("password", this.state.password);
+        newUser.append("cellphone", this.state.cellphone);
+
+
+        this.props.addUser(newUser);
+        this.resetRegister();
+        this.props.history.push("/login");
+    };
+
+    resetRegister = () => {
+        this.setState(() => this.initialState);
+    };
+
     render() {
+        const {email, password, fname, lname, cellphone} = this.state;
         return (
-            <Row className="justify-content-md-center">
-                <Col md={5}>
+            <Row className="justify-content-center align-content-center">
+                <Col lg={4} md={8} sm={10}>
+                    <div style={{"display": this.state.show ? "block": "none"}}>
+                        <PhotoPadToast show={this.state.show} message="Added successfully" type={"success"}/>
+                    </div>
                     <Card className={"border border-white bg-white text-dark registerMain"}>
                         <Card.Header>
                             <FontAwesomeIcon icon={faKey}/>  Register
                         </Card.Header>
                         <Card.Body>
-                            <Form>
-                                <Form.Group className="mb-3" controlId="formBasicEmail">
+                            <Form onReset={this.resetRegister} onSubmit={this.createNewUser}>
+                                <Form.Group className="mb-2" controlId="formBasicEmail">
                                     <Form.Label><FontAwesomeIcon icon={faAddressBook}/> Email address</Form.Label>
-                                    <Form.Control type="email" name="email" values="email" onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter email here" />
+                                    <Form.Control type="email" name="email" values={email} onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter email here" />
                                 </Form.Group>
 
-                                <Form.Group className="mb-3" controlId="formBasicFirstName">
+                                <Form.Group className="mb-2" controlId="formBasicFirstName">
                                     <Form.Label><FontAwesomeIcon icon={faFill}/> First Name</Form.Label>
-                                    <Form.Control type="text" name="fname" values="fname" onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter first name here" />
+                                    <Form.Control type="text" name="fname" values={fname} onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter first name here" />
                                 </Form.Group>
 
-                                <Form.Group className="mb-3" controlId="formBasicLastName">
+                                <Form.Group className="mb-2" controlId="formBasicLastName">
                                     <Form.Label><FontAwesomeIcon icon={faBook}/> Last Name</Form.Label>
-                                    <Form.Control type="text" name="lname" values="lname" onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter last name here" />
+                                    <Form.Control type="text" name="lname" values={lname} onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter last name here" />
                                 </Form.Group>
 
-                                <Form.Group className="mb-3" controlId="formBasicCellphone">
+                                <Form.Group className="mb-2" controlId="formBasicCellphone">
                                     <Form.Label><FontAwesomeIcon icon={faPhone}/> Cellphone Number</Form.Label>
-                                    <Form.Control type="cell" name="cellphone" values="cellphone" onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter cellphone here" />
+                                    <Form.Control type="cell" name="cellphone" values={cellphone} onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter cellphone here" />
                                 </Form.Group>
 
-                                <Form.Group className="mb-3" controlId="formBasicPassword">
+                                <Form.Group className="mb-2" controlId="formBasicPassword">
                                     <Form.Label><FontAwesomeIcon icon={faPassport}/> Password</Form.Label>
-                                    <Form.Control type="password" name="password" values="password" onChange={this.detailsChange} className={"bg-white text-dark"} placeholder="Enter password here" />
+                                    <Form.Control type="password" name="password" values={password} onChange={this.detailsChange} className={"bg-white text-dark"} placeholder="Enter password here" />
                                 </Form.Group>
                             </Form>
                         </Card.Body>
                         <Card.Footer style={{"textAlign":"right"}}>
-                            <Button size="sm" type="button" variant="info"  >
+                            <Button size="sm" type="button" variant="info" onClick={this.resetRegister} >
                                 <FontAwesomeIcon icon={faUndo}/>  Reset
                             </Button> {' '}
-                            <Button size="sm" type="button" variant="success" >
+                            <Button size="sm" type="button" variant="success" onClick={this.createNewUser} disabled={this.state.email.length === 0 || this.state.password.length === 0 || this.state.fname.length === 0 || this.state.lname.length === 0 || this.state.cellphone.length === 0}>
                                 <FontAwesomeIcon icon={faIdBadge}/>  Register
                             </Button>
                         </Card.Footer>
@@ -63,3 +108,17 @@ export default  class PhotoPadRegister extends Component {
         );
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        user: state.user
+    }
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        addUser: (newUser) => dispatch(addUser(newUser))
+    }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PhotoPadRegister);

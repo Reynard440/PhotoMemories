@@ -48,21 +48,10 @@ public class AwsController {
         LOGGER.info("[AWS Controller log] displayPhoto method, input email {} and imageName {}", email, imageName);
         byte[] imageData = awsCRUDService.downloadPhoto(email, imageName);
         ByteArrayResource arrayResource = new ByteArrayResource(imageData);
-        MediaType type;
-        String[] newType = imageName.split("\\.");
-        switch (newType[1]) {
-            case "jpg": { type = new MediaType("image/jpg");}
-            case "png": {type = new MediaType("image/tiff");}
-            case "bmp": {type = new MediaType("image/bmp");}
-            case "jpeg": {type = new MediaType("image/jpeg");}
-            case "ico": {type = new MediaType("image/ico");}
-            case "gif": {type = new MediaType("image/gif");}
-            default: {type = new MediaType("image/png");}
-        }
         return ResponseEntity
                 .ok()
                 .contentLength(imageData.length)
-                .contentType(type)
+                .contentType(extractContentType(imageName))
                 .body(arrayResource);
     }
 
@@ -92,12 +81,12 @@ public class AwsController {
         String[] newType = type.split("\\.");
         switch (newType[1]) {
             case "jpg": { return MediaType.valueOf("image/jpg");}
-            case "png": {return MediaType.valueOf("image/tiff");}
+            case "png": {return MediaType.valueOf("image/png");}
             case "bmp": {return MediaType.valueOf("image/bmp");}
             case "jpeg": {return MediaType.valueOf("image/jpeg");}
             case "ico": {return MediaType.valueOf("image/ico");}
             case "gif": {return MediaType.valueOf("image/gif");}
-            default: {return MediaType.valueOf("image/png");}
+            default: {return MediaType.valueOf("image/tiff");}
         }
     }
 }

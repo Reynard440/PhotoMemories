@@ -23,7 +23,6 @@ class PhotoPadSharePhoto extends Component {
 
     componentDidMount() {
         const photoId = +this.props.match.params.photoId;
-        console.log("hello");
         if (photoId) {
             this.retrieveById(photoId);
         }
@@ -49,8 +48,7 @@ class PhotoPadSharePhoto extends Component {
         bodyInfo.append("accessRights", this.state.ph_access);
         bodyInfo.append("accessRights", this.state.ph_access);
         bodyInfo.append("id", this.state.photoId);
-        bodyInfo.append("sharingEmail", this.state.sendingEmail);
-        console.log(bodyInfo);
+        bodyInfo.append("sharingEmail", localStorage.userEmail);
 
         axios.post("http://localhost:8095/v1/c2/sharePhotoWithAnotherUser", bodyInfo,
             {
@@ -76,8 +74,6 @@ class PhotoPadSharePhoto extends Component {
     };
 
     detailsChanged = event => {
-        console.log(event.target.name);
-
         if (event.target.name === 'ph_access') {
             if (this.state.ph_access === false) {
                 // eslint-disable-next-line
@@ -103,53 +99,46 @@ class PhotoPadSharePhoto extends Component {
     };
 
     render() {
-        const {recipientEmail, sendingEmail, photoId, ph_access} = this.state;
+        const {recipientEmail, photoId, ph_access} = this.state;
         return (
-            <div>
+            <div className="justify-content-sm-center">
                 <div style={{"display": this.state.show ? "block": "none"}}>
                     <PhotoPadToast show={this.state.show} message={"Photo shared, this photo was successfully shared with" + this.state.recipientEmail + "."} type={"info"}/>
                 </div>
-                <Card className={"border border-white bg-white text-dark"}>
-                    <CardHeader><FontAwesomeIcon icon={faShareSquare}/> Share a Photo with Someone </CardHeader>
-                    <Form onReset={this.clearAllFields} onSubmit={this.sharePhoto} id={"photoShareForm"}>
-                        <Card.Body>
-                            <Row>
-                                <Form.Group as={Col} controlId="formGridToEmail">
-                                    <Form.Label>To Email</Form.Label>
-                                    <Form.Control type="email" name="recipientEmail" value={recipientEmail} onChange={this.detailsChanged} required autoComplete="off" placeholder="Enter destination email here" className={"bg-white text-dark"} />
-                                </Form.Group>
+                <Row className="justify-content-sm-center">
+                    <Col lg={5} md={6} sm={8}>
+                        <Card className={"border border-white bg-white text-dark"}>
+                            <CardHeader><FontAwesomeIcon icon={faShareSquare}/> Share a Photo with Someone </CardHeader>
+                            <Form onReset={this.clearAllFields} onSubmit={this.sharePhoto} id={"photoShareForm"}>
+                                <Card.Body>
+                                    <Form.Group as={Col} controlId="formGridToEmail">
+                                        <Form.Label>To Email</Form.Label>
+                                        <Form.Control type="email" name="recipientEmail" value={recipientEmail} onChange={this.detailsChanged} required autoComplete="off" placeholder="Enter destination email here" className={"bg-white text-dark"} />
+                                    </Form.Group>
+                                    <Form.Group as={Col} controlId="formGridPhotoId">
+                                        <Form.Label>Photo Id</Form.Label>
+                                        <Form.Control type="text" name="photoId" value={photoId} onChange={this.detailsChanged} required autoComplete="off" placeholder="Enter the id of the photo here" className={"bg-white text-dark"} disabled />
+                                    </Form.Group>
+                                    <Form.Group as={Col} controlId="formGridPhotoAccessRights"><Form.Label>Photo Access Rights</Form.Label>
 
-                                <Form.Group as={Col} controlId="formGridToEmail">
-                                    <Form.Label>From Email</Form.Label>
-                                    <Form.Control type="email" name="sendingEmail" value={sendingEmail} onChange={this.detailsChanged} required autoComplete="off" placeholder="Your email address" className={"bg-white text-dark"} />
-                                </Form.Group>
-
-                            </Row>
-                            <Row>
-                                <Form.Group as={Col} controlId="formGridPhotoId">
-                                    <Form.Label>Photo Id</Form.Label>
-                                    <Form.Control type="text" name="photoId" value={photoId} onChange={this.detailsChanged} required autoComplete="off" placeholder="Enter the id of the photo here" className={"bg-white text-dark"} disabled />
-                                </Form.Group>
-
-                                <Form.Group as={Col} controlId="formGridPhotoAccessRights"><Form.Label>Photo Access Rights</Form.Label>
-
-                                    <Form.Check type="checkbox" name="ph_access" value={ph_access} onChange={this.detailsChanged} required autoComplete="off" className={"bg-white text-dark"} />
-                                </Form.Group>
-                            </Row>
-                        </Card.Body>
-                        <Card.Footer style={{ "textAlign":"right" }}>
-                            <Button size="md" type="reset" variant="info" onClick={this.clearAllFields}>
-                                <FontAwesomeIcon icon={faUndo}/> Clear
-                            </Button>{' '}
-                            <Button size="md" type="submit" variant="primary" disabled={this.state.sendingEmail.length === 0 || this.state.recipientEmail.length === 0 || this.state.photoId.length === 0} onClick={this.sharePhoto}>
-                                <FontAwesomeIcon icon={faSave}/> Share Photo
-                            </Button>{' '}
-                            <Button size="md" type="button" variant="info" onClick={this.photoGallery.bind()}>
-                                <FontAwesomeIcon icon={faBackward}/> Photo Gallery
-                            </Button>
-                        </Card.Footer>
-                    </Form>
-                </Card>
+                                        <Form.Check type="checkbox" name="ph_access" value={ph_access} onChange={this.detailsChanged} required autoComplete="off" className={"bg-white text-dark"} />
+                                    </Form.Group>
+                                </Card.Body>
+                                <Card.Footer style={{ "textAlign":"right" }}>
+                                    <Button size="md" type="reset" variant="info" onClick={this.clearAllFields}>
+                                        <FontAwesomeIcon icon={faUndo}/> Clear
+                                    </Button>{' '}
+                                    <Button size="md" type="submit" variant="primary" disabled={this.state.sendingEmail.length === 0 || this.state.recipientEmail.length === 0 || this.state.photoId.length === 0} onClick={this.sharePhoto}>
+                                        <FontAwesomeIcon icon={faSave}/> Share Photo
+                                    </Button>{' '}
+                                    <Button size="md" type="button" variant="info" onClick={this.photoGallery.bind()}>
+                                        <FontAwesomeIcon icon={faBackward}/> Photo Gallery
+                                    </Button>
+                                </Card.Footer>
+                            </Form>
+                        </Card>
+                    </Col>
+                </Row>
             </div>
         );
     }

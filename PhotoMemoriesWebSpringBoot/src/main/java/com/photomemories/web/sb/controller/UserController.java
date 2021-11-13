@@ -20,6 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.transaction.Transactional;
 import java.net.URI;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping(path="/v1/c1")
@@ -35,16 +36,25 @@ public class UserController {
         this.awsCRUDService = awsCRUDService;
     }
 
-    @PostMapping(value = "/addNewUser",
-    produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional(rollbackOn = { RuntimeException.class, Exception.class, SQLException.class })
+    @PostMapping(
+            value = "/addNewUser",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     @ApiOperation(value = "Create a new User.", notes = "Creates a new User in the DB.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "User successfully created", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 400, message = "Bad Request: could not resolve the creation of a new user.", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
     public ResponseEntity<PhotoMemoriesResponse<UserDto>> addNewUser(
-            @ApiParam(value = "Request body to create a new User", required = true)
-            @RequestBody UserDto userDto) throws Exception {
+//            @ApiParam(value = "Request body to create a new User", required = true)
+//            @RequestBody UserDto userDto,
+            @RequestParam(value = "email") String email,
+            @RequestParam(value = "fname") String fname,
+            @RequestParam(value = "lname") String lname,
+            @RequestParam(value = "cellphone") String cellphone,
+            @RequestParam(value = "password") String password) throws Exception {
+        UserDto userDto = new UserDto(fname, lname, LocalDate.now(), password, email, cellphone);
         LOGGER.info("[User Controller log] addNewUser method, input object {} ", userDto);
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/v1/c1/addNewUser").toUriString());
         UserDto userResponse = userCRUDService.createNewUser(userDto);

@@ -35,15 +35,6 @@ class PhotoPadGallery extends Component {
 
     downloadPhoto = (photoLink) => {
         window.open("http://localhost:8095/v1/c4/downloadPhoto/reynardengels@gmail.com/"+photoLink);
-        // axios.get("http://localhost:8095/photo-memories/mvc/v1/c4/downloadPhoto/reynardengels@gmail.com/"+photoLink)
-        //     .then(res => {
-        //         if (res.data !== null) {
-        //             this.setState({"show": true});
-        //             setTimeout(() => this.setState({"show": false}), 3000);
-        //         }else {
-        //             this.setState({"show": false});
-        //         }
-        //     });
     };
 
     render() {
@@ -53,7 +44,7 @@ class PhotoPadGallery extends Component {
             <div className={"galleryMain"}>
                 <Card className={"border border-dark bg-white text-dark galleryCard"}>
                     <CardHeader className={"bg-white text-dark"} style={{textAlign: 'left'}}><FontAwesomeIcon icon={faImages}/> Your Gallery of Photos {'  '}
-                        <Link to={"add"} className="btn btn-sm btn-outline-primary" ><FontAwesomeIcon icon={faSave}/> Add Photo</Link>
+                        <Link to={"add"} className="btn btn-sm btn-outline-primary float-end" ><FontAwesomeIcon icon={faSave}/> Add Photo</Link>
                     </CardHeader>
                     <Card.Body>
                         <div>

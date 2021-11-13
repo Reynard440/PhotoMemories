@@ -8,14 +8,14 @@ export default function PhotoPadWelcome(props) {
     }
 
     return (
-        <Alert variant="primary">
+        <Alert variant="primary" className="text-dark">
             <Alert.Heading>{props.title}</Alert.Heading>
             <blockquote className="blockquote mb-0">
                 <p>
                     "{props.msg}"
                 </p>
                 <hr />
-                <footer className="blockquote-footer">
+                <footer className="blockquote-footer text-dark">
                     {props.footer}
                 </footer>
             </blockquote>

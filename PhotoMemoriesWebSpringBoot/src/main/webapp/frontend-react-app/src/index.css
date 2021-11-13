@@ -31,6 +31,10 @@ body{
     margin-bottom: 60px;
 }
 
+.tableColor {
+    background-color: rgba(129,60,0,1.00);
+}
+
 .registerMain{
     margin-bottom: 60px;
 }

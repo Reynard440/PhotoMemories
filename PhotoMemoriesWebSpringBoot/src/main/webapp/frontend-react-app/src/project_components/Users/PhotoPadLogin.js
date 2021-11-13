@@ -47,20 +47,21 @@ class PhotoPadLogin extends Component {
         const {email, password, error} = this.state;
         return (
             <Row className="justify-content-sm-center">
-                <Col lg={5}>
+                <Col lg={4} md={6} sm={8}>
+                    {this.props.message && <Alert variant="success">{this.props.message}</Alert>}
                     {error && <Alert variant="danger">{error}</Alert>}
                     <Card className={"border border-white bg-white text-dark"}>
                         <Card.Header>
                             <FontAwesomeIcon icon={faSignInAlt}/>  Login
                         </Card.Header>
                         <Card.Body>
-                            <Form>
-                                <Form.Group className="md-5" controlId="formBasicEmail" onSubmit={this.validateUser} onReset={this.resetPhotoPadLoginForm}>
+                            <Form onSubmit={this.validateUser} onReset={this.resetPhotoPadLoginForm}>
+                                <Form.Group className="mb-3" controlId="formBasicEmail">
                                     <Form.Label>Email address</Form.Label>
                                     <Form.Control type="email" name="email" values={email} onChange={this.detailsChange} className={"bg-white text-dark"} placeholder="Enter email here" />
                                 </Form.Group>
 
-                                <Form.Group className="md-5" controlId="formBasicPassword">
+                                <Form.Group className="mb-3" controlId="formBasicPassword">
                                     <Form.Label>Password</Form.Label>
                                     <Form.Control type="password" name="password" values={password} onChange={this.detailsChange} className={"bg-white text-dark"} placeholder="Enter password here" />
                                 </Form.Group>
