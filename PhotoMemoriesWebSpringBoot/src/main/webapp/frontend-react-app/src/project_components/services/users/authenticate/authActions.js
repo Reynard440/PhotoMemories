@@ -9,8 +9,8 @@ export const authenticateUser = (credentials) => {
       });
       axios.post("http://localhost:8095/v1/c1/login", credentials)
           .then(res => {
-              let access_key = res.data.access_key;
-              localStorage.setItem('access_key', access_key);
+              let access_key = res.data.access_token;
+              localStorage.setItem('access_key', "Carrier " + access_key);
               localStorage.setItem('userEmail', credentials.get("email"));
               dispatch(success(true));
           })

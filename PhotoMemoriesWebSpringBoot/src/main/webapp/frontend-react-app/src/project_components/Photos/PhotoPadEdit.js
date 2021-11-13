@@ -22,6 +22,7 @@ class PhotoPadEdit extends Component {
 
     componentDidMount() {
         const photoId = +this.props.match.params.photoId;
+        console.log(photoId);
         if (photoId) {
             this.retrieveById(photoId);
         }
@@ -43,7 +44,10 @@ class PhotoPadEdit extends Component {
     };
 
     updatePhoto = event => {
+        event.preventDefault();
         const bodyInfo = new FormData();
+
+        bodyInfo.append("photoId", this.state.photoId);
         bodyInfo.append("pName", this.state.ph_name);
         bodyInfo.append("pLocation", this.state.location);
         bodyInfo.append("pCaptured", this.state.ph_captured);
@@ -53,12 +57,12 @@ class PhotoPadEdit extends Component {
         setTimeout(() => {
             if (this.props.updatedPhotoObj.photo != null) {
                 this.setState({"show": true, "method":"put"});
-                setTimeout(() => this.setState({"show": false}), 1500);
-                setTimeout(() => this.photoList(), 1500);
+                setTimeout(() => this.setState({"show": false}), 1000);
+                setTimeout(() => this.photoList(), 1000);
             } else {
                 this.setState({"show": false});
             }
-        }, 1000);
+        }, 500);
         this.setState(this.initialState);
     }
 

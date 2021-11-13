@@ -20,6 +20,7 @@ class PhotoPadGallery extends Component {
     }
 
     deletePhoto = (photoId, photoLink) => {
+        console.log(localStorage.getItem('access_key'));
         this.props.deletePhoto(photoLink, photoId);
         setTimeout(() => {
             if (this.props.deletedPhotoObj != null) {
@@ -58,7 +59,7 @@ class PhotoPadGallery extends Component {
                         <div>
                             {photos.map((photo) => (
                                 <div key={photo.photoId} className={"grouping"}>
-                                    <img src={`http://localhost:8095/photo-memories/mvc/v1/c4/displayPhoto/reynardengels@gmail.com/` + photo.photoLink + `/`} className={"containerImage"} alt={"default"}/>
+                                    <img src={`http://localhost:8095/v1/c4/displayPhoto/` + localStorage.userEmail + `/` + photo.photoLink + `/`} className={"containerImage"} alt={"default"}/>
                                     <div className={"divText"}>{photo.photoId}</div>
                                     <Link to={"edit/"+photo.photoId} className="btn btn-sm btn-outline-primary"><FontAwesomeIcon icon={faEdit}/></Link>|
                                     <Link to={"share/"+photo.photoId} className="btn btn-sm btn-outline-info"><FontAwesomeIcon icon={faShareSquare}/></Link>|
@@ -83,7 +84,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        getPhotos: () => dispatch(getPhotos()),
+        getPhotos: (email) => dispatch(getPhotos(email)),
         deletePhoto: (photoId, photoLink) => dispatch(deletePhoto(photoId, photoLink))
     }
 };

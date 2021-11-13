@@ -50,17 +50,18 @@ class PhotoPadSharePhoto extends Component {
         bodyInfo.append("accessRights", this.state.ph_access);
         bodyInfo.append("id", this.state.photoId);
         bodyInfo.append("sharingEmail", this.state.sendingEmail);
+        console.log(bodyInfo);
 
         axios.post("http://localhost:8095/v1/c2/sharePhotoWithAnotherUser", bodyInfo,
             {
                 headers:{
                     "Access-Control-Allow-Origin": "*",
-                    "Authorization": "Carier eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyZXluYXJkZW5nZWxzQGdtYWlsLmNvbSIsInJvbGVzIjpbIlVTRVJfUk9MRSJdLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwOTUvcGhvdG8tbWVtb3JpZXMvbXZjL2xvZ2luIiwiZXhwIjoxNjM2MDIxMTk2fQ.6lvWZ4NtC9r3fvJWa72W3sRtk2rFJauBHioQkuoOyTg"
+                    "Authorization": localStorage.access_key
                 }
             })
             .then(res => {
                 if (res.data != null) {
-                    this.setState({"show": true});
+                    this.setState({"show": true, "method":"post"});
                     setTimeout(() => this.setState({"show": false}), 3000);
                     setTimeout(() => this.photoGallery(), 3000);
                 } else {
@@ -79,8 +80,10 @@ class PhotoPadSharePhoto extends Component {
 
         if (event.target.name === 'ph_access') {
             if (this.state.ph_access === false) {
+                // eslint-disable-next-line
                 this.state.ph_access = true;
             } else {
+                // eslint-disable-next-line
                 this.state.ph_access = false;
             }
             console.log(this.state.ph_access);

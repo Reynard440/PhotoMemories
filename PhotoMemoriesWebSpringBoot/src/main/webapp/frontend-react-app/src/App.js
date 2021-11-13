@@ -1,6 +1,5 @@
 import React from 'react';
 import './App.css';
-
 import PhotoPadNavigationBar from "./project_components/Photos/PhotoPadNavigationBar";
 import {Col, Container, Row} from "react-bootstrap";
 import PhotoPadWelcome from "./project_components/Photos/PhotoPadWelcome";
@@ -15,10 +14,18 @@ import PhotoPadEdit from "./project_components/Photos/PhotoPadEdit";
 import PhotoPadSharePhoto from "./project_components/Photos/PhotoPadSharePhoto";
 
 export default function App() {
+    window.onbeforeunload = (event) => {
+        const ev = event || window.event;
+        ev.preventDefault();
+        if (ev) {
+            ev.returnValue = '';
+        }
+        return '';
+    };
+
     const marginTop = {
         marginTop: "5px",
-        marginLeft: "10px",
-        marginRight: "30px"
+        marginLeft: "0"
     };
 
     const title = "Hi and welcome to my project 2 website";

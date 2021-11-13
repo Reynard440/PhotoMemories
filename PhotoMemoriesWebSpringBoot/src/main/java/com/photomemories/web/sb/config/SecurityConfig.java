@@ -49,6 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(STATELESS);
         http.authorizeRequests().antMatchers("/v1/c1/login").permitAll();
+        http.authorizeRequests().antMatchers("/v1/c1/addNewUser").permitAll();
 
         http.authorizeRequests().antMatchers(GET, "/v1/c1/**").hasAnyAuthority("USER_ROLE");
         http.authorizeRequests().antMatchers(POST, "/v1/c1/**").hasAnyAuthority("USER_ROLE");
@@ -65,7 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers(PUT, "/v1/c3/**").hasAnyAuthority("USER_ROLE");
         http.authorizeRequests().antMatchers(DELETE, "/v1/c3/**").hasAnyAuthority("USER_ROLE");
 
-        http.authorizeRequests().antMatchers(GET, "/v1/c4/**").hasAnyAuthority("USER_ROLE");
+        http.authorizeRequests().antMatchers(GET, "/v1/c4/**").permitAll();
         http.authorizeRequests().antMatchers(POST, "/v1/c4/**").hasAnyAuthority("USER_ROLE");
         http.authorizeRequests().antMatchers(PUT, "/v1/c4/**").hasAnyAuthority("USER_ROLE");
         http.authorizeRequests().antMatchers(DELETE, "/v1/c4/**").hasAnyAuthority("USER_ROLE");

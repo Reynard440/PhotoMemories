@@ -29,7 +29,6 @@ class PhotoPadLogin extends Component {
 
         this.props.authenticateUser(bodyInfo);
         setTimeout(() => {
-            console.log(this.state.email);
             if (this.props.auth.isLoggedIn) {
                 return this.props.history.push("/");
             } else {
@@ -47,8 +46,8 @@ class PhotoPadLogin extends Component {
     render() {
         const {email, password, error} = this.state;
         return (
-            <Row className="justify-content-lg-center">
-                <Col xs={5} style={{"width":"75%"}}>
+            <Row className="justify-content-sm-center">
+                <Col lg={5}>
                     {error && <Alert variant="danger">{error}</Alert>}
                     <Card className={"border border-white bg-white text-dark"}>
                         <Card.Header>
@@ -56,12 +55,12 @@ class PhotoPadLogin extends Component {
                         </Card.Header>
                         <Card.Body>
                             <Form>
-                                <Form.Group className="mb-5" controlId="formBasicEmail" onSubmit={this.validateUser} onReset={this.resetPhotoPadLoginForm}>
+                                <Form.Group className="md-5" controlId="formBasicEmail" onSubmit={this.validateUser} onReset={this.resetPhotoPadLoginForm}>
                                     <Form.Label>Email address</Form.Label>
                                     <Form.Control type="email" name="email" values={email} onChange={this.detailsChange} className={"bg-white text-dark"} placeholder="Enter email here" />
                                 </Form.Group>
 
-                                <Form.Group className="mb-5" controlId="formBasicPassword">
+                                <Form.Group className="md-5" controlId="formBasicPassword">
                                     <Form.Label>Password</Form.Label>
                                     <Form.Control type="password" name="password" values={password} onChange={this.detailsChange} className={"bg-white text-dark"} placeholder="Enter password here" />
                                 </Form.Group>

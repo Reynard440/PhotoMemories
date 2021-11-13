@@ -1,7 +1,7 @@
 import {applyMiddleware, createStore} from 'redux';
 import thunk from 'redux-thunk';
 import rootReducer from './rootReducer';
-import accessKey from "./utilities/accessKey";
+import accessKey from "../../../src/utilities/accessKey";
 
 const store = createStore(rootReducer, applyMiddleware(thunk));
 

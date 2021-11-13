@@ -48,10 +48,21 @@ public class AwsController {
         LOGGER.info("[AWS Controller log] displayPhoto method, input email {} and imageName {}", email, imageName);
         byte[] imageData = awsCRUDService.downloadPhoto(email, imageName);
         ByteArrayResource arrayResource = new ByteArrayResource(imageData);
+        MediaType type;
+        String[] newType = imageName.split("\\.");
+        switch (newType[1]) {
+            case "jpg": { type = new MediaType("image/jpg");}
+            case "png": {type = new MediaType("image/tiff");}
+            case "bmp": {type = new MediaType("image/bmp");}
+            case "jpeg": {type = new MediaType("image/jpeg");}
+            case "ico": {type = new MediaType("image/ico");}
+            case "gif": {type = new MediaType("image/gif");}
+            default: {type = new MediaType("image/png");}
+        }
         return ResponseEntity
                 .ok()
                 .contentLength(imageData.length)
-                .contentType(extractContentType(imageName))
+                .contentType(type)
                 .body(arrayResource);
     }
 

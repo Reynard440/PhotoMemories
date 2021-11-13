@@ -3,18 +3,27 @@ import axios from 'axios';
 
 export const getPhotos = () => {
     return dispatch => {
-        dispatch(getPhotoRequest());
-        axios.get("http://localhost:8095/v1/c2/loadAllPhotosOfUser/"+localStorage.userEmail+"/")
+        dispatch(getPhotosRequest());
+        axios.get("http://localhost:8095/v1/c2/loadAllPhotosOfUser/"+localStorage.userEmail+"/",
+            {
+                headers:{
+                    "Access-Control-Allow-Origin": "*",
+                    "Authorization": localStorage.access_key
+                }
+            })
             .then(res => {
                 dispatch(getPhotoSuccess(res.data.cargo));
             })
-            .catch(error => {
-                dispatch(getPhotoFailure(error.message));
+            .catch(err => {
+                dispatch(getPhotoFailure(err.message));
+                console.log(err.message);
+                localStorage.removeItem('access_key');
+                this.props.history.push('/');
             });
     };
 };
 
-const getPhotoRequest = () => {
+const getPhotosRequest = () => {
     return {
         type: GET_PHOTO_REQUEST
     };

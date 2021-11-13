@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Button, Card, Col, Form, InputGroup, Row} from "react-bootstrap";
+import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import CardHeader from "react-bootstrap/CardHeader";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faImages, faList, faPlusSquare, faSave, faUndo} from '@fortawesome/free-solid-svg-icons';
@@ -42,9 +42,9 @@ class PhotoPadPhoto extends Component {
         this.props.savePhoto(bodyInfo);
         setTimeout(() => {
             if (this.props.savedPhotoObj.photo != null) {
-                this.setState({"show": true, "method":"put"});
-                setTimeout(() => this.setState({"show": false}), 1500);
-                setTimeout(() => this.photoList(), 1500);
+                this.setState({"show": true, "method":"post"});
+                setTimeout(() => this.setState({"show": false}), 1000);
+                setTimeout(() => this.photoList(), 1000);
             } else {
                 this.setState({"show": false});
             }
@@ -54,6 +54,7 @@ class PhotoPadPhoto extends Component {
 
     photoChanged = (event) => {
         if (event.target.name === "photo") {
+            // eslint-disable-next-line
             this.state.photo = event.target.files[0];
         } else {
             this.setState({
@@ -106,10 +107,8 @@ class PhotoPadPhoto extends Component {
                                 </Form.Group>
 
                                 <Form.Group as={Col} controlId="formGridPhoto">
-                                    <InputGroup>
-                                        <Form.Label>Import the photo here...</Form.Label>
-                                        <Form.Control type="file" name="photo" value={photo} onChange={this.photoChanged} required autoComplete="off" className={"bg-white text-dark"} />
-                                    </InputGroup>
+                                        <Form.Label>Photo</Form.Label>
+                                        <Form.Control type="file" name="photo" value={photo} onChange={this.photoChanged} required autoComplete="off" placeholder="Enter your email" className={"bg-white text-dark"} />
                                 </Form.Group>
                             </Row>
                         </Card.Body>
