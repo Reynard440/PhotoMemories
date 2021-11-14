@@ -7,7 +7,6 @@ import PhotoPadToast from "./PhotoPadToast";
 import {Link} from "react-router-dom";
 import {connect} from 'react-redux';
 import {deletePhoto, getPhotos} from "../services/index";
-import {Alert} from "bootstrap";
 
 class PhotoPadPhotoList extends Component {
     constructor(props) {
@@ -46,62 +45,59 @@ class PhotoPadPhotoList extends Component {
                 <div style={{"display": this.state.show ? "block": "none"}}>
                     <PhotoPadToast show={this.state.show} message={"Photo deleted, this photo is no longer on the site for you."} type={"danger"}/>
                 </div>
-                {photoData.error ?
-                    <Alert variant="danger">
-                        {photoData.error}
-                    </Alert> :  <Card className={"border border-dark bg-white text-dark"}>
-                        <CardHeader className={"bg-white text-dark"}><FontAwesomeIcon icon={faList}/> Photo List {' '}
-                            <Link to={"add"} className="btn btn-sm btn-outline-primary float-end"><FontAwesomeIcon icon={faSave}/> Add Photo</Link>
-                        </CardHeader>
-                        <Card.Body>
-                            <Row className="justify-content-md-center">
-                                <Col md={13}>
-                                    <Table bordered hover striped responsive="sm" variant={"bg-white"}>
-                                        <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>DATE MODIFIED</th>
-                                            <th>CAPTURED BY</th>
-                                            <th>FORMAT</th>
-                                            <th>NAME</th>
-                                            <th>LOCATION</th>
-                                            <th>SIZE</th>
-                                            <th>DATE UPLOADED</th>
-                                            <th>OPERATIONS</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {this.state.photos.length === 0 && this.state.photos.confirmation === true ?
-                                            <tr align="center">
-                                                <td colSpan="9">No Photos Available</td>
-                                            </tr> :
-                                            photos.map((photo) => (
-                                                <tr key={photo.photoId}>
-                                                    <td>{photo.photoId}</td>
-                                                    <td>{photo.dateModified}</td>
-                                                    <td>{photo.photoCapturedBy}</td>
-                                                    <td>{photo.photoFormat}</td>
-                                                    <td>{photo.photoName}</td>
-                                                    <td>{photo.photoLocation}</td>
-                                                    <td>{(photo.photoSize / 1000000).toFixed(2)} MB</td>
-                                                    <td>{photo.uploadDate}</td>
-                                                    <td>
-                                                        <ButtonGroup>
-                                                            <Link to={"edit/"+photo.photoId} className="btn btn-sm btn-outline-primary"><FontAwesomeIcon icon={faEdit}/></Link>|
-                                                            <Link to={"share/"+photo.photoId} className="btn btn-sm btn-outline-info"><FontAwesomeIcon icon={faShareSquare}/></Link>|
-                                                            <Button size="sm" variant="outline-success" onClick={this.downloadPhoto.bind(this, photo.photoLink)}><FontAwesomeIcon icon={faDownload}/></Button>|
-                                                            <Button size="sm" variant="outline-danger" onClick={this.deletePhoto.bind(this, photo.photoLink , photo.photoId)} ><FontAwesomeIcon icon={faTrash}/></Button>
-                                                        </ButtonGroup>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        }
-                                        </tbody>
-                                    </Table>
-                                </Col>
-                            </Row>
-                        </Card.Body>
-                    </Card>
+                <Card className={"border border-dark bg-white text-dark"}>
+                    <CardHeader className={"bg-white text-dark"}><FontAwesomeIcon icon={faList}/> Photo List {' '}
+                        <Link to={"add"} className="btn btn-sm btn-outline-primary float-end"><FontAwesomeIcon icon={faSave}/> Add Photo</Link>
+                    </CardHeader>
+                    <Card.Body>
+                        <Row className="justify-content-md-center">
+                            <Col md={13}>
+                                <Table bordered hover striped responsive="lg" variant={"bg-white"}>
+                                    <thead>
+                                    <tr>
+                                        <th>OPERATIONS</th>
+                                        <th>ID</th>
+                                        <th>DATE MODIFIED</th>
+                                        <th>CAPTURED BY</th>
+                                        <th>FORMAT</th>
+                                        <th>NAME</th>
+                                        <th>LOCATION</th>
+                                        <th>SIZE</th>
+                                        <th>DATE UPLOADED</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {photoData.photos.length === 0 || this.state.photos.confirmation === true ?
+                                        <tr align="center">
+                                            <td colSpan="9">No Current Photos To List for: {localStorage.userEmail}</td>
+                                        </tr> :
+                                        photos.map((photo) => (
+                                            <tr key={photo.photoId}>
+                                                <td>
+                                                    <ButtonGroup>
+                                                        <Link to={"edit/"+photo.photoId} className="btn btn-sm btn-outline-primary"><FontAwesomeIcon icon={faEdit}/></Link>|
+                                                        <Link to={"share/"+photo.photoId} className="btn btn-sm btn-outline-info"><FontAwesomeIcon icon={faShareSquare}/></Link>|
+                                                        <Button size="sm" variant="outline-success" onClick={this.downloadPhoto.bind(this, photo.photoLink)}><FontAwesomeIcon icon={faDownload}/></Button>|
+                                                        <Button size="sm" variant="outline-danger" onClick={this.deletePhoto.bind(this, photo.photoLink , photo.photoId)} ><FontAwesomeIcon icon={faTrash}/></Button>
+                                                    </ButtonGroup>
+                                                </td>
+                                                <td>{photo.photoId}</td>
+                                                <td>{photo.dateModified}</td>
+                                                <td>{photo.photoCapturedBy}</td>
+                                                <td>{photo.photoFormat}</td>
+                                                <td>{photo.photoName}</td>
+                                                <td>{photo.photoLocation}</td>
+                                                <td>{(photo.photoSize / 1000000).toFixed(2)} MB</td>
+                                                <td>{photo.uploadDate}</td>
+                                            </tr>
+                                        ))
+                                    }
+                                    </tbody>
+                                </Table>
+                            </Col>
+                        </Row>
+                    </Card.Body>
+                </Card>
                 }
             </div>
         );

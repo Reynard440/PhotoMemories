@@ -22,14 +22,14 @@ public class UserTranslatorImpl implements UserTranslator {
         this.userRepository = userRepository;
     }
 
-    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
     @Override
     public User newUser(User user) throws Exception {
         LOGGER.info("[User Translator log] newUser method, input object's email: {}", user.getEmail());
         return userRepository.save(user);
     }
 
-    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
     @Override
     public Integer deleteUser(Integer id) throws Exception {
         LOGGER.info("[User Translator log] deleteUser method, input id: {}", id);
@@ -38,9 +38,9 @@ public class UserTranslatorImpl implements UserTranslator {
         return deleteValue;
     }
 
-    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
     @Override
-    public Integer updateUser(String firstName, String lastName, String email, String phoneNumber, Integer userId) {
+    public Integer updateUser(String firstName, String lastName, String email, String phoneNumber, Integer userId) throws SQLException {
         return userRepository.updateUser(firstName, lastName, email, phoneNumber, userId);
     }
 

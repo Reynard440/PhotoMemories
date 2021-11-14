@@ -12,12 +12,12 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
-    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
     @Modifying
     @Query(value = "update User set FirstName = ?1, LastName = ?2, Email = ?3, PhoneNumber = ?4 where UserId = ?5 ")
     int updateUser(String firstName, String lastName, String email, String phoneNumber, Integer userId);
 
-    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
     @Modifying
     @Query("delete from User u where u.UserId = ?1")
     int deleteByUserId(Integer UserId);

@@ -46,20 +46,35 @@ class PhotoPadGallery extends Component {
                     <CardHeader className={"bg-white text-dark"} style={{textAlign: 'left'}}><FontAwesomeIcon icon={faImages}/> Your Gallery of Photos {'  '}
                         <Link to={"add"} className="btn btn-sm btn-outline-primary float-end" ><FontAwesomeIcon icon={faSave}/> Add Photo</Link>
                     </CardHeader>
-                    <Card.Body>
-                        <div>
-                            {photos.map((photo) => (
-                                <div key={photo.photoId} className={"grouping"}>
-                                    <img src={`http://localhost:8095/v1/c4/displayPhoto/` + localStorage.userEmail + `/` + photo.photoLink + `/`} className={"containerImage"} alt={"default"}/>
-                                    <div className={"divText"}>{photo.photoId}</div>
-                                    <Link to={"edit/"+photo.photoId} className="btn btn-sm btn-outline-primary"><FontAwesomeIcon icon={faEdit}/></Link>|
-                                    <Link to={"share/"+photo.photoId} className="btn btn-sm btn-outline-info"><FontAwesomeIcon icon={faShareSquare}/></Link>|
-                                    <Button size="sm" variant="outline-success" onClick={this.downloadPhoto.bind(this, photo.photoLink)} ><FontAwesomeIcon icon={faDownload}/></Button>|
-                                    <Button size="sm" variant="outline-danger" onClick={this.deletePhoto.bind(this, photo.photoLink , photo.photoId)}><FontAwesomeIcon icon={faTrash}/></Button>
-                                </div>
-                            ))}
-                        </div>
-                    </Card.Body>
+                    {photoData.photos.length === 0 || this.state.photos.confirmation === true ?
+                        <Card.Body>
+                            No Current Photos To Display for: {localStorage.userEmail}
+                        </Card.Body> :
+                        <Card.Body>
+                            <div>
+                                {photos.map((photo) => (
+                                    <div key={photo.photoId} className={"grouping"}>
+                                        <img
+                                            src={`http://localhost:8095/v1/c4/displayPhoto/` + localStorage.userEmail + `/` + photo.photoLink + `/`}
+                                            className={"containerImage"} alt={"default"} fluid rounded />
+                                        <div className={"divText"}>ID: {photo.photoId}</div>
+                                        <Link to={"edit/" + photo.photoId}
+                                              className="btn btn-sm btn-outline-primary"><FontAwesomeIcon
+                                            icon={faEdit}/></Link>|
+                                        <Link to={"share/" + photo.photoId}
+                                              className="btn btn-sm btn-outline-info"><FontAwesomeIcon
+                                            icon={faShareSquare}/></Link>|
+                                        <Button size="sm" variant="outline-success"
+                                                onClick={this.downloadPhoto.bind(this, photo.photoLink)}><FontAwesomeIcon
+                                            icon={faDownload}/></Button>|
+                                        <Button size="sm" variant="outline-danger"
+                                                onClick={this.deletePhoto.bind(this, photo.photoLink, photo.photoId)}><FontAwesomeIcon
+                                            icon={faTrash}/></Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </Card.Body>
+                    }
                 </Card>
             </div>
         );

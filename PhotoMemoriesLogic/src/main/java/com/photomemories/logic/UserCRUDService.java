@@ -2,12 +2,14 @@ package com.photomemories.logic;
 
 import com.photomemories.domain.dto.UserDto;
 
+import java.sql.SQLException;
+
 public interface UserCRUDService {
     UserDto createNewUser(UserDto userDto) throws Exception;
 
     Integer deleteUser(Integer id) throws Exception;
 
-    UserDto updateUserDto(String firstName, String lastName, String email, String phoneNumber, Integer userId);
+    UserDto updateUserDto(String firstName, String lastName, String email, String phoneNumber, Integer userId) throws SQLException;
 
     UserDto getUserDtoById(Integer id);
 

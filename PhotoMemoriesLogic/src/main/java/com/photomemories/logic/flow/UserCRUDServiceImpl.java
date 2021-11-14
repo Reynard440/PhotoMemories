@@ -33,7 +33,7 @@ public class UserCRUDServiceImpl implements UserCRUDService, UserDetailsService 
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
     @Override
     public UserDto createNewUser(UserDto userDto) throws Exception {
         try {
@@ -80,7 +80,7 @@ public class UserCRUDServiceImpl implements UserCRUDService, UserDetailsService 
 
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
     @Override
-    public UserDto updateUserDto(String firstName, String lastName, String email, String phoneNumber, Integer userId) {
+    public UserDto updateUserDto(String firstName, String lastName, String email, String phoneNumber, Integer userId) throws SQLException {
         int returnValue = userTranslator.updateUser(firstName, lastName, email, phoneNumber, userId);
 
         if (returnValue == 0) {

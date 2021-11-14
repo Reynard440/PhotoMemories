@@ -47,14 +47,15 @@ public class UserController {
             @ApiResponse(code = 400, message = "Bad Request: could not resolve the creation of a new user.", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
     public ResponseEntity<PhotoMemoriesResponse<UserDto>> addNewUser(
-//            @ApiParam(value = "Request body to create a new User", required = true)
-//            @RequestBody UserDto userDto,
             @RequestParam(value = "email") String email,
             @RequestParam(value = "fname") String fname,
             @RequestParam(value = "lname") String lname,
             @RequestParam(value = "cellphone") String cellphone,
             @RequestParam(value = "password") String password) throws Exception {
         UserDto userDto = new UserDto(fname, lname, LocalDate.now(), password, email, cellphone);
+        if (userDto == null) {
+            throw new SQLException("Invalid input detected, cancelling the request");
+        }
         LOGGER.info("[User Controller log] addNewUser method, input object {} ", userDto);
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/v1/c1/addNewUser").toUriString());
         UserDto userResponse = userCRUDService.createNewUser(userDto);
@@ -62,6 +63,7 @@ public class UserController {
         return ResponseEntity.created(uri).body(response);
     }
 
+    @Transactional(rollbackOn = { RuntimeException.class, Exception.class, SQLException.class })
     @PostMapping("/login")
     @ApiOperation(value = "Logs a user in.", notes = "Logs a user in.")
     @ApiResponses(value = {
@@ -88,7 +90,7 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 
-    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
     @DeleteMapping("/deleteUser/{id}")
     @ApiOperation(value = "Deletes a user by id.", notes = "Removes a user from the DB.")
     @ApiResponses(value = {
@@ -108,7 +110,7 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
     @PutMapping("/updateAccount/{id}")
     @ApiOperation(value = "Updates a user by id.", notes = "Changes a user from the DB.")
     @ApiResponses(value = {
@@ -139,6 +141,7 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
     @GetMapping("/userExists/{id}")
     @ApiOperation(value = "Checks if a user exists based on their id.", notes = "Tries to fetch a user by id from the DB.")
     @ApiResponses(value = {
