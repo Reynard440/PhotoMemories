@@ -94,6 +94,7 @@ public class PhotoController {
 
         UserDto userDto = userCRUDService.getUserDtoByEmail(email);
         SharedDto sharedDto = sharedCRUDService.findBySharedWithAndPhotoId(userDto.getUserId(), id);
+        LOGGER.info("[Photo Controller log] deletePhoto method, access granted? {}", sharedDto.getSharedHasAccess());
 
         if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedWith().equals(userDto.getUserId()))) {
             photoResponse = photoCRUDService.deletePhotoDto(id, photoLink, email);

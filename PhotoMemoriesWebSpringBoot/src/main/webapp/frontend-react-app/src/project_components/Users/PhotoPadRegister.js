@@ -58,11 +58,11 @@ class PhotoPadRegister extends Component {
         const {email, password, fname, lname, cellphone} = this.state;
         return (
             <Row className="justify-content-center align-content-center">
-                <Col lg={4} md={8} sm={10}>
+                <Col lg={5}>
                     <div style={{"display": this.state.show ? "block": "none"}}>
                         <PhotoPadToast show={this.state.show} message="Added successfully" type={"success"}/>
                     </div>
-                    <Card className={"border border-white bg-white text-dark registerMain"}>
+                    <Card className={"border border-white bg-white text-dark"}>
                         <Card.Header>
                             <FontAwesomeIcon icon={faKey}/>  Register
                         </Card.Header>

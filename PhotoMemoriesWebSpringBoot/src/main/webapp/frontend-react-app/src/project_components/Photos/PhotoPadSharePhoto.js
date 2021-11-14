@@ -103,10 +103,10 @@ class PhotoPadSharePhoto extends Component {
         return (
             <div className="justify-content-sm-center">
                 <div style={{"display": this.state.show ? "block": "none"}}>
-                    <PhotoPadToast show={this.state.show} message={"Photo shared, this photo was successfully shared with" + this.state.recipientEmail + "."} type={"info"}/>
+                    <PhotoPadToast show={this.state.show} message={"Photo shared, this photo was successfully shared with" + this.state.recipientEmail + "."} type={"success"}/>
                 </div>
                 <Row className="justify-content-sm-center">
-                    <Col lg={5} md={6} sm={8}>
+                    <Col lg={5}>
                         <Card className={"border border-white bg-white text-dark"}>
                             <CardHeader><FontAwesomeIcon icon={faShareSquare}/> Share a Photo with Someone </CardHeader>
                             <Form onReset={this.clearAllFields} onSubmit={this.sharePhoto} id={"photoShareForm"}>
@@ -128,7 +128,7 @@ class PhotoPadSharePhoto extends Component {
                                     <Button size="md" type="reset" variant="info" onClick={this.clearAllFields}>
                                         <FontAwesomeIcon icon={faUndo}/> Clear
                                     </Button>{' '}
-                                    <Button size="md" type="submit" variant="primary" disabled={this.state.sendingEmail.length === 0 || this.state.recipientEmail.length === 0 || this.state.photoId.length === 0} onClick={this.sharePhoto}>
+                                    <Button size="md" type="submit" variant="primary" disabled={this.state.recipientEmail.length === 0 || this.state.photoId.length === 0} onClick={this.sharePhoto}>
                                         <FontAwesomeIcon icon={faSave}/> Share Photo
                                     </Button>{' '}
                                     <Button size="md" type="button" variant="info" onClick={this.photoGallery.bind()}>

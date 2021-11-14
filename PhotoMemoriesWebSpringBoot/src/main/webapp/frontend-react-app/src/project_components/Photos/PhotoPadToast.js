@@ -11,8 +11,8 @@ export default function PhotoPadToast(props) {
     };
     return (
         <div style={props.show ? details : null}>
-            <Toast className={`border text-white ${props.type === "success" ? "border-success bg-success" : "danger" ? "border-danger bg-danger" : "border-info bg-info"}`} show={props.show}>
-                <Toast.Header className={`text-white ${props.type === "success" ? "bg-success" : "danger" ? "bg-danger" : "bg-info"}`} closeButton={false}>
+            <Toast className={`border text-white ${props.type === "success" ? "border-success bg-success" : "danger" ? "border-danger bg-danger" : "info" ? "border-info bg-info" : "border-warning bg-warning"}`} show={props.show}>
+                <Toast.Header className={`text-white ${props.type === "success" ? "bg-success" : "danger" ? "bg-danger" : "info" ? "bg-info" : "bg-warning"}`} closeButton={false}>
                     <strong className="mr-auto">Success</strong>
                 </Toast.Header>
                 <Toast.Body>

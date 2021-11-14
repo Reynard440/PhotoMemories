@@ -56,7 +56,7 @@ class PhotoPadGallery extends Component {
                                     <div key={photo.photoId} className={"grouping"}>
                                         <img
                                             src={`http://localhost:8095/v1/c4/displayPhoto/` + localStorage.userEmail + `/` + photo.photoLink + `/`}
-                                            className={"containerImage"} alt={"default"} fluid rounded />
+                                            className={"containerImage"} alt={"default"} />
                                         <div className={"divText"}>ID: {photo.photoId}</div>
                                         <Link to={"edit/" + photo.photoId}
                                               className="btn btn-sm btn-outline-primary"><FontAwesomeIcon

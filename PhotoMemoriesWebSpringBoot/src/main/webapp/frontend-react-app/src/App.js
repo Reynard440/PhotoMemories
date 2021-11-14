@@ -36,8 +36,8 @@ export default function App() {
 
   return (
     <Router>
-        <PhotoPadNavigationBar/>>
-            <Container>
+        <PhotoPadNavigationBar/>
+            <Container className="registerMain">
                 <Row>
                     <Col md={12} style={marginTop}>
                         <Switch>

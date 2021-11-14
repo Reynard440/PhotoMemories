@@ -47,7 +47,7 @@ class PhotoPadLogin extends Component {
         const {email, password, error} = this.state;
         return (
             <Row className="justify-content-sm-center">
-                <Col lg={4} md={6} sm={8}>
+                <Col lg={5}>
                     {this.props.message && <Alert variant="success">{this.props.message}</Alert>}
                     {error && <Alert variant="danger">{error}</Alert>}
                     <Card className={"border border-white bg-white text-dark"}>
@@ -68,7 +68,7 @@ class PhotoPadLogin extends Component {
                             </Form>
                         </Card.Body>
                         <Card.Footer style={{"textAlign":"right"}}>
-                            <Button size="md" type="button" variant="info" onClick={this.resetPhotoPadLoginForm.bind()}>
+                            <Button size="md" type="button" variant="info" onClick={this.resetPhotoPadLoginForm}>
                                 <FontAwesomeIcon icon={faUndo}/>  Reset
                             </Button> {' '}
                             <Button size="md" type="button" variant="success" onClick={this.validateUser.bind()} disabled={this.state.email.length === 0 || this.state.password.length === 0}>

@@ -22,7 +22,6 @@ class PhotoPadEdit extends Component {
 
     componentDidMount() {
         const photoId = +this.props.match.params.photoId;
-        console.log(photoId);
         if (photoId) {
             this.retrieveById(photoId);
         }

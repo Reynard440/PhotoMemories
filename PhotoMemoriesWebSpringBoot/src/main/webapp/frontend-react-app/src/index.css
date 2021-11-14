@@ -24,15 +24,18 @@ body{
     text-align: center;
     align-items: center;
     margin-bottom: 60px;
+    margin-top: 20px;
 }
 
 .listMain {
     text-align: left;
     margin-bottom: 60px;
+    margin-top: 20px;
 }
 
 .registerMain{
     margin-bottom: 60px;
+    margin-top: 40px;
 }
 
 .galleryCard {
