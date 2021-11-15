@@ -32,7 +32,7 @@ class PhotoPadNavigationBar extends Component {
                     <Link to={"gallery"} className="navbar-brand"><FontAwesomeIcon icon={faImages}/> Gallery</Link>
                 </Nav>
                 <Nav>
-                    <Link to={"logout"} className="navbar-brand" onClick={this.logout}><FontAwesomeIcon icon={faSignOutAlt}/> Logout</Link>
+                    <Link to={"login"} className="navbar-brand" onClick={this.logout}><FontAwesomeIcon icon={faSignOutAlt}/> Logout</Link>
                 </Nav>
             </>
         );

@@ -23,7 +23,7 @@ class PhotoPadPhotoList extends Component {
     deletePhoto = (photoId, photoLink) => {
         this.props.deletePhoto(photoLink, photoId);
         setTimeout(() => {
-            if (this.props.deletedPhotoObj != null) {
+            if (this.props.deletedPhotoObj !== null && this.props.deletedPhotoObj.error !== "Request failed with status code 403") {
                 this.setState({"show": true});
                 setTimeout(() => this.setState({"show": false}), 1500);
                 this.props.getPhotos();

@@ -54,7 +54,7 @@ class PhotoPadEdit extends Component {
 
         this.props.updatePhoto(bodyInfo);
         setTimeout(() => {
-            if (this.props.updatedPhotoObj.photo != null) {
+            if (this.props.updatedPhotoObj.photo != null && this.props.updatedPhotoObj.photo !== "Request failed with status code 403") {
                 this.setState({"show": true, "method":"put"});
                 setTimeout(() => this.setState({"show": false}), 1000);
                 setTimeout(() => this.photoList(), 1000);

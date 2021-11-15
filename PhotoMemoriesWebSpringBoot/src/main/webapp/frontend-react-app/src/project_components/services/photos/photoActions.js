@@ -16,9 +16,10 @@ export const getPhotos = () => {
             })
             .catch(err => {
                 dispatch(getPhotoFailure(err.message));
-                console.log(err.message);
-                localStorage.removeItem('access_key');
-                this.props.history.push('/');
+                if (err.message === "Request failed with status code 403"){
+                    console.log("Insufficient credentials");
+                }
+                // localStorage.removeItem('access_key');
             });
     };
 };

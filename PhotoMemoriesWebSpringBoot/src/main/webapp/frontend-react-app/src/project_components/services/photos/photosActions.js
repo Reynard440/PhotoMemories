@@ -18,7 +18,6 @@ export const savePhoto = photo => {
              dispatch(photoFailure(err));
               console.log(err.message);
               localStorage.removeItem('access_key');
-              this.props.history.push('/');
           });
   };
 };
@@ -51,8 +50,9 @@ export const updatePhoto = photo => {
             .catch(err => {
                 dispatch(photoFailure(err.message));
                 console.log(err.message);
-                localStorage.removeItem('access_key');
-                this.props.history.push('/');
+                if (err.message === "Request failed with status code 403"){
+                    console.log("Insufficient credentials");
+                }
             });
     };
 };
@@ -79,8 +79,10 @@ export const getPhoto = photoId => {
             .catch(err => {
                 dispatch(photoFailure(err.message));
                 console.log(err.message);
-                localStorage.removeItem('access_key');
-                this.props.history.push('/');
+                if (err.message === "Request failed with status code 403"){
+                    console.log("Insufficient credentials");
+                }
+                // localStorage.removeItem('access_key');
             });
     };
 };
@@ -107,8 +109,9 @@ export const deletePhoto = (photoId, photoLink) => {
             .catch(err => {
                 dispatch(photoFailure(err.message));
                 console.log(err.message);
-                localStorage.removeItem('access_key');
-                this.props.history.push('/');
+                if (err.message === "Request failed with status code 403"){
+                    console.log("Insufficient credentials");
+                }
             });
     };
 };

@@ -96,11 +96,7 @@ public class PhotoController {
         SharedDto sharedDto = sharedCRUDService.findBySharedWithAndPhotoId(userDto.getUserId(), id);
         LOGGER.info("[Photo Controller log] deletePhoto method, access granted? {}", sharedDto.getSharedHasAccess());
 
-        if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedWith().equals(userDto.getUserId()))) {
-            photoResponse = photoCRUDService.deletePhotoDto(id, photoLink, email);
-            response = new PhotoMemoriesResponse<>(true, photoResponse);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedHasAccess())) {
+        if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedHasAccess())) {
             photoResponse = photoCRUDService.deletePhotoDto(id, photoLink, email);
             response = new PhotoMemoriesResponse<>(true, photoResponse);
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -142,11 +138,7 @@ public class PhotoController {
         UserDto userDto = userCRUDService.getUserDtoByEmail(email);
         SharedDto sharedDto = sharedCRUDService.findBySharedWithAndPhotoId(userDto.getUserId(), id);
 
-        if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedWith().equals(userDto.getUserId()))) {
-            photoResponse = photoCRUDService.updatePhotoDto(pName, pLocation, pCaptured, id, email);
-            response = new PhotoMemoriesResponse<>(true, photoResponse);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedHasAccess())) {
+        if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedHasAccess())) {
             photoResponse = photoCRUDService.updatePhotoDto(pName, pLocation, pCaptured, id, email);
             response = new PhotoMemoriesResponse<>(true, photoResponse);
             return new ResponseEntity<>(response, HttpStatus.OK);
