@@ -13,6 +13,7 @@ class PhotoPadSharePhoto extends Component {
         super(props);
         this.state = this.initialState;
         this.state.show = false;
+        this.state.errorShow = false;
         this.detailsChanged = this.detailsChanged.bind(this);
         this.sharePhoto = this.sharePhoto.bind(this);
     }
@@ -58,7 +59,7 @@ class PhotoPadSharePhoto extends Component {
                 }
             })
             .then(res => {
-                if (res.data != null) {
+                if (res.data != null && res.data.status === 200) {
                     this.setState({"show": true, "method":"post"});
                     setTimeout(() => this.setState({"show": false}), 3000);
                     setTimeout(() => this.photoGallery(), 3000);
@@ -67,7 +68,10 @@ class PhotoPadSharePhoto extends Component {
                 }
             })
             .catch(error => {
-                console.log(error.response)
+                if (error.response.status === 403) {
+                    this.setState({"errorShow" : true, "method":"post"});
+                    setTimeout(() => this.setState({"errorShow": false}), 4500);
+                }
             });
 
         this.setState(this.initialState);
@@ -82,7 +86,6 @@ class PhotoPadSharePhoto extends Component {
                 // eslint-disable-next-line
                 this.state.ph_access = false;
             }
-            console.log(this.state.ph_access);
         } else {
             this.setState({
                 [event.target.name] : event.target.value
@@ -105,11 +108,14 @@ class PhotoPadSharePhoto extends Component {
                 <div style={{"display": this.state.show ? "block": "none"}}>
                     <PhotoPadToast show={this.state.show} message={"Photo shared, this photo was successfully shared with" + this.state.recipientEmail + "."} type={"success"}/>
                 </div>
+                <div style={{"display": this.state.errorShow ? "block": "none"}}>
+                    <PhotoPadToast show={this.state.errorShow} message={`User not fount, please ensure that the user is registered.`} type={"404"}/>
+                </div>
                 <Row className="justify-content-sm-center">
-                    <Col lg={5}>
+                    <Col lg={6}>
                         <Card className={"border border-white bg-white text-dark"}>
                             <CardHeader><FontAwesomeIcon icon={faShareSquare}/> Share a Photo with Someone </CardHeader>
-                            <Form onReset={this.clearAllFields} onSubmit={this.sharePhoto} id={"photoShareForm"}>
+                            <Form onReset={this.clearAllFields} onSubmit={this.sharePhoto}>
                                 <Card.Body>
                                     <Form.Group as={Col} controlId="formGridToEmail">
                                         <Form.Label>To Email</Form.Label>
@@ -128,11 +134,11 @@ class PhotoPadSharePhoto extends Component {
                                     <Button size="md" type="reset" variant="info" onClick={this.clearAllFields}>
                                         <FontAwesomeIcon icon={faUndo}/> Clear
                                     </Button>{' '}
-                                    <Button size="md" type="submit" variant="primary" disabled={this.state.recipientEmail.length === 0 || this.state.photoId.length === 0} onClick={this.sharePhoto}>
-                                        <FontAwesomeIcon icon={faSave}/> Share Photo
-                                    </Button>{' '}
                                     <Button size="md" type="button" variant="info" onClick={this.photoGallery.bind()}>
                                         <FontAwesomeIcon icon={faBackward}/> Photo Gallery
+                                    </Button>{' '}
+                                    <Button size="md" type="submit" variant="primary" disabled={this.state.recipientEmail.length === 0 || this.state.photoId.length === 0} onClick={this.sharePhoto}>
+                                        <FontAwesomeIcon icon={faSave}/> Share Photo
                                     </Button>
                                 </Card.Footer>
                             </Form>

@@ -12,6 +12,7 @@ class PhotoPadPhoto extends Component {
         super(props);
         this.state = this.initialState;
         this.state.show = false;
+        this.state.unsupportedFileType = false;
         this.photoChanged = this.photoChanged.bind(this);
         this.addPhoto = this.addPhoto.bind(this);
     }
@@ -43,13 +44,17 @@ class PhotoPadPhoto extends Component {
         setTimeout(() => {
             if (this.props.savedPhotoObj.photo != null) {
                 this.setState({"show": true, "method":"post"});
-                setTimeout(() => this.setState({"show": false}), 1000);
-                setTimeout(() => this.photoList(), 1000);
+                setTimeout(() => this.setState({"show": false}), 3000);
+                this.setState(this.initialState);
+                setTimeout(() => this.photoList(), 3000);
             } else {
                 this.setState({"show": false});
+                if (this.props.savedPhotoObj.error !== '') {
+                    this.setState({"unsupportedFileType" : true, "method":"post"});
+                    setTimeout(() => this.setState({"unsupportedFileType": false}), 4000);
+                }
             }
-        }, 1000);
-        this.setState(this.initialState);
+        }, 1500);
     };
 
     photoChanged = (event) => {
@@ -73,6 +78,9 @@ class PhotoPadPhoto extends Component {
             <div>
                 <div style={{"display": this.state.show ? "block": "none"}}>
                     <PhotoPadToast show={this.state.show} message={"Photo saved, you can now share it with the group."} type={"success"}/>
+                </div>
+                <div style={{"display": this.state.unsupportedFileType ? "block": "none"}}>
+                    <PhotoPadToast show={this.state.unsupportedFileType} message={"Unsupported format, please upload the content in a different format."} type={"danger"}/>
                 </div>
                 <Card className={"border border-white bg-white text-dark"}>
                     <CardHeader><FontAwesomeIcon icon={faPlusSquare}/> {this.state.photoId ? "Update a Photo":"Add a Photo"}</CardHeader>
@@ -103,7 +111,7 @@ class PhotoPadPhoto extends Component {
                             <Row>
                                 <Form.Group as={Col} controlId="formGridPhoto">
                                         <Form.Label>Photo</Form.Label>
-                                        <Form.Control type="file" name="photo" value={photo} onChange={this.photoChanged} required autoComplete="off" placeholder="Enter your email" className={"bg-white text-dark"} />
+                                        <Form.Control type="file" name="photo" values={photo} onChange={this.photoChanged} required autoComplete="off" placeholder="Enter your email" className={"bg-white text-dark"} />
                                 </Form.Group>
                             </Row>
                         </Card.Body>

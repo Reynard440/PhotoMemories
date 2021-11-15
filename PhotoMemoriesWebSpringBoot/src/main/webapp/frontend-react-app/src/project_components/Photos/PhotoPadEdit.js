@@ -12,6 +12,7 @@ class PhotoPadEdit extends Component {
         super(props);
         this.state = this.initialState;
         this.state.show = false;
+        this.state.accessErrorShow = false;
         this.photoChanged = this.photoChanged.bind(this);
         this.updatePhoto = this.updatePhoto.bind(this);
     }
@@ -54,15 +55,17 @@ class PhotoPadEdit extends Component {
 
         this.props.updatePhoto(bodyInfo);
         setTimeout(() => {
-            if (this.props.updatedPhotoObj.photo != null && this.props.updatedPhotoObj.photo !== "Request failed with status code 403") {
+            if (this.props.updatedPhotoObj.error === '') {
                 this.setState({"show": true, "method":"put"});
-                setTimeout(() => this.setState({"show": false}), 1000);
-                setTimeout(() => this.photoList(), 1000);
+                setTimeout(() => this.setState({"show": false}), 3000);
+                this.setState(this.initialState);
+                setTimeout(() => this.photoList(), 3000);
             } else {
                 this.setState({"show": false});
+                this.setState({"accessErrorShow" : true, "method":"post"});
+                setTimeout(() => this.setState({"accessErrorShow": false}), 4000);
             }
-        }, 500);
-        this.setState(this.initialState);
+        }, 1500);
     }
 
     photoChanged = event => {
@@ -90,6 +93,9 @@ class PhotoPadEdit extends Component {
                 <div style={{"display": this.state.show ? "block": "none"}}>
                     <PhotoPadToast show={this.state.show} message={"Photo updated, you can now share it with the group."} type={"success"}/>
                 </div>
+                <div style={{"display": this.state.accessErrorShow ? "block": "none"}}>
+                    <PhotoPadToast show={this.state.accessErrorShow} message={"Access Required, please consult with the owner."} type={"ad"}/>
+                </div>
                 <Card className={"border border-white bg-white text-dark"}>
                     <CardHeader><FontAwesomeIcon icon={faPlusSquare}/> Update a Photo</CardHeader>
                     <Form onReset={this.clearAllFields} onSubmit={this.updatePhoto} id={"photoEditForm"}>
@@ -116,14 +122,14 @@ class PhotoPadEdit extends Component {
                             <Button size="md" type="reset" variant="info" onClick={this.clearAllFields}>
                                 <FontAwesomeIcon icon={faUndo}/> Clear
                             </Button>{' '}
-                            <Button size="md" type="submit" variant="success" disabled={this.state.location.length === 0 || this.state.ph_captured.length === 0 || this.state.ph_name.length === 0} onClick={this.updatePhoto}>
-                                <FontAwesomeIcon icon={faEdit}/> Update Photo
-                            </Button>{' '}
                             <Button size="md" type="button" variant="info" onClick={this.photoList.bind()}>
                                 <FontAwesomeIcon icon={faList}/> Photo List
                             </Button>{' '}
                             <Button size="md" type="button" variant="primary" onClick={this.photoGallery.bind()}>
                                 <FontAwesomeIcon icon={faImages}/> Photo Gallery
+                            </Button>{' '}
+                            <Button size="md" type="submit" variant="success" disabled={this.state.location.length === 0 || this.state.ph_captured.length === 0 || this.state.ph_name.length === 0} onClick={this.updatePhoto}>
+                                <FontAwesomeIcon icon={faEdit}/> Update Photo
                             </Button>
                         </Card.Footer>
                     </Form>
