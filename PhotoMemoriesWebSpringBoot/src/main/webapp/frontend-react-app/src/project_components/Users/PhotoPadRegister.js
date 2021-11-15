@@ -29,6 +29,10 @@ class PhotoPadRegister extends Component {
         email:'', password:'', fname:'', lname:'', cellphone:'', error:''
     };
 
+    componentDidMount() {
+        this.resetRegister();
+    };
+
     detailsChange = event => {
         this.setState({
             [event.target.name]: event.target.value
@@ -52,6 +56,8 @@ class PhotoPadRegister extends Component {
 
     resetRegister = () => {
         this.setState(() => this.initialState);
+        // this.state.name;
+        console.log(this.state.value);
     };
 
     render() {
@@ -67,30 +73,30 @@ class PhotoPadRegister extends Component {
                             <FontAwesomeIcon icon={faKey}/>  Register
                         </Card.Header>
                         <Card.Body>
-                            <Form onReset={this.resetRegister} onSubmit={this.createNewUser}>
+                            <Form onReset={this.resetRegister} onSubmit={this.createNewUser} controlId="registerForm">
                                 <Form.Group className="mb-2" controlId="formBasicEmail">
                                     <Form.Label><FontAwesomeIcon icon={faAddressBook}/> Email address</Form.Label>
-                                    <Form.Control type="email" name="email" values={email} onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter email here" />
+                                    <Form.Control type="email" name="email" value={email} onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter email here" />
                                 </Form.Group>
 
                                 <Form.Group className="mb-2" controlId="formBasicFirstName">
                                     <Form.Label><FontAwesomeIcon icon={faFill}/> First Name</Form.Label>
-                                    <Form.Control type="text" name="fname" values={fname} onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter first name here" />
+                                    <Form.Control type="text" name="fname" value={fname} onChange={this.detailsChange} className={"bg-white text-dark"} placeholder="Enter first name here" />
                                 </Form.Group>
 
                                 <Form.Group className="mb-2" controlId="formBasicLastName">
                                     <Form.Label><FontAwesomeIcon icon={faBook}/> Last Name</Form.Label>
-                                    <Form.Control type="text" name="lname" values={lname} onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter last name here" />
+                                    <Form.Control type="text" name="lname" value={lname} onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter last name here" />
                                 </Form.Group>
 
                                 <Form.Group className="mb-2" controlId="formBasicCellphone">
                                     <Form.Label><FontAwesomeIcon icon={faPhone}/> Cellphone Number</Form.Label>
-                                    <Form.Control type="cell" name="cellphone" values={cellphone} onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter cellphone here" />
+                                    <Form.Control type="cell" name="cellphone" value={cellphone} onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter cellphone here" />
                                 </Form.Group>
 
                                 <Form.Group className="mb-2" controlId="formBasicPassword">
                                     <Form.Label><FontAwesomeIcon icon={faPassport}/> Password</Form.Label>
-                                    <Form.Control type="password" name="password" values={password} onChange={this.detailsChange} className={"bg-white text-dark"} placeholder="Enter password here" />
+                                    <Form.Control type="password" name="password" value={password} onChange={this.detailsChange} className={"bg-white text-dark"} placeholder="Enter password here" />
                                 </Form.Group>
                             </Form>
                         </Card.Body>

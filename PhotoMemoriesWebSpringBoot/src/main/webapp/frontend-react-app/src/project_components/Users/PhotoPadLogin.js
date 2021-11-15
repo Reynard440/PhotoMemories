@@ -58,12 +58,12 @@ class PhotoPadLogin extends Component {
                             <Form onSubmit={this.validateUser} onReset={this.resetPhotoPadLoginForm}>
                                 <Form.Group className="mb-3" controlId="formBasicEmail">
                                     <Form.Label>Email address</Form.Label>
-                                    <Form.Control type="email" name="email" values={email} onChange={this.detailsChange} className={"bg-white text-dark"} placeholder="Enter email here" />
+                                    <Form.Control type="email" name="email" value={email} onChange={this.detailsChange} className={"bg-white text-dark"} placeholder="Enter email here" />
                                 </Form.Group>
 
                                 <Form.Group className="mb-3" controlId="formBasicPassword">
                                     <Form.Label>Password</Form.Label>
-                                    <Form.Control type="password" name="password" values={password} onChange={this.detailsChange} className={"bg-white text-dark"} placeholder="Enter password here" />
+                                    <Form.Control type="password" name="password" value={password} onChange={this.detailsChange} className={"bg-white text-dark"} placeholder="Enter password here" />
                                 </Form.Group>
                             </Form>
                         </Card.Body>
