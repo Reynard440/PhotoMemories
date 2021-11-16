@@ -13,6 +13,7 @@ class PhotoPadPhoto extends Component {
         this.state = this.initialState;
         this.state.show = false;
         this.state.unsupportedFileType = false;
+        this.state.isFourHundred = false;
         this.photoChanged = this.photoChanged.bind(this);
         this.addPhoto = this.addPhoto.bind(this);
     }
@@ -49,9 +50,14 @@ class PhotoPadPhoto extends Component {
                 setTimeout(() => this.photoList(), 3000);
             } else {
                 this.setState({"show": false});
-                if (this.props.savedPhotoObj.error !== '') {
+                if (this.props.savedPhotoObj.error.response.status === 403) {
+                    this.setState({"isFourHundred":false});
                     this.setState({"unsupportedFileType" : true, "method":"post"});
                     setTimeout(() => this.setState({"unsupportedFileType": false}), 4000);
+                } else if (this.props.savedPhotoObj.error.response.status === 400) {
+                    this.setState({"unsupportedFileType":false});
+                    this.setState({"isFourHundred" : true, "method":"post"});
+                    setTimeout(() => this.setState({"isFourHundred": false}), 4000);
                 }
             }
         }, 1500);
@@ -82,16 +88,24 @@ class PhotoPadPhoto extends Component {
                 <div style={{"display": this.state.unsupportedFileType ? "block": "none"}}>
                     <PhotoPadToast show={this.state.unsupportedFileType} message={"Unsupported format, please upload the content in a different format."} type={"danger"}/>
                 </div>
+                <div style={{"display": this.state.isFourHundred ? "block": "none"}}>
+                    <PhotoPadToast show={this.state.isFourHundred} message={"Ensure that the provided information is correct."} type={"400"}/>
+                </div>
                 <Card className={"border border-white bg-white text-dark"}>
                     <CardHeader><FontAwesomeIcon icon={faPlusSquare}/> {this.state.photoId ? "Update a Photo":"Add a Photo"}</CardHeader>
                     <Form onReset={this.clearAllFields} onSubmit={this.addPhoto} id={"photoForm"}>
                         <Card.Body>
                             <Row>
+                                <Form.Group as={Col} controlId="formGridPhoto">
+                                    <Form.Label><strong>First upload the photo</strong></Form.Label>
+                                    <Form.Control type="file" name="photo" values={photo} onChange={this.photoChanged} required autoComplete="off" className={"bg-white text-dark"} />
+                                </Form.Group>
+                            </Row>
+                            <Row>
                                 <Form.Group as={Col} controlId="formGridModifiedDate">
                                     <Form.Label>Date Modified</Form.Label>
                                     <Form.Control type="date" name="modifiedDate" value={modifiedDate} onChange={this.photoChanged} required autoComplete="off" placeholder="Enter modified date" className={"bg-white text-dark"} />
                                 </Form.Group>
-
                                 <Form.Group as={Col} controlId="formGridPhotoName">
                                     <Form.Label>Photo Name</Form.Label>
                                     <Form.Control type="text" name="ph_name" value={ph_name} onChange={this.photoChanged} required autoComplete="off" placeholder="Enter name of photo date" className={"bg-white text-dark"} />
@@ -102,16 +116,9 @@ class PhotoPadPhoto extends Component {
                                     <Form.Label>Photo Location</Form.Label>
                                     <Form.Control type="text" name="location" value={location} onChange={this.photoChanged} required autoComplete="off" placeholder="Enter name of city" className={"bg-white text-dark"} />
                                 </Form.Group>
-
                                 <Form.Group as={Col} controlId="formGridCaptured">
                                     <Form.Label>Capture By?</Form.Label>
-                                    <Form.Control required type="text" name="ph_captured" value={ph_captured} onChange={this.photoChanged} autoComplete="off" placeholder="Enter name of person" className={"bg-white text-dark"} />
-                                </Form.Group>
-                            </Row>
-                            <Row>
-                                <Form.Group as={Col} controlId="formGridPhoto">
-                                        <Form.Label>Photo</Form.Label>
-                                        <Form.Control type="file" name="photo" values={photo} onChange={this.photoChanged} required autoComplete="off" placeholder="Enter your email" className={"bg-white text-dark"} />
+                                    <Form.Control type="text" name="ph_captured" value={ph_captured} onChange={this.photoChanged} required autoComplete="off" placeholder="Enter name of person" className={"bg-white text-dark"} />
                                 </Form.Group>
                             </Row>
                         </Card.Body>
@@ -125,7 +132,7 @@ class PhotoPadPhoto extends Component {
                             <Button size="md" type="button" variant="primary" onClick={this.photoGallery.bind()}>
                                 <FontAwesomeIcon icon={faImages}/> Photo Gallery
                             </Button>{' '}
-                            <Button size="md" type="submit" variant="success" disabled={this.state.ph_name.length === 0 || this.state.ph_captured.length === 0 || this.state.location.length === 0}  onClick={this.addPhoto}>
+                            <Button size="md" type="submit" variant="success" disabled={this.state.modifiedDate.value === 'yyyy/mm/dd' || this.state.ph_name.length === 0 || this.state.ph_captured.length === 0 || this.state.location.length === 0}  onClick={this.addPhoto}>
                                 <FontAwesomeIcon icon={faSave}/> Add Photo
                             </Button>
                         </Card.Footer>

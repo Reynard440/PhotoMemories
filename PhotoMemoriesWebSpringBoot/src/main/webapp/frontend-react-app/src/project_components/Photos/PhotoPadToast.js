@@ -16,11 +16,12 @@ export default function PhotoPadToast(props) {
                     {props.type === "success" ?
                         <strong className="mr-auto">Success</strong> : props.type === "danger" ?
                             <strong className="mr-auto">Danger</strong> : props.type === "403" ?
-                            <strong className="mr-auto">HTTP-403</strong> : props.type === "404" ?
-                                <strong className="mr-auto">HTTP-404</strong> : props.type === "Unauthorized" ?
+                                <strong className="mr-auto">HTTP-403: Forbidden</strong> : props.type === "404" ?
+                                    <strong className="mr-auto">HTTP-404: Not Found</strong> : props.type === "Unauthorized" ?
                                         <strong className="mr-auto">Unauthorized</strong> : props.type === "ad" ?
-                                        <strong className="mr-auto">Access Denied</strong>:
-                                            <strong className="mr-auto">Info</strong>
+                                            <strong className="mr-auto">Access Denied</strong>: props.type === "400" ?
+                                                <strong className="mr-auto">HTTP-400: Bad Request</strong> :
+                                                <strong className="mr-auto">Info</strong>
                     }
                 </Toast.Header>
                 <Toast.Body>

@@ -4,6 +4,8 @@ body{
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
+    font-family: "Font Awesome 5 Free", "HP Simplified";
+    font-size: large;
 }
 
 .imageDisplay {
@@ -18,6 +20,7 @@ body{
     align-items: center;
     margin-bottom: 5px;
     margin-right: 2px;
+    padding: 0.05rem;
 }
 
 .galleryMain {
@@ -34,8 +37,8 @@ body{
 }
 
 .registerMain{
-    margin-bottom: 60px;
-    margin-top: 40px;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
 .galleryCard {
@@ -45,20 +48,18 @@ body{
 .containerImage {
     width: 250px;
     height: 250px;
-    background-color: lightgrey;
-    padding: 10px;
 }
 
-.containerImage:hover {
-    position:relative;
-    width:300px;
-    height:300px;
-    display:block;
-    z-index:999;
-}
+/*.containerImage:hover {*/
+/*    position:relative;*/
+/*    width:300px;*/
+/*    height:300px;*/
+/*    display:block;*/
+/*    z-index:999;*/
+/*}*/
 
 .divText {
-    text-align: center;
+    text-align: left;
 }
 
 /*.overlay {*/

@@ -63,22 +63,35 @@ class PhotoPadGallery extends Component {
                                 <div>
                                     {photos.map((photo) => (
                                         <div key={photo.photoId} className={"grouping"}>
-                                            <img
-                                                src={`http://localhost:8095/v1/c4/displayPhoto/` + localStorage.userEmail + `/` + photo.photoLink + `/`}
-                                                className={"containerImage"} alt={"default"} />
-                                            <div className={"divText"}>ID: {photo.photoId}</div>
-                                            <Link to={"edit/" + photo.photoId}
-                                                  className="btn btn-sm btn-outline-primary"><FontAwesomeIcon
-                                                icon={faEdit}/></Link>|
-                                            <Link to={"share/" + photo.photoId}
-                                                  className="btn btn-sm btn-outline-info"><FontAwesomeIcon
-                                                icon={faShareSquare}/></Link>|
-                                            <Button size="sm" variant="outline-success"
-                                                    onClick={this.downloadPhoto.bind(this, photo.photoLink)}><FontAwesomeIcon
-                                                icon={faDownload}/></Button>|
-                                            <Button size="sm" variant="outline-danger"
-                                                    onClick={this.deletePhoto.bind(this, photo.photoLink, photo.photoId)}><FontAwesomeIcon
-                                                icon={faTrash}/></Button>
+                                            <Card>
+                                                <CardHeader className="bg-light">
+                                                    <div className={"divText"}><strong>ID:</strong> {photo.photoId}</div>
+                                                </CardHeader>
+                                                <Card.Img src={`http://localhost:8095/v1/c4/displayPhoto/` + localStorage.userEmail + `/` + photo.photoLink + `/`}
+                                                          className={"containerImage"} alt={"default"}/>
+                                                <Card.Body>
+                                                    <div className={"divText"}><strong>Name:</strong> {photo.photoName}</div>
+                                                    <div className={"divText"}><strong>Uploaded:</strong> {photo.uploadDate}</div>
+                                                    <div className={"divText"}><strong>Captured By:</strong> {photo.photoCapturedBy}</div>
+                                                    <div className={"divText"}><strong>Format:</strong> {photo.photoFormat}</div>
+                                                    <div className={"divText"}><strong>Location:</strong> {photo.photoLocation}</div>
+                                                    <div className={"divText"}><strong>Size:</strong> {(photo.photoSize / 1000000).toFixed(2)} MB</div>
+                                                </Card.Body>
+                                                <Card.Footer className="bg-light">
+                                                    <Link to={"edit/" + photo.photoId}
+                                                          className="btn btn-sm btn-outline-primary"><FontAwesomeIcon
+                                                        icon={faEdit}/></Link>|
+                                                    <Link to={"share/" + photo.photoId}
+                                                          className="btn btn-sm btn-outline-info"><FontAwesomeIcon
+                                                        icon={faShareSquare}/></Link>|
+                                                    <Button size="sm" variant="outline-success"
+                                                            onClick={this.downloadPhoto.bind(this, photo.photoLink)}><FontAwesomeIcon
+                                                        icon={faDownload}/></Button>|
+                                                    <Button size="sm" variant="outline-danger"
+                                                            onClick={this.deletePhoto.bind(this, photo.photoLink, photo.photoId)}><FontAwesomeIcon
+                                                        icon={faTrash}/></Button>
+                                                </Card.Footer>
+                                            </Card>
                                         </div>
                                     ))}
                                 </div>
