@@ -72,7 +72,7 @@ public class AwsCRUDServiceImpl implements AwsCRUDService {
             return "Photo could not be deleted";
         }
         LOGGER.info("[AWS Logic log] deletePhoto method, Photo was deleted successfully");
-        return "Photo was deleted successfully";
+        return "Photo could not be deleted";
     }
 
     @Override

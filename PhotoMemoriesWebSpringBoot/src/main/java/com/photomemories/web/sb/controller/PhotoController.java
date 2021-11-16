@@ -96,13 +96,22 @@ public class PhotoController {
         SharedDto sharedDto = sharedCRUDService.findBySharedWithAndPhotoId(userDto.getUserId(), id);
         LOGGER.info("[Photo Controller log] deletePhoto method, access granted? {}", sharedDto.getSharedHasAccess());
 
-        if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedHasAccess())) {
-            photoResponse = photoCRUDService.deletePhotoDto(id, photoLink, email);
-            response = new PhotoMemoriesResponse<>(true, photoResponse);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+        if (photoCRUDService.photoExists(id, photoLink)) {
+            if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedHasAccess())) {
+                if (sharedDto.getUserId().equals(sharedDto.getSharedWith())) {
+                    photoResponse = photoCRUDService.deletePhotoDto(id, photoLink, email);
+                } else {
+                    photoResponse = sharedCRUDService.deleteBySharedRecord(sharedDto.getSharedWith(), id, photoLink);
+                }
+                response = new PhotoMemoriesResponse<>(true, photoResponse);
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                LOGGER.error("[Photo Controller log] deletePhoto method, access rights are not sufficient");
+                throw new SQLException("[Photo Controller log] deletePhoto method, not permitted");
+            }
         } else {
-            LOGGER.error("[Photo Controller log] deletePhoto method, access rights are not sufficient");
-            throw new SQLException("[Photo Controller log] deletePhoto method, not permitted");
+            LOGGER.error("[Photo Controller log] deletePhoto method, photo {} does not exist ", photoLink);
+            throw new SQLException("[Photo Controller Error] deletePhoto method, photo does not exist");
         }
     }
 

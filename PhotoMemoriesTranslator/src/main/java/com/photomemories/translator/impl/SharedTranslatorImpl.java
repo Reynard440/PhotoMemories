@@ -21,11 +21,23 @@ public class SharedTranslatorImpl implements SharedTranslator {
         this.sharedRepository = sharedRepository;
     }
 
-    @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
+    @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
     @Override
     public Shared addShared(Shared shared) throws RuntimeException, SQLException {
         LOGGER.info("[Shared Translator log] addShared method, input object's date {}", shared.getSharedDate());
         return sharedRepository.save(shared);
+    }
+
+    @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
+    @Override
+    public Integer deleteBySharedRecord(Integer sharedWith, Integer photoId) throws SQLException {
+        try {
+            LOGGER.info("[Shared Translator log] deleteBySharedRecord method, delete photo {} for user {} ", sharedWith, photoId);
+            return sharedRepository.deleteBySharedWithAndPhotoId_PhotoId(sharedWith, photoId);
+        } catch (RuntimeException error) {
+            LOGGER.error("[Shared Translator log] deleteBySharedRecord method, delete request could not be carried out");
+            throw new RuntimeException("[Shared Translator Error] deleteBySharedRecord method, deletion error ", error.getCause());
+        }
     }
 
     @Override

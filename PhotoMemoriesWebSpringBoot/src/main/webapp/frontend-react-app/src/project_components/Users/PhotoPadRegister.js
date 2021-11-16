@@ -21,7 +21,7 @@ class PhotoPadRegister extends Component {
         this.state = this.initialState;
         this.detailsChange = this.detailsChange.bind(this);
         this.resetRegister = this.resetRegister.bind(this);
-        this.state.show  = false;
+        this.state.registerShow  = false;
         this.state.message = '';
     }
 
@@ -50,13 +50,13 @@ class PhotoPadRegister extends Component {
 
 
         this.props.addUser(newUser);
+        // this.setState({"registerShow": true});
+        // setTimeout(() => {this.setState({"registerShow": false});return this.props.history.push("/login");}, 3000);
         this.resetRegister();
-        this.props.history.push("/login");
     };
 
     resetRegister = () => {
         this.setState(() => this.initialState);
-        // this.state.name;
         console.log(this.state.value);
     };
 
@@ -65,8 +65,8 @@ class PhotoPadRegister extends Component {
         return (
             <Row className="justify-content-center align-content-center">
                 <Col lg={5}>
-                    <div style={{"display": this.state.show ? "block": "none"}}>
-                        <PhotoPadToast show={this.state.show} message="Added successfully" type={"success"}/>
+                    <div style={{"display": this.state.registerShow ? "block": "none"}}>
+                        <PhotoPadToast show={this.state.registerShow} message="Added successfully" type={"registerUser"}/>
                     </div>
                     <Card className={"border border-white bg-white text-dark"}>
                         <Card.Header>

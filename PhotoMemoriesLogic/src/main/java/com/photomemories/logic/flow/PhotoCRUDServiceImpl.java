@@ -86,10 +86,6 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
             throw new RuntimeException("[Photo Logic Error] deletePhoto method, Photo with id " + id + " does not exist!");
         }
 
-//        UserDto userDto = userCRUDService.getUserDtoByEmail(email);
-
-//        LOGGER.info("[Photo Logic log] deletePhotoDto method, You have valid access rights. Access Rights for photo modification {} ", true);
-
         int photoDelete = photoTranslator.deletePhoto(id, photoLink);
         awsCRUDService.deletePhoto(photoLink, email);
         boolean afterDelete = photoTranslator.photoExists(id, photoLink);

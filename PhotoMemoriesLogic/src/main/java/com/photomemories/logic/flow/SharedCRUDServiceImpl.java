@@ -51,6 +51,21 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
         }
     }
 
+    @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
+    @Override
+    public Integer deleteBySharedRecord(Integer sharedWith, Integer photoId, String photoLink) throws SQLException {
+        try {
+            LOGGER.info("[Shared Logic log] deleteBySharedRecord method, delete photo {} for user {} ", sharedWith, photoId);
+            int response = sharedTranslator.deleteBySharedRecord(sharedWith, photoId);
+            UserDto userDto = new UserDto(userTranslator.getUserById(sharedWith));
+            awsCRUDService.deletePhoto(photoLink, userDto.getEmail());
+            return response;
+        } catch (RuntimeException error) {
+            LOGGER.error("[Shared Logic log] deleteBySharedRecord method, delete request could not be carried out");
+            throw new RuntimeException("[Shared Logic Error] deleteBySharedRecord method, deletion error ", error.getCause());
+        }
+    }
+
     @Override
     public SharedDto getSharedBySharedId(Integer id) {
         LOGGER.info("[Shared Logic log] getSharedByUserId method, shared id {}", id);

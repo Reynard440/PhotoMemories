@@ -12,7 +12,7 @@ export default function PhotoPadToast(props) {
     return (
         <div style={props.show ? details : null}>
             <Toast className={`border text-white ${props.type === "success" ? "border-success bg-success" : "danger" ? "border-danger bg-danger" : "info" ? "border-info bg-info" : "border-warning bg-warning"}`} show={props.show}>
-                <Toast.Header className={`text-white ${props.type === "success" ? "bg-success" : "danger" ? "bg-danger" : "info" ? "bg-info" : "bg-warning"}`} closeButton={false}>
+                <Toast.Header className={`text-white ${props.type === "success" ? "bg-success" : "danger" ? "bg-danger" : "info" ? "bg-info" : "validUser" ? "bg-success": "bg-warning"}`} closeButton={false}>
                     {props.type === "success" ?
                         <strong className="mr-auto">Success</strong> : props.type === "danger" ?
                             <strong className="mr-auto">Danger</strong> : props.type === "403" ?
@@ -20,8 +20,10 @@ export default function PhotoPadToast(props) {
                                     <strong className="mr-auto">HTTP-404: Not Found</strong> : props.type === "Unauthorized" ?
                                         <strong className="mr-auto">Unauthorized</strong> : props.type === "ad" ?
                                             <strong className="mr-auto">Access Denied</strong>: props.type === "400" ?
-                                                <strong className="mr-auto">HTTP-400: Bad Request</strong> :
-                                                <strong className="mr-auto">Info</strong>
+                                                <strong className="mr-auto">HTTP-400: Bad Request</strong> : props.type === "validUser" ?
+                                                <strong className="mr-auto">Credentials Validated:</strong>: props.type === "registerUser" ?
+                                                    <strong className="mr-auto">Register Status:</strong>:
+                                                        <strong className="mr-auto">Info:</strong>
                     }
                 </Toast.Header>
                 <Toast.Body>
