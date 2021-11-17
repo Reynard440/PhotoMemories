@@ -62,7 +62,7 @@ class PhotoPadSharePhoto extends Component {
                 if (res.data != null && res.data.status === 200) {
                     this.setState({"show": true, "method":"post"});
                     setTimeout(() => this.setState({"show": false}), 3000);
-                    setTimeout(() => this.photoGallery(), 3000);
+                    setTimeout(() => this.photoCollection(), 3000);
                 } else {
                     this.setState({"show": false});
                 }
@@ -93,7 +93,7 @@ class PhotoPadSharePhoto extends Component {
         }
     };
 
-    photoGallery = () => {
+    photoCollection = () => {
         return this.props.history.push("/gallery");
     };
 
@@ -134,8 +134,8 @@ class PhotoPadSharePhoto extends Component {
                                     <Button size="md" type="reset" variant="info" onClick={this.clearAllFields}>
                                         <FontAwesomeIcon icon={faUndo}/> Clear
                                     </Button>{' '}
-                                    <Button size="md" type="button" variant="info" onClick={this.photoGallery.bind()}>
-                                        <FontAwesomeIcon icon={faBackward}/> Photo Gallery
+                                    <Button size="md" type="button" variant="info" onClick={this.photoCollection.bind()}>
+                                        <FontAwesomeIcon icon={faBackward}/> Photo Collection
                                     </Button>{' '}
                                     <Button size="md" type="submit" variant="primary" disabled={this.state.recipientEmail.length === 0 || this.state.photoId.length === 0} onClick={this.sharePhoto}>
                                         <FontAwesomeIcon icon={faSave}/> Share Photo

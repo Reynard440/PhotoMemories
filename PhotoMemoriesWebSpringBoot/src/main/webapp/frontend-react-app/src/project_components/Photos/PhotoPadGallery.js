@@ -80,7 +80,7 @@ class PhotoPadGallery extends Component {
                                                 </CardHeader>
                                                 <Card.Img src={`http://localhost:8095/v1/c4/displayPhoto/` + localStorage.userEmail + `/` + photo.photoLink + `/`}
                                                           className={"containerImage"} alt={"default"}/>
-                                                <Card.Body>
+                                                <Card.Body className={"bg-light"}>
                                                     <div className={"divText"}><strong>Name:</strong>
                                                         <div className="float-end">
                                                             {photo.photoName}

@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import CardHeader from "react-bootstrap/CardHeader";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faImages, faList, faPlusSquare, faSave, faUndo} from '@fortawesome/free-solid-svg-icons';
+import {faImages, faPlusSquare, faSave, faUndo} from '@fortawesome/free-solid-svg-icons';
 import PhotoPadToast from "./PhotoPadToast";
 import {connect} from "react-redux";
 import {savePhoto} from "../services/index";
@@ -26,8 +26,8 @@ class PhotoPadPhoto extends Component {
         this.setState(() => this.initialState);
     };
 
-    photoList = () => {
-        return this.props.history.push("/list");
+    photoCollection = () => {
+        return this.props.history.push("/gallery");
     };
 
     addPhoto = event => {
@@ -47,7 +47,7 @@ class PhotoPadPhoto extends Component {
                 this.setState({"show": true, "method":"post"});
                 setTimeout(() => this.setState({"show": false}), 3000);
                 this.setState(this.initialState);
-                setTimeout(() => this.photoList(), 3000);
+                setTimeout(() => this.photoCollection(), 3000);
             } else {
                 this.setState({"show": false});
                 if (this.props.savedPhotoObj.error.response.status === 403) {
@@ -126,11 +126,8 @@ class PhotoPadPhoto extends Component {
                             <Button size="md" type="reset" variant="info" onClick={this.clearAllFields}>
                                 <FontAwesomeIcon icon={faUndo}/> Clear
                             </Button>{' '}
-                            <Button size="md" type="button" variant="primary" onClick={this.photoList.bind()}>
-                                <FontAwesomeIcon icon={faList}/> Photo List
-                            </Button>{' '}
-                            <Button size="md" type="button" variant="primary" onClick={this.photoGallery.bind()}>
-                                <FontAwesomeIcon icon={faImages}/> Photo Gallery
+                            <Button size="md" type="button" variant="primary" onClick={this.photoCollection.bind()}>
+                                <FontAwesomeIcon icon={faImages}/> Photo Collection
                             </Button>{' '}
                             <Button size="md" type="submit" variant="success" disabled={this.state.modifiedDate.value === 'yyyy/mm/dd' || this.state.ph_name.length === 0 || this.state.ph_captured.length === 0 || this.state.location.length === 0}  onClick={this.addPhoto}>
                                 <FontAwesomeIcon icon={faSave}/> Add Photo

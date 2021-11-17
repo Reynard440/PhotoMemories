@@ -33,7 +33,7 @@ class PhotoPadLogin extends Component {
         setTimeout(() => {
             if (this.props.auth.isLoggedIn) {
                 this.setState({"loggedIn": true});
-                setTimeout(() => {this.setState({"loggedIn": false});return this.props.history.push("/");}, 3000);
+                setTimeout(() => {this.setState({"loggedIn": false});return this.props.history.push("/");}, 2000);
             } else {
                 this.resetPhotoPadLoginForm();
                 this.setState({"error": "Invalid email and password"});

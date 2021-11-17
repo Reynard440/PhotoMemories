@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Container, Nav, Navbar} from "react-bootstrap";
 import logo from '../../logo.png';
 import {Link} from 'react-router-dom';
-import {faHome, faImages, faKey, faList, faSignInAlt, faSignOutAlt} from "@fortawesome/free-solid-svg-icons";
+import {faHome, faImages, faKey, faSignInAlt, faSignOutAlt} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {connect} from "react-redux";
 import {logoutUser} from '../services/index';
@@ -28,8 +28,7 @@ class PhotoPadNavigationBar extends Component {
             <>
                 <Nav>
                     <Link to={""} className="navbar-brand"><FontAwesomeIcon icon={faHome}/> Home</Link>
-                    <Link to={"list"} className="navbar-brand"><FontAwesomeIcon icon={faList}/> Photo List</Link>
-                    <Link to={"gallery"} className="navbar-brand"><FontAwesomeIcon icon={faImages}/> Gallery</Link>
+                    <Link to={"gallery"} className="navbar-brand"><FontAwesomeIcon icon={faImages}/> Photo Collection</Link>
                 </Nav>
                 <Nav>
                     <Link to={"login"} className="navbar-brand" onClick={this.logout}><FontAwesomeIcon icon={faSignOutAlt}/> Logout</Link>

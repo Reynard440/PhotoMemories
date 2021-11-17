@@ -3,7 +3,7 @@ import PhotoPadToast from "./PhotoPadToast";
 import {Button, Card, Col, Form, Row} from "react-bootstrap";
 import CardHeader from "react-bootstrap/CardHeader";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEdit, faImages, faList, faPlusSquare, faUndo} from "@fortawesome/free-solid-svg-icons";
+import {faEdit, faImages, faPlusSquare, faUndo} from "@fortawesome/free-solid-svg-icons";
 import {connect} from "react-redux";
 import {getPhoto, updatePhoto} from "../services/index";
 
@@ -43,6 +43,10 @@ class PhotoPadEdit extends Component {
         },1500);
     };
 
+    photoCollection = () => {
+        return this.props.history.push("/gallery");
+    };
+
     updatePhoto = event => {
         event.preventDefault();
         const bodyInfo = new FormData();
@@ -59,7 +63,7 @@ class PhotoPadEdit extends Component {
                 this.setState({"show": true, "method":"put"});
                 setTimeout(() => this.setState({"show": false}), 3000);
                 this.setState(this.initialState);
-                setTimeout(() => this.photoList(), 3000);
+                setTimeout(() => this.photoCollection(), 3000);
             } else {
                 this.setState({"show": false});
                 this.setState({"accessErrorShow" : true, "method":"post"});
@@ -76,10 +80,6 @@ class PhotoPadEdit extends Component {
 
     photoGallery = () => {
         return this.props.history.push("/gallery");
-    };
-
-    photoList = () => {
-        return this.props.history.push("/list");
     };
 
     clearAllFields = () => {
@@ -122,11 +122,8 @@ class PhotoPadEdit extends Component {
                             <Button size="md" type="reset" variant="info" onClick={this.clearAllFields}>
                                 <FontAwesomeIcon icon={faUndo}/> Clear
                             </Button>{' '}
-                            <Button size="md" type="button" variant="info" onClick={this.photoList.bind()}>
-                                <FontAwesomeIcon icon={faList}/> Photo List
-                            </Button>{' '}
-                            <Button size="md" type="button" variant="primary" onClick={this.photoGallery.bind()}>
-                                <FontAwesomeIcon icon={faImages}/> Photo Gallery
+                            <Button size="md" type="button" variant="primary" onClick={this.photoCollection.bind()}>
+                                <FontAwesomeIcon icon={faImages}/> Photo Collection
                             </Button>{' '}
                             <Button size="md" type="submit" variant="success" disabled={this.state.location.length === 0 || this.state.ph_captured.length === 0 || this.state.ph_name.length === 0} onClick={this.updatePhoto}>
                                 <FontAwesomeIcon icon={faEdit}/> Update Photo
