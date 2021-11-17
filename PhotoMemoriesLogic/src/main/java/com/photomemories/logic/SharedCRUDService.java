@@ -10,8 +10,6 @@ public interface SharedCRUDService {
 
     Integer deleteBySharedRecord(Integer sharedWith, Integer photoId, String photoLink) throws SQLException;
 
-    SharedDto getSharedBySharedId(Integer id);
-
     SharedDto findBySharedWithAndPhotoId(Integer sharedWith, Integer photoId);
 
     String sharePhoto(String sharingEmail, String receivingEmail, boolean accessRights, Integer photoId, MultipartFile photo) throws Exception;

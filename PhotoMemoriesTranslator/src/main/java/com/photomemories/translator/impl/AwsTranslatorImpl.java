@@ -19,22 +19,25 @@ public class AwsTranslatorImpl implements AwsTranslator {
 
     private final AwsFileServices awsFileServices;
 
+    //Dependency Injection: awsFileServices is injected and singleton pattern is followed
     @Autowired
     public AwsTranslatorImpl(AwsFileServices awsFileServices) {
         this.awsFileServices = awsFileServices;
     }
 
+    //Saving to the S3 bucket on AWS
     @Override
     public void save(String path, String fileName, Optional<Map<String, String>> optionalMetaData, InputStream inputStream) {
         try {
             awsFileServices.save(path, fileName, optionalMetaData, inputStream);
             LOGGER.info("[AWS Translator log] save method, successful save");
         } catch (RuntimeException error) {
-            LOGGER.warn("[AWS Translator log] save method, Could not execute the save request with error {}", error.getMessage());
-            throw new RuntimeException("Could not execute the save request", error);
+            LOGGER.error("[AWS Translator log] save method, Could not execute the save request with error {}", error.getMessage());
+            throw new RuntimeException("[AWS Translator Error] save method, Could not execute the save request", error.getCause());
         }
     }
 
+    //Downloading from the S3 bucket on AWS
     @Override
     public byte[] download(String path, String key) {
         try {
@@ -43,11 +46,12 @@ public class AwsTranslatorImpl implements AwsTranslator {
             LOGGER.info("[AWS Translator log] download method, successful download");
             return downloadResult;
         } catch (AWSAccountException e) {
-            LOGGER.warn("[AWS Translator log] download method, Could not execute the download request with error {}", e.getMessage());
-            throw new RuntimeException("Could not download the photo", e.getCause());
+            LOGGER.error("[AWS Translator log] download method, Could not execute the download request with error {}", e.getMessage());
+            throw new RuntimeException("[AWS Translator Error] download method, failed to execute the request", e.getCause());
         }
     }
 
+    //Deleting a photo from the S3 bucket on AWS
     @Override
     public boolean deletePhotoFromFolder(String fileName) {
         try {
@@ -55,11 +59,12 @@ public class AwsTranslatorImpl implements AwsTranslator {
             LOGGER.info("[AWS Translator log] deletePhotoFromFolder method, successfully deleted photo from {}", fileName);
             return true;
         } catch (RuntimeException e) {
-            LOGGER.warn("[AWS Translator log] deletePhotoFromFolder method, Could not delete the photo with error {}", e.getMessage());
-            throw new RuntimeException("Could not delete the photo", e);
+            LOGGER.error("[AWS Translator log] deletePhotoFromFolder method, Could not delete the photo with error {}", e.getMessage());
+            throw new RuntimeException("[AWS Translator Error] deletePhotoFromFolder method, failed to execute the request ", e.getCause());
         }
     }
 
+    //Deleting a folder from the S3 bucket on AWS
     @Override
     public boolean deleteUserFolder(String path) {
         try {
@@ -68,10 +73,11 @@ public class AwsTranslatorImpl implements AwsTranslator {
             return true;
         } catch (RuntimeException e) {
             LOGGER.error("[AWS Translator log] deleteUserFolder method, Could not delete the folder with error {}", e.getMessage());
-            throw new RuntimeException("[AWS Translator Error] deleteUserFolder method, Could not delete the folder", e);
+            throw new RuntimeException("[AWS Translator Error] deleteUserFolder method, failed to execute the request ", e.getCause());
         }
     }
 
+    //Sharing a photo to another folder in the S3 bucket on AWS
     @Override
     public boolean sharePhoto(String fromBucketName, String toBucketName, String key) {
         try {
@@ -80,7 +86,7 @@ public class AwsTranslatorImpl implements AwsTranslator {
             return true;
         } catch (RuntimeException e) {
             LOGGER.error("[AWS Translator log] sharePhoto method, Could not share the photo with error {}", e.getMessage());
-            throw new RuntimeException("[AWS Translator Error] sharePhoto method, Could not share the photo", e);
+            throw new RuntimeException("[AWS Translator Error] sharePhoto method, failed to execute the request ", e.getCause());
         }
     }
 }

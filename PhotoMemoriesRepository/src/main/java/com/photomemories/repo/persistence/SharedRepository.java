@@ -24,7 +24,4 @@ public interface SharedRepository extends JpaRepository<Shared, Integer> {
 
     @Query("select s from Shared s where s.SharedWith = ?1 and s.PhotoId.PhotoId = ?2")
     Shared findBySharedWithAndPhotoId(Integer sharedWith, Integer photoId);
-
-    @Query("select s from Shared s where s.SharedId = ?1")
-    Shared findBySharedId(Integer sharedId);
 }

@@ -7,9 +7,9 @@ import java.sql.SQLException;
 
 @Component
 public interface UserTranslator {
-    User newUser(User user) throws Exception;
+    User newUser(User user) throws SQLException;
 
-    Integer deleteUser(Integer id) throws Exception;
+    Integer deleteUser(Integer id) throws SQLException;
 
     Integer updateUser(String firstName, String lastName, String email, String phoneNumber, Integer userId) throws SQLException;
 

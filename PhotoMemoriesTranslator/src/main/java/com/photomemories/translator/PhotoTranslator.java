@@ -3,11 +3,12 @@ package com.photomemories.translator;
 import com.photomemories.domain.persistence.Photo;
 import org.springframework.stereotype.Component;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @Component
 public interface PhotoTranslator {
-    Photo addPhoto(Photo photo) throws Exception;
+    Photo addPhoto(Photo photo) throws SQLException;
 
     Integer updatePhoto(String pName, String pLocation, String pCapturedBy, Integer photoId);
 

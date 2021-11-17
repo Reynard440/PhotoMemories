@@ -11,8 +11,6 @@ public interface SharedTranslator {
 
     Integer deleteBySharedRecord(Integer sharedWith, Integer photoId) throws SQLException;
 
-    Shared getSharedBySharedId(Integer id);
-
     boolean existsBySharedWithAndPhotoId(Integer sharedWith, Integer photoId);
 
     boolean existsBySharedWithAndUserIdAndPhotoId(Integer sharedWith, Integer userId, Integer photoId);

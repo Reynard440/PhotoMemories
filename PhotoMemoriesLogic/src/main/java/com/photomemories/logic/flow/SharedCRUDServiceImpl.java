@@ -67,12 +67,6 @@ public class SharedCRUDServiceImpl implements SharedCRUDService {
     }
 
     @Override
-    public SharedDto getSharedBySharedId(Integer id) {
-        LOGGER.info("[Shared Logic log] getSharedByUserId method, shared id {}", id);
-        return new SharedDto(sharedTranslator.getSharedBySharedId(id));
-    }
-
-    @Override
     public SharedDto findBySharedWithAndPhotoId(Integer sharedWith, Integer photoId) {
         LOGGER.info("[Shared Logic log] findBySharedWithAndPhotoId method, shared with id {} and photo id {}", sharedWith, photoId);
         return new SharedDto(sharedTranslator.findBySharedWithAndPhotoId(sharedWith, photoId));
