@@ -5,9 +5,9 @@ import com.photomemories.domain.dto.UserDto;
 import java.sql.SQLException;
 
 public interface UserCRUDService {
-    UserDto createNewUser(UserDto userDto) throws Exception;
+    UserDto createNewUser(UserDto userDto) throws SQLException, Exception;
 
-    Integer deleteUser(Integer id) throws Exception;
+    Integer deleteUser(Integer id) throws SQLException;
 
     UserDto updateUserDto(String firstName, String lastName, String email, String phoneNumber, Integer userId) throws SQLException;
 

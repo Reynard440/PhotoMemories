@@ -21,11 +21,13 @@ public class SharedController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SharedController.class);
     private final SharedCRUDService sharedCRUDService;
 
+    //Dependency Injection: sharedCRUDService is injected to ensure singleton pattern is followed
     @Autowired
     public SharedController(SharedCRUDService sharedCRUDService) {
         this.sharedCRUDService = sharedCRUDService;
     }
 
+    //Inserts a new shared record in the database
     @PostMapping("/addNewUserRecord")
     @ApiOperation(value = "Create a new Shared record.", notes = "Creates a new Shared record in the DB.")
     @ApiResponses(value = {
@@ -35,12 +37,18 @@ public class SharedController {
     public ResponseEntity<PhotoMemoriesResponse<SharedDto>> addNewUserRecord(
             @ApiParam(value = "Request body to create a new Shared record", required = true)
             @RequestBody SharedDto sharedDto) throws Exception {
-        LOGGER.info("[Shared Controller log] addNewUserRecord method, input object {} ", sharedDto);
-        SharedDto sharedResponse = sharedCRUDService.createSharedDto(sharedDto);
-        PhotoMemoriesResponse<SharedDto> response = new PhotoMemoriesResponse<>(true, sharedResponse);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        try {
+            LOGGER.info("[Shared Controller log] addNewUserRecord method, input object {} ", sharedDto);
+            SharedDto sharedResponse = sharedCRUDService.createSharedDto(sharedDto);
+            PhotoMemoriesResponse<SharedDto> response = new PhotoMemoriesResponse<>(true, sharedResponse);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (RuntimeException error) {
+            LOGGER.error("[Shared Controller log] addNewUserRecord method, Could not add the new shared record, with error {} ", error.getMessage());
+            throw new RuntimeException("[Shared Controller Error] addNewUserRecord method, failed to execute the request ", error.getCause());
+        }
     }
 
+    //Returns a shared record by given parameters
     @GetMapping("/getSharedBySharedWithAndEmail/{email}/{id}")
     @ApiOperation(value = "Checks if a photo exists based on their id.", notes = "Tries to fetch a photo by id from the DB.")
     @ApiResponses(value = {
@@ -53,9 +61,14 @@ public class SharedController {
             @PathVariable("email") String email,
             @ApiParam(value = "The id of the photo", example = "1", name = "id", required = true)
             @PathVariable("id") Integer id) throws Exception {
-        LOGGER.info("[Shared Controller log] getSharedByIdAndEmail method, input photo id {} and user email {}", id, email);
-        boolean isFound = sharedCRUDService.checkBySharedWithAndPhotoId(email, id);
-        PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, isFound);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            LOGGER.info("[Shared Controller log] getSharedByIdAndEmail method, input photo id {} and user email {}", id, email);
+            boolean isFound = sharedCRUDService.checkBySharedWithAndPhotoId(email, id);
+            PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, isFound);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException error) {
+            LOGGER.error("[Shared Controller log] getSharedBySharedWithAndEmail method, Could not get the shared record, with error {} ", error.getMessage());
+            throw new RuntimeException("[Shared Controller Error] getSharedBySharedWithAndEmail method, failed to execute the request ", error.getCause());
+        }
     }
 }

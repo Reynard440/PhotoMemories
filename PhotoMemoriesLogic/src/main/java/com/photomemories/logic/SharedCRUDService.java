@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.sql.SQLException;
 
 public interface SharedCRUDService {
-    SharedDto createSharedDto(SharedDto sharedDto) throws Exception;
+    SharedDto createSharedDto(SharedDto sharedDto) throws SQLException, Exception;
 
     Integer deleteBySharedRecord(Integer sharedWith, Integer photoId, String photoLink) throws SQLException;
 

@@ -27,15 +27,17 @@ public class UserCRUDServiceImpl implements UserCRUDService, UserDetailsService 
     private final PasswordEncoder passwordEncoder;
     private final UserTranslator userTranslator;
 
+    //Dependency Injection: userTranslator and passwordEncoder are injected and singleton pattern is followed
     @Autowired
     public UserCRUDServiceImpl(UserTranslator userTranslator, PasswordEncoder passwordEncoder) {
         this.userTranslator = userTranslator;
         this.passwordEncoder = passwordEncoder;
     }
 
+    //Inserts a userDto in the database
     @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
     @Override
-    public UserDto createNewUser(UserDto userDto) throws Exception {
+    public UserDto createNewUser(UserDto userDto) throws SQLException, Exception {
         try {
             LOGGER.info("[User Logic log] createNewUser method, input Dto object is {}", userDto);
 
@@ -54,59 +56,82 @@ public class UserCRUDServiceImpl implements UserCRUDService, UserDetailsService 
             LOGGER.info("[User Logic log] createNewUser method, Dto returned {}", returnUser);
 
             return returnUser;
-        } catch (Exception e) {
-            LOGGER.warn("[User Logic log] createNewUser method, exception with error {}", e.getMessage());
-            throw new RuntimeException("User could not be created!", e);
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Logic log] createNewUser method, Could not create the new user Dto, with error {}", error.getMessage());
+            throw new RuntimeException("[User Logic log] createNewUser method, failed to execute the request", error.getCause());
         }
     }
 
+    //Deletes a userDto from the database with given id
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
     @Override
-    public Integer deleteUser(Integer id) throws Exception {
-        LOGGER.info("[User Logic log] deleteUser method, queried id: {}", id);
-        boolean beforeDelete = userTranslator.userExists(id);
-        LOGGER.info("[User Logic log] deleteUser method, (exists?): {}", beforeDelete);
+    public Integer deleteUser(Integer id) throws SQLException {
+        try {
+            LOGGER.info("[User Logic log] deleteUser method, queried id: {}", id);
+            boolean beforeDelete = userTranslator.userExists(id);
+            LOGGER.info("[User Logic log] deleteUser method, (exists?): {}", beforeDelete);
 
-        if (!userExists(id)) {
-            LOGGER.warn("User with id {} does not exists", id);
-            throw new RuntimeException("User deletion error.");
+            if (!userExists(id)) {
+                LOGGER.warn("User with id {} does not exists", id);
+                throw new RuntimeException("User deletion error.");
+            }
+
+            int userDelete = userTranslator.deleteUser(id);
+            boolean afterDelete = userTranslator.userExists(id);
+            LOGGER.info("[User Logic log] deleteUser method, (exists?): {}", afterDelete);
+            return userDelete;
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Logic log] deleteUser method, Could not delete the user, with error {}", error.getMessage());
+            throw new RuntimeException("[User Logic log] deleteUser method, failed to execute the request", error.getCause());
         }
-
-        int userDelete = userTranslator.deleteUser(id);
-        boolean afterDelete = userTranslator.userExists(id);
-        LOGGER.info("[User Logic log] deleteUser method, (exists?): {}", afterDelete);
-        return userDelete;
     }
 
+    //Updates a userDto in the database with given id and information
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class})
     @Override
     public UserDto updateUserDto(String firstName, String lastName, String email, String phoneNumber, Integer userId) throws SQLException {
-        int returnValue = userTranslator.updateUser(firstName, lastName, email, phoneNumber, userId);
-
-        if (returnValue == 0) {
-            LOGGER.error("[User Logic log] updateUserDto method, did not update account: {}", false);
-            throw new RuntimeException("[User Logic Error] updateUserDto method, did not update account");
+        try {
+            int returnValue = userTranslator.updateUser(firstName, lastName, email, phoneNumber, userId);
+            if (returnValue == 0) {
+                LOGGER.error("[User Logic log] updateUserDto method, did not update account: {}", false);
+                throw new RuntimeException("[User Logic Error] updateUserDto method, did not update account");
+            }
+            return new UserDto(userTranslator.getUserById(userId));
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Logic log] updateUserDto method, Could not update the user, with error {}", error.getMessage());
+            throw new RuntimeException("[User Logic log] updateUserDto method, failed to execute the request", error.getCause());
         }
-
-        return new UserDto(userTranslator.getUserById(userId));
     }
 
+    //Returns a userDto object from the database with given id
     @Override
     public UserDto getUserDtoById(Integer id) {
-        LOGGER.info("[User Logic log] getUserDtoById method, input id {}", id);
-        return new UserDto(userTranslator.getUserById(id));
+        try {
+            LOGGER.info("[User Logic log] getUserDtoById method, input id {}", id);
+            return new UserDto(userTranslator.getUserById(id));
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Logic log] getUserDtoById method, Could not get the user with id {}, with error {}", id, error.getMessage());
+            throw new RuntimeException("[User Logic log] getUserDtoById method, failed to execute the request", error.getCause());
+        }
     }
 
+    //Returns a userDto object from the database with given email
     @Override
     public UserDto getUserDtoByEmail(String email) {
-        LOGGER.info("[User Logic log] getUserDtoById method, input email {}", email);
-        if (!userTranslator.userExistsWithEmail(email)) {
-            LOGGER.error("[User Logic log] getUserDtoByEmail method, User with email {} does not exist", email);
-            throw new UserNotFoundException("User with email " + email + " does not exist");
+        try {
+            LOGGER.info("[User Logic log] getUserDtoById method, input email {}", email);
+            if (!userTranslator.userExistsWithEmail(email)) {
+                LOGGER.error("[User Logic log] getUserDtoByEmail method, User with email {} does not exist", email);
+                throw new UserNotFoundException("User with email " + email + " does not exist");
+            }
+            return new UserDto(userTranslator.getUserByEmail(email));
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Logic log] getUserDtoByEmail method, Could not get the userDto with email {}, with error {}", email, error.getMessage());
+            throw new RuntimeException("[User Logic log] getUserDtoByEmail method, failed to execute the request", error.getCause());
         }
-        return new UserDto(userTranslator.getUserByEmail(email));
     }
 
+    //Private method that verifies that the userDto is unique
     private void isUniqueUser(UserDto userDto) throws Exception {
         if (userTranslator.registerCheck(userDto.getPhoneNumber(), userDto.getEmail())) {
             LOGGER.warn("User with phone number: {} and email: {} already exists", userDto.getPhoneNumber(), userDto.getEmail());
@@ -114,46 +139,76 @@ public class UserCRUDServiceImpl implements UserCRUDService, UserDetailsService 
         }
     }
 
-    @Override
-    public boolean userExists(Integer id) {
-        LOGGER.info("[User Logic log] userExists method, queried id: {}", id);
-        boolean returnLogicValue = userTranslator.userExists(id);
-        LOGGER.info("[User Logic log] userExists method, result: {}", returnLogicValue);
-        return returnLogicValue;
-    }
-
+    //Confirms that the userDto exists with email or not
     @Override
     public boolean userExistsByEmail(String email) {
-        LOGGER.info("[User Logic log] userExists method, queried email {}", email);
-        boolean returnLogicValue = userTranslator.userExistsWithEmail(email);
-        LOGGER.info("[User Logic log] userExists method, result {}", returnLogicValue);
-        return returnLogicValue;
+        try {
+            LOGGER.info("[User Logic log] userExists method, queried email {}", email);
+            boolean returnLogicValue = userTranslator.userExistsWithEmail(email);
+            LOGGER.info("[User Logic log] userExists method, result {}", returnLogicValue);
+            return returnLogicValue;
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Logic log] userExistsByEmail method, Could not verify the user with email {}, with error {}", email, error.getMessage());
+            throw new RuntimeException("[User Logic log] userExistsByEmail method, failed to execute the request", error.getCause());
+        }
     }
 
+    //Confirms that the user exists by id or not
+    @Override
+    public boolean userExists(Integer id) {
+        try {
+            LOGGER.info("[User Logic log] userExists method, queried id: {}", id);
+            boolean returnLogicValue = userTranslator.userExists(id);
+            LOGGER.info("[User Logic log] userExists method, result: {}", returnLogicValue);
+            return returnLogicValue;
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Logic log] userExists method, Could not verify the user with id {}, with error {}", id, error.getMessage());
+            throw new RuntimeException("[User Logic log] userExists method, failed to execute the request", error.getCause());
+        }
+    }
+
+    //Confirms that the login of a user
     @Override
     public boolean loginUser(String password, String email) throws Exception {
-        LOGGER.info("[User Logic log] loginUser method, password: {} and email: {}", password, email);
-        boolean userValid = userTranslator.loginUser(password, email);
-        LOGGER.info("[User Logic log] loginUser method, (valid?): {}", userValid);
-        return userValid;
+        try {
+            LOGGER.info("[User Logic log] loginUser method, password: {} and email: {}", password, email);
+            boolean userValid = userTranslator.loginUser(password, email);
+            LOGGER.info("[User Logic log] loginUser method, (valid?): {}", userValid);
+            return userValid;
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Logic log] loginUser method, Could not log the user in, with error {}", error.getMessage());
+            throw new RuntimeException("[User Logic log] loginUser method, failed to execute the request", error.getCause());
+        }
     }
 
+    //Verifies that the userDto is unique according to given parameters
     @Override
     public boolean verifyUserByPhoneNumberAndEmail(String phoneNumber, String email) throws Exception {
-        return userTranslator.registerCheck(phoneNumber, email);
+        try {
+            return userTranslator.registerCheck(phoneNumber, email);
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Logic log] verifyUserByPhoneNumberAndEmail method, Could not verify the user with phone number {} and email {}, with error {}", phoneNumber, email, error.getMessage());
+            throw new RuntimeException("[User Logic log] verifyUserByPhoneNumberAndEmail method, failed to execute the request", error.getCause());
+        }
     }
 
+    //Method that loads the user by given email, implemented for spring security
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
-        if (userDto == null) {
-            LOGGER.error("User not present in database");
-            throw new UsernameNotFoundException("User not present in database");
-        } else {
-            LOGGER.info("User present in database: {}", email);
+        try {
+            UserDto userDto = new UserDto(userTranslator.getUserByEmail(email));
+            if (userDto == null) {
+                LOGGER.error("User not present in database");
+                throw new UsernameNotFoundException("User not present in database");
+            } else {
+                LOGGER.info("User present in database: {}", email);
+            }
+            Collection<SimpleGrantedAuthority> auths = new ArrayList<>();
+            auths.add(new SimpleGrantedAuthority("USER_ROLE"));
+            return new org.springframework.security.core.userdetails.User(userDto.getEmail(), userDto.getUserHashPassword(), auths);
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Logic log] loadUserByUsername method, Could not load the user with email {} by email, with error {}", email, error.getMessage());
+            throw new RuntimeException("[User Logic log] loadUserByUsername method, failed to execute the request", error.getCause());
         }
-        Collection<SimpleGrantedAuthority> auths = new ArrayList<>();
-        auths.add(new SimpleGrantedAuthority("USER_ROLE"));
-        return new org.springframework.security.core.userdetails.User(userDto.getEmail(), userDto.getUserHashPassword(), auths);
     }
 }

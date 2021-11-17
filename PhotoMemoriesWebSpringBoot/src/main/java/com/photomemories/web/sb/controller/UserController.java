@@ -30,12 +30,14 @@ public class UserController {
     private final UserCRUDService userCRUDService;
     private final AwsCRUDService awsCRUDService;
 
+    //Dependency Injection: userCRUDService and awsCRUDService are injected and singleton pattern is followed
     @Autowired
     public UserController(UserCRUDService userCRUDService, AwsCRUDService awsCRUDService) {
         this.userCRUDService = userCRUDService;
         this.awsCRUDService = awsCRUDService;
     }
 
+    //Inserts a user to the database, and adds it to spring security config for login purposes
     @Transactional(rollbackOn = { RuntimeException.class, Exception.class, SQLException.class })
     @PostMapping(
             value = "/addNewUser",
@@ -52,17 +54,23 @@ public class UserController {
             @RequestParam(value = "lname") String lname,
             @RequestParam(value = "cellphone") String cellphone,
             @RequestParam(value = "password") String password) throws Exception {
-        UserDto userDto = new UserDto(fname, lname, LocalDate.now(), password, email, cellphone);
-        if (userDto == null) {
-            throw new SQLException("Invalid input detected, cancelling the request");
+        try {
+            UserDto userDto = new UserDto(fname, lname, LocalDate.now(), password, email, cellphone);
+            if (userDto == null) {
+                throw new SQLException("Invalid input detected, cancelling the request");
+            }
+            LOGGER.info("[User Controller log] addNewUser method, input object {} ", userDto);
+            URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/v1/c1/addNewUser").toUriString());
+            UserDto userResponse = userCRUDService.createNewUser(userDto);
+            PhotoMemoriesResponse<UserDto> response = new PhotoMemoriesResponse<>(true, userResponse);
+            return ResponseEntity.created(uri).body(response);
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Controller log] createNewUser method, Could not create the new user, with error {}", error.getMessage());
+            throw new RuntimeException("[User Controller log] createNewUser method, failed to execute the request", error.getCause());
         }
-        LOGGER.info("[User Controller log] addNewUser method, input object {} ", userDto);
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/v1/c1/addNewUser").toUriString());
-        UserDto userResponse = userCRUDService.createNewUser(userDto);
-        PhotoMemoriesResponse<UserDto> response = new PhotoMemoriesResponse<>(true, userResponse);
-        return ResponseEntity.created(uri).body(response);
     }
 
+    //Verifies the user is valid and in the database
     @Transactional(rollbackOn = { RuntimeException.class, Exception.class, SQLException.class })
     @PostMapping("/login")
     @ApiOperation(value = "Logs a user in.", notes = "Logs a user in.")
@@ -75,21 +83,27 @@ public class UserController {
             @ApiParam(value = "Email of the user", example = "reynardengels@gmail.com", name = "email", required = true)
             @RequestParam String email,
             @RequestParam String password) throws Exception {
-        if (!userCRUDService.userExistsByEmail(email)) {
-            boolean userResponse = userCRUDService.userExistsByEmail(email);
-            PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(false, userResponse);
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        try {
+            if (!userCRUDService.userExistsByEmail(email)) {
+                boolean userResponse = userCRUDService.userExistsByEmail(email);
+                PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(false, userResponse);
+                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            }
+            LOGGER.info("[User Controller log] login method, user email {} ", email);
+            boolean userResponse = userCRUDService.loginUser(email, password);
+            if (!userResponse) {
+                PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(false, userResponse);
+                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            }
+            PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, userResponse);
+            return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Controller log] login method, Could not authenticate the user, with error {}", error.getMessage());
+            throw new RuntimeException("[User Controller log] login method, failed to execute the request", error.getCause());
         }
-        LOGGER.info("[User Controller log] login method, user email {} ", email);
-        boolean userResponse = userCRUDService.loginUser(email, password);
-        if (!userResponse) {
-            PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(false, userResponse);
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
-        PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, userResponse);
-        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
 
+    //Deletes the user from the database and from spring security
     @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
     @DeleteMapping("/deleteUser/{id}")
     @ApiOperation(value = "Deletes a user by id.", notes = "Removes a user from the DB.")
@@ -101,15 +115,21 @@ public class UserController {
     public ResponseEntity<PhotoMemoriesResponse<Integer>> deleteUser(
             @ApiParam(value = "The id of each user", example = "1", name = "id", required = true)
             @PathVariable("id") Integer id) throws Exception {
-        LOGGER.info("[User Controller log] deleteUser method, input id {} ", id);
-        UserDto userDto = userCRUDService.getUserDtoById(id);
-        String awsDeleteFolder = awsCRUDService.deleteFolderForUser(userDto.getEmail());
-        LOGGER.info("[User Controller log] deleteUser method, from folder {}", awsDeleteFolder);
-        int userResponse = userCRUDService.deleteUser(id);
-        PhotoMemoriesResponse<Integer> response = new PhotoMemoriesResponse<>(true, userResponse);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            LOGGER.info("[User Controller log] deleteUser method, input id {} ", id);
+            UserDto userDto = userCRUDService.getUserDtoById(id);
+            String awsDeleteFolder = awsCRUDService.deleteFolderForUser(userDto.getEmail());
+            LOGGER.info("[User Controller log] deleteUser method, from folder {}", awsDeleteFolder);
+            int userResponse = userCRUDService.deleteUser(id);
+            PhotoMemoriesResponse<Integer> response = new PhotoMemoriesResponse<>(true, userResponse);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Controller log] deleteUser method, Could not delete the user, with error {}", error.getMessage());
+            throw new RuntimeException("[User Controller log] deleteUser method, failed to execute the request", error.getCause());
+        }
     }
 
+    //Updates a user in the database
     @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
     @PutMapping("/updateAccount/{id}")
     @ApiOperation(value = "Updates a user by id.", notes = "Changes a user from the DB.")
@@ -129,18 +149,24 @@ public class UserController {
             @RequestParam("email") String email,
             @ApiParam(value = "The user's new phone number.", example = "0765543174", name = "phoneNumber", required = true)
             @RequestParam("phoneNumber") String phoneNumber) throws Exception {
-        LOGGER.info("[User Controller log] updateUser method, input id {} ", id);
+        try {
+            LOGGER.info("[User Controller log] updateUser method, input id {} ", id);
 
-        if (userCRUDService.verifyUserByPhoneNumberAndEmail(phoneNumber, email)) {
-            LOGGER.error("[User Controller log] updateUser method, phone number {} and email {} not unique", phoneNumber, email);
-            throw new RuntimeException("[User Controller Error] updateUser method, phone number and email not unique");
+            if (userCRUDService.verifyUserByPhoneNumberAndEmail(phoneNumber, email)) {
+                LOGGER.error("[User Controller log] updateUser method, phone number {} and email {} not unique", phoneNumber, email);
+                throw new RuntimeException("[User Controller Error] updateUser method, phone number and email not unique");
+            }
+
+            UserDto userResponse = userCRUDService.updateUserDto(firstName, lastName, email, phoneNumber, id);
+            PhotoMemoriesResponse<UserDto> response = new PhotoMemoriesResponse<>(true, userResponse);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Controller log] updateUser method, Could not update the user, with error {}", error.getMessage());
+            throw new RuntimeException("[User Controller log] updateUser method, failed to execute the request", error.getCause());
         }
-
-        UserDto userResponse = userCRUDService.updateUserDto(firstName, lastName, email, phoneNumber, id);
-        PhotoMemoriesResponse<UserDto> response = new PhotoMemoriesResponse<>(true, userResponse);
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    //Verifies that a user exists in the database
     @Transactional(rollbackOn = {SQLException.class, Exception.class, RuntimeException.class})
     @GetMapping("/userExists/{id}")
     @ApiOperation(value = "Checks if a user exists based on their id.", notes = "Tries to fetch a user by id from the DB.")
@@ -152,12 +178,18 @@ public class UserController {
     public ResponseEntity<PhotoMemoriesResponse<Boolean>> userExists(
             @ApiParam(value = "The id of each user", example = "1", name = "id", required = true)
             @PathVariable("id") Integer id) throws SQLException {
-        LOGGER.info("[User Controller log] userExists method, input id {} ", id);
-        boolean userResponse = userCRUDService.userExists(id);
-        PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, userResponse);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            LOGGER.info("[User Controller log] userExists method, input id {} ", id);
+            boolean userResponse = userCRUDService.userExists(id);
+            PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, userResponse);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Controller log] userExists method, Could not verify that the user with id {} exists, with error {}", id, error.getMessage());
+            throw new RuntimeException("[User Controller log] userExists method, failed to execute the request", error.getCause());
+        }
     }
 
+    //Returns a user from the database
     @GetMapping("/getUserById/{id}")
     @ApiOperation(value = "Checks if a photo exists based on their id.", notes = "Tries to fetch a photo by id from the DB.")
     @ApiResponses(value = {
@@ -168,12 +200,18 @@ public class UserController {
     public ResponseEntity<PhotoMemoriesResponse<UserDto>> getUserById(
             @ApiParam(value = "The id of each user", example = "1", name = "id", required = true)
             @PathVariable("id") Integer id) throws SQLException {
-        LOGGER.info("[User Controller log] getUserById method, input id {} ", id);
-        UserDto userResponse = userCRUDService.getUserDtoById(id);
-        PhotoMemoriesResponse<UserDto> response = new PhotoMemoriesResponse<>(true, userResponse);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            LOGGER.info("[User Controller log] getUserById method, input id {} ", id);
+            UserDto userResponse = userCRUDService.getUserDtoById(id);
+            PhotoMemoriesResponse<UserDto> response = new PhotoMemoriesResponse<>(true, userResponse);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Controller log] getUserById method, Could not get the user with id {}, with error {}", id, error.getMessage());
+            throw new RuntimeException("[User Controller log] getUserById method, failed to execute the request", error.getCause());
+        }
     }
 
+    //Returns a userDto from the database by given email
     @GetMapping("/getUserByEmail/{email}")
     @ApiOperation(value = "Checks if a photo exists based on their email.", notes = "Tries to fetch a photo by email from the DB.")
     @ApiResponses(value = {
@@ -184,9 +222,14 @@ public class UserController {
     public ResponseEntity<PhotoMemoriesResponse<UserDto>> getUserByEmail(
             @ApiParam(value = "The email of each user", example = "reynardengels@gmail.com", name = "email", required = true)
             @PathVariable("email") String email) throws SQLException {
-        LOGGER.info("[User Controller log] getUserByEmail method, input email {} ", email);
-        UserDto userResponse = userCRUDService.getUserDtoByEmail(email);
-        PhotoMemoriesResponse<UserDto> response = new PhotoMemoriesResponse<>(true, userResponse);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            LOGGER.info("[User Controller log] getUserByEmail method, input email {} ", email);
+            UserDto userResponse = userCRUDService.getUserDtoByEmail(email);
+            PhotoMemoriesResponse<UserDto> response = new PhotoMemoriesResponse<>(true, userResponse);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException error) {
+            LOGGER.error("[User Controller log] getUserByEmail method, Could not get the user with email {}, with error {}", email, error.getMessage());
+            throw new RuntimeException("[User Controller log] getUserByEmail method, failed to execute the request", error.getCause());
+        }
     }
 }

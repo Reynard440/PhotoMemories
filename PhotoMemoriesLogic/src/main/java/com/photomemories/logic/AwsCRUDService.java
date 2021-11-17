@@ -2,12 +2,10 @@ package com.photomemories.logic;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 public interface AwsCRUDService {
-    void uploadToS3(String email, MultipartFile file) throws IOException;
+    void uploadToS3(String email, MultipartFile file) throws RuntimeException;
 
-    byte[] downloadPhoto(String email, String imageName);
+    byte[] downloadPhoto(String email, String imageName) throws Exception;
 
     String deletePhoto(String fileName, String email);
 

@@ -36,6 +36,7 @@ public class PhotoController {
     private final SharedCRUDService sharedCRUDService;
     private final UserCRUDService userCRUDService;
 
+    //Dependency Injection: photoCRUDService, sharedCRUDService, and userCRUDService are injected to ensure singleton pattern is followed
     @Autowired
     public PhotoController(PhotoCRUDService photoCRUDService, UserCRUDService userCRUDService, SharedCRUDService sharedCRUDService) {
         this.photoCRUDService = photoCRUDService;
@@ -43,6 +44,7 @@ public class PhotoController {
         this.userCRUDService = userCRUDService;
     }
 
+    //Inserts a photo in the database and on AWS
     @Transactional(rollbackOn = { RuntimeException.class, Exception.class, SQLException.class })
     @PostMapping(
             path = "/addNewPhoto",
@@ -68,8 +70,9 @@ public class PhotoController {
 
                 PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
                 return new ResponseEntity<>(response, HttpStatus.CREATED);
-            } catch (IOException e) {
-                throw new IOException("[Photo Controller Error] addNewPhoto method, An error occurred: ", e.getCause());
+            } catch (IOException | RuntimeException error) {
+                LOGGER.error("[Photo Controller log] addNewPhoto method, Could add the new photo record, with error {} ", error.getMessage());
+                throw new RuntimeException("[Photo Controller Error] addNewPhoto method, failed to execute the request ", error.getCause());
             }
     }
 
@@ -88,33 +91,39 @@ public class PhotoController {
             @PathVariable(value = "email") String email,
             @ApiParam(value = "The id of the photo", example = "1", name = "id", required = true)
             @PathVariable("id") Integer id) throws Exception {
-        LOGGER.info("[Photo Controller log] deletePhoto method, input id {} and email {} and photoLink {}", id, email, photoLink);
-        PhotoMemoriesResponse<Integer> response;
-        int photoResponse;
+        try {
+            LOGGER.info("[Photo Controller log] deletePhoto method, input id {} and email {} and photoLink {}", id, email, photoLink);
+            PhotoMemoriesResponse<Integer> response;
+            int photoResponse;
 
-        UserDto userDto = userCRUDService.getUserDtoByEmail(email);
-        SharedDto sharedDto = sharedCRUDService.findBySharedWithAndPhotoId(userDto.getUserId(), id);
-        LOGGER.info("[Photo Controller log] deletePhoto method, access granted? {}", sharedDto.getSharedHasAccess());
+            UserDto userDto = userCRUDService.getUserDtoByEmail(email);
+            SharedDto sharedDto = sharedCRUDService.findBySharedWithAndPhotoId(userDto.getUserId(), id);
+            LOGGER.info("[Photo Controller log] deletePhoto method, access granted? {}", sharedDto.getSharedHasAccess());
 
-        if (photoCRUDService.photoExists(id, photoLink)) {
-            if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedHasAccess())) {
-                if (sharedDto.getUserId().equals(sharedDto.getSharedWith())) {
-                    photoResponse = photoCRUDService.deletePhotoDto(id, photoLink, email);
+            if (photoCRUDService.photoExists(id, photoLink)) {
+                if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedHasAccess())) {
+                    if (sharedDto.getUserId().equals(sharedDto.getSharedWith())) {
+                        photoResponse = photoCRUDService.deletePhotoDto(id, photoLink, email);
+                    } else {
+                        photoResponse = sharedCRUDService.deleteBySharedRecord(sharedDto.getSharedWith(), id, photoLink);
+                    }
+                    response = new PhotoMemoriesResponse<>(true, photoResponse);
+                    return new ResponseEntity<>(response, HttpStatus.OK);
                 } else {
-                    photoResponse = sharedCRUDService.deleteBySharedRecord(sharedDto.getSharedWith(), id, photoLink);
+                    LOGGER.error("[Photo Controller log] deletePhoto method, access rights are not sufficient");
+                    throw new SQLException("[Photo Controller log] deletePhoto method, not permitted");
                 }
-                response = new PhotoMemoriesResponse<>(true, photoResponse);
-                return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
-                LOGGER.error("[Photo Controller log] deletePhoto method, access rights are not sufficient");
-                throw new SQLException("[Photo Controller log] deletePhoto method, not permitted");
+                LOGGER.error("[Photo Controller log] deletePhoto method, photo {} does not exist ", photoLink);
+                throw new SQLException("[Photo Controller Error] deletePhoto method, photo does not exist");
             }
-        } else {
-            LOGGER.error("[Photo Controller log] deletePhoto method, photo {} does not exist ", photoLink);
-            throw new SQLException("[Photo Controller Error] deletePhoto method, photo does not exist");
+        } catch (RuntimeException error) {
+            LOGGER.error("[Photo Controller log] deletePhoto method, Could not delete the photo with id {}, with error {} ", id, error.getMessage());
+            throw new RuntimeException("[Photo Controller Error] deletePhoto method, failed to execute the request ", error.getCause());
         }
     }
 
+    //Updates the metadata of a photo
     @Transactional(rollbackOn = { RuntimeException.class, Exception.class, SQLException.class })
     @PutMapping("/updateMetadata/{id}")
     @ApiOperation(value = "Updates a photo's metadata by id.", notes = "Changes a photo's metadata in the DB.")
@@ -134,29 +143,35 @@ public class PhotoController {
             @RequestParam("pCaptured") String pCaptured,
             @ApiParam(value = "The email of the user trying to update the photo.", example = "reynardengels@gmail.com", name = "email", required = true)
             @RequestParam("email") String email) throws Exception {
-        LOGGER.info("[Photo Controller log] updateMetadata method, input id {} ", id);
+        try {
+            LOGGER.info("[Photo Controller log] updateMetadata method, input id {} ", id);
 
-        if (photoCRUDService.photoExists(id, pName)) {
-            LOGGER.error("[Photo Controller log] updateMetadata method, photo {} does not exist", pName);
-            throw new SQLException("[Photo Controller Error] updateMetadata method, photo " + pName + " does not exist");
-        }
+            if (photoCRUDService.photoExists(id, pName)) {
+                LOGGER.error("[Photo Controller log] updateMetadata method, photo {} does not exist", pName);
+                throw new SQLException("[Photo Controller Error] updateMetadata method, photo " + pName + " does not exist");
+            }
 
-        PhotoMemoriesResponse<PhotoDto> response;
-        PhotoDto photoResponse;
+            PhotoMemoriesResponse<PhotoDto> response;
+            PhotoDto photoResponse;
 
-        UserDto userDto = userCRUDService.getUserDtoByEmail(email);
-        SharedDto sharedDto = sharedCRUDService.findBySharedWithAndPhotoId(userDto.getUserId(), id);
+            UserDto userDto = userCRUDService.getUserDtoByEmail(email);
+            SharedDto sharedDto = sharedCRUDService.findBySharedWithAndPhotoId(userDto.getUserId(), id);
 
-        if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedHasAccess())) {
-            photoResponse = photoCRUDService.updatePhotoDto(pName, pLocation, pCaptured, id, email);
-            response = new PhotoMemoriesResponse<>(true, photoResponse);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else {
-            LOGGER.error("[Photo Controller log] updateMetadata method, access rights are not sufficient");
-            throw new SQLException("[Photo Controller Error] updateMetadata method, not permitted to change metadata");
+            if ((sharedCRUDService.checkBySharedWithAndPhotoId(email, id)) && (sharedDto.getSharedHasAccess())) {
+                photoResponse = photoCRUDService.updatePhotoDto(pName, pLocation, pCaptured, id, email);
+                response = new PhotoMemoriesResponse<>(true, photoResponse);
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                LOGGER.error("[Photo Controller log] updateMetadata method, access rights are not sufficient");
+                throw new SQLException("[Photo Controller Error] updateMetadata method, not permitted to change metadata");
+            }
+        } catch (RuntimeException error) {
+            LOGGER.error("[Photo Controller log] updateMetadata method, Could not update the photo, with error {} ", error.getMessage());
+            throw new RuntimeException("[Photo Controller Error] updateMetadata method, failed to execute the request ", error.getCause());
         }
     }
 
+    //Shares a photo with another user
     @PostMapping("/sharePhotoWithAnotherUser")
     @ApiOperation(value = "Shares a photo with another user.", notes = "Shares a photo with another user to the S3 bucket and database.")
     @ApiResponses(value = {
@@ -172,19 +187,25 @@ public class PhotoController {
             @RequestParam("accessRights") boolean accessRights,
             @ApiParam(value = "Id of the sharing photo", required = true, example = "2")
             @RequestParam("id") Integer id) throws Exception {
-        LOGGER.info("[Photo Controller log] sharePhotoWithAnotherUser method, input sharingEmail {} receivingEmail {} accessRights {} id {} ", sharingEmail, receivingEmail, accessRights, id);
+        try {
+            LOGGER.info("[Photo Controller log] sharePhotoWithAnotherUser method, input sharingEmail {} receivingEmail {} accessRights {} id {} ", sharingEmail, receivingEmail, accessRights, id);
 
-        if (sharedCRUDService.existsBySharedWithAndUserIdAndPhotoId(receivingEmail, id)) {
-            LOGGER.error("[Photo Controller log] sharePhotoWithAnotherUser method, user {} already has this photo", receivingEmail);
-            throw new SQLException("[Photo Controller Error] sharePhotoWithAnotherUser method, user already has this photo");
+            if (sharedCRUDService.existsBySharedWithAndUserIdAndPhotoId(receivingEmail, id)) {
+                LOGGER.error("[Photo Controller log] sharePhotoWithAnotherUser method, user {} already has this photo", receivingEmail);
+                throw new SQLException("[Photo Controller Error] sharePhotoWithAnotherUser method, user already has this photo");
+            }
+
+            String photoResponse = photoCRUDService.sendPhoto(sharingEmail, receivingEmail, accessRights, id);
+            LOGGER.info("[Photo Controller log] uploadPhoto method, photos uploaded to {}'s folder", receivingEmail);
+            PhotoMemoriesResponse<String> response = new PhotoMemoriesResponse<>(true, photoResponse);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (RuntimeException error) {
+            LOGGER.error("[Photo Controller log] sharePhotoWithAnotherUser method, Could not share the photo with another user, with error {} ", error.getMessage());
+            throw new RuntimeException("[Photo Controller Error] sharePhotoWithAnotherUser method, failed to execute the request ", error.getCause());
         }
-
-        String photoResponse = photoCRUDService.sendPhoto(sharingEmail, receivingEmail, accessRights, id);
-        LOGGER.info("[Photo Controller log] uploadPhoto method, photos uploaded to {}'s folder", receivingEmail);
-        PhotoMemoriesResponse<String> response = new PhotoMemoriesResponse<>(true, photoResponse);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    //Checks if a photoDto exists by given parameters
     @GetMapping("/photoExists/{id}/{photoLink}")
     @ApiOperation(value = "Checks if a photo exists based on their id.", notes = "Tries to fetch a photo by id from the DB.")
     @ApiResponses(value = {
@@ -197,12 +218,18 @@ public class PhotoController {
             @PathVariable("id") Integer id,
             @ApiParam(value = "The name of each photo", example = "ReynardEngels.jpeg", name = "photoLink", required = true)
             @PathVariable("photoLink") String photoLink) throws SQLException {
-        LOGGER.info("[Photo Controller log] photoExists method, input id {} and photoLink {}", id, photoLink);
-        boolean photoResponse = photoCRUDService.photoExists(id, photoLink);
-        PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, photoResponse);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            LOGGER.info("[Photo Controller log] photoExists method, input id {} and photoLink {}", id, photoLink);
+            boolean photoResponse = photoCRUDService.photoExists(id, photoLink);
+            PhotoMemoriesResponse<Boolean> response = new PhotoMemoriesResponse<>(true, photoResponse);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException error) {
+            LOGGER.error("[Photo Controller log] photoExists method, Could not verify the photo with id {} and link {} exists, with error {} ", id, photoLink, error.getMessage());
+            throw new RuntimeException("[Photo Controller Error] photoExists method, failed to execute the request ", error.getCause());
+        }
     }
 
+    //Returns a photoDto by given id
     @GetMapping("/getPhotoById/{id}")
     @ApiOperation(value = "Checks if a photo exists based on their id.", notes = "Tries to fetch a photo by id from the DB.")
     @ApiResponses(value = {
@@ -213,12 +240,18 @@ public class PhotoController {
     public ResponseEntity<PhotoMemoriesResponse<PhotoDto>> getPhotoById(
             @ApiParam(value = "The id of each photo", example = "1", name = "id", required = true)
             @PathVariable("id") Integer id) throws SQLException {
-        LOGGER.info("[Photo Controller log] getPhotoById method, input id {} ", id);
-        PhotoDto photoResponse = photoCRUDService.getPhotoDtoById(id);
-        PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            LOGGER.info("[Photo Controller log] getPhotoById method, input id {} ", id);
+            PhotoDto photoResponse = photoCRUDService.getPhotoDtoById(id);
+            PhotoMemoriesResponse<PhotoDto> response = new PhotoMemoriesResponse<>(true, photoResponse);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException error) {
+            LOGGER.error("[Photo Controller log] getPhotoById method, Could not get the photo by id {}, with error {} ", id, error.getMessage());
+            throw new RuntimeException("[Photo Controller Error] getPhotoById method, failed to execute the request ", error.getCause());
+        }
     }
 
+    //Returns all the photos
     @GetMapping("/getAllPhotos")
     @ApiOperation(value = "Checks if a photo exists based on their id.", notes = "Tries to fetch a photo by id from the DB.")
     @ApiResponses(value = {
@@ -227,11 +260,18 @@ public class PhotoController {
             @ApiResponse(code = 404, message = "Could not found a member by this email", response = PhotoMemoriesResponse.class),
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
     public ResponseEntity<PhotoMemoriesResponse<List<PhotoDto>>> getAllPhotos() throws SQLException {
-        List<PhotoDto> photoResponse = photoCRUDService.getAllPhotos();
-        PhotoMemoriesResponse<List<PhotoDto>> response = new PhotoMemoriesResponse<>(true, photoResponse);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            List<PhotoDto> photoResponse = photoCRUDService.getAllPhotos();
+            PhotoMemoriesResponse<List<PhotoDto>> response = new PhotoMemoriesResponse<>(true, photoResponse);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException error) {
+            LOGGER.error("[Photo Controller log] getAllPhotos method, Could not get all the photos, with error {} ", error.getMessage());
+            throw new RuntimeException("[Photo Controller Error] getAllPhotos method, failed to execute the request ", error.getCause());
+        }
     }
 
+
+    //Returns a list of photoDtos for a given user email
     @GetMapping("/loadAllPhotosOfUser/{email}/")
     @ApiOperation(value = "Gets a list of photos exists based on its id and the users email.", notes = "Tries to fetch a photo by id from the DB.")
     @ApiResponses(value = {
@@ -241,9 +281,14 @@ public class PhotoController {
             @ApiResponse(code = 500, message = "Internal Server Error", response = PhotoMemoriesResponse.class)})
     public ResponseEntity<PhotoMemoriesResponse<List<PhotoDto>>> loadAllPhotosOfUser(
             @PathVariable("email") String email) throws SQLException {
-        LOGGER.info("[Photo Controller log] getAllPhotosOfUser method, email {} ", email);
-        List<PhotoDto> photoResponse = photoCRUDService.getPhotosByUserEmail(email);
-        PhotoMemoriesResponse<List<PhotoDto>> response = new PhotoMemoriesResponse<>(true, photoResponse);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            LOGGER.info("[Photo Controller log] getAllPhotosOfUser method, email {} ", email);
+            List<PhotoDto> photoResponse = photoCRUDService.getPhotosByUserEmail(email);
+            PhotoMemoriesResponse<List<PhotoDto>> response = new PhotoMemoriesResponse<>(true, photoResponse);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException error) {
+            LOGGER.error("[Photo Controller log] loadAllPhotosOfUser method, Could not load all photos for the user, with error {} ", error.getMessage());
+            throw new RuntimeException("[Photo Controller Error] loadAllPhotosOfUser method, failed to execute the request ", error.getCause());
+        }
     }
 }

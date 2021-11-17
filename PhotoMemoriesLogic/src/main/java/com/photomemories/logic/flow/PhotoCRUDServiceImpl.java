@@ -33,6 +33,7 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
     private final SharedCRUDService sharedCRUDService;
     private final AwsCRUDService awsCRUDService;
 
+    //Dependency Injection: photoTranslator, userCRUDService, sharedCRUDService, and awsCRUDService are injected to ensure singleton pattern is followed
     @Autowired
     public PhotoCRUDServiceImpl(PhotoTranslator photoTranslator, AwsCRUDService awsCRUDService, UserCRUDService userCRUDService, SharedCRUDService sharedCRUDService) {
         this.photoTranslator = photoTranslator;
@@ -41,6 +42,7 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
         this.awsCRUDService = awsCRUDService;
     }
 
+    //Inserts a photo in the database and on AWS
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
     @Override
     public PhotoDto createPhotoDto(PhotoDto photoDto, String email, MultipartFile photoFile) throws Exception {
@@ -69,63 +71,69 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
             LOGGER.info("[Photo Logic log] createPhotoDto method, Dto returned: {}", returnDto);
 
             return returnDto;
-        } catch (Exception e) {
-            LOGGER.error("[Photo Logic log] createPhotoDto method, Photo could not be created with error {}", e.getMessage());
-            throw new SQLException("[Photo Logic Error] createPhotoDto method, Photo could not be created!", e);
+        } catch (RuntimeException e) {
+            LOGGER.error("[Photo Logic log] createPhotoDto method, Photo could not be created, with error {}", e.getMessage());
+            throw new RuntimeException("[Photo Logic Error] createPhotoDto method, Request could not be executed ", e);
         }
     }
 
+    //Deletes a photo in the database and from AWS by given id and photoLink
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
     @Override
-    public Integer deletePhotoDto(Integer id, String photoLink, String email) throws Exception {
-        boolean beforeDelete = photoTranslator.photoExists(id, photoLink);
-        LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", beforeDelete);
+    public Integer deletePhotoDto(Integer id, String photoLink, String email) throws SQLException, Exception {
+        try {
+            boolean beforeDelete = photoTranslator.photoExists(id, photoLink);
+            LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", beforeDelete);
 
-        if (!photoExists(id, photoLink)) {
-            LOGGER.error("[Photo Logic log] deletePhoto method, Photo with id {} does not exists", id);
-            throw new RuntimeException("[Photo Logic Error] deletePhoto method, Photo with id " + id + " does not exist!");
+            if (!photoExists(id, photoLink)) {
+                LOGGER.error("[Photo Logic log] deletePhoto method, Photo with id {} does not exists", id);
+                throw new RuntimeException("[Photo Logic Error] deletePhoto method, Photo with id " + id + " does not exist!");
+            }
+
+            int photoDelete = photoTranslator.deletePhoto(id, photoLink);
+            awsCRUDService.deletePhoto(photoLink, email);
+            boolean afterDelete = photoTranslator.photoExists(id, photoLink);
+            LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", afterDelete);
+
+            return photoDelete;
+        } catch (RuntimeException error) {
+            LOGGER.error("[Photo Logic log] createPhotoDto method, Photo could not be delete, with error {}", error.getMessage());
+            throw new SQLException("[Photo Logic Error] createPhotoDto method, Request could not be executed ", error.getCause());
         }
-
-        int photoDelete = photoTranslator.deletePhoto(id, photoLink);
-        awsCRUDService.deletePhoto(photoLink, email);
-        boolean afterDelete = photoTranslator.photoExists(id, photoLink);
-        LOGGER.info("[Photo Logic log] deletePhoto method, (exists?): {}", afterDelete);
-
-        return photoDelete;
     }
 
+    //Updates the metadata of a photo in the database with given information
     @Transactional(rollbackOn = {SQLException.class, RuntimeException.class, Exception.class})
     @Override
-    public PhotoDto updatePhotoDto(String pName, String pLocation, String pCapturedBy, Integer photoId, String email) {
-        int returnValue = photoTranslator.updatePhoto(pName, pLocation, pCapturedBy, photoId);
+    public PhotoDto updatePhotoDto(String pName, String pLocation, String pCapturedBy, Integer photoId, String email) throws SQLException {
+        try {
+            int returnValue = photoTranslator.updatePhoto(pName, pLocation, pCapturedBy, photoId);
 
-        if (returnValue == 0) {
-            LOGGER.error("[Photo Logic log] updatePhotoDto method, did not update photo metadata: {}", false);
-            throw new RuntimeException("[Photo Logic Error] updatePhotoDto method, did not update metadata");
+            if (returnValue == 0) {
+                LOGGER.error("[Photo Logic log] updatePhotoDto method, did not update photo metadata: {}", false);
+                throw new RuntimeException("[Photo Logic Error] updatePhotoDto method, did not update metadata");
+            }
+
+            return new PhotoDto(photoTranslator.getPhotoById(photoId));
+        } catch (RuntimeException error) {
+            LOGGER.error("[Photo Logic log] updatePhotoDto method, Photo could not be updated, with error {}", error.getMessage());
+            throw new SQLException("[Photo Logic Error] updatePhotoDto method, Request could not be executed ", error.getCause());
         }
-
-        return new PhotoDto(photoTranslator.getPhotoById(photoId));
     }
 
+    //Returns a photoDto object from the database with given photo id
     @Override
     public PhotoDto getPhotoDtoById(Integer id) {
-        LOGGER.info("[Photo Logic log] getPhotoDtoById method, input id {}", id);
-        return new PhotoDto(photoTranslator.getPhotoById(id));
-    }
-
-    @Override
-    public List<PhotoDto> getAllPhotoDtosOfUser(Integer userId) {
-        LOGGER.info("[Photo Logic log] getAllPhotoDtosOfUser method, user id {}", userId);
-        List<PhotoDto> list = new ArrayList<>();
-        Integer index = 0;
-        for (Photo photo : photoTranslator.getAllPhotosOfUser(userId)) {
-            PhotoDto photoDto = new PhotoDto(photo);
-            list.add(photoDto);
-            list.stream().distinct();
+        try {
+            LOGGER.info("[Photo Logic log] getPhotoDtoById method, input id {}", id);
+            return new PhotoDto(photoTranslator.getPhotoById(id));
+        } catch (RuntimeException error) {
+            LOGGER.error("[Photo Logic log] getPhotoDtoById method, Photo could not be found with id {}, with error {}", id, error.getMessage());
+            throw new RuntimeException("[Photo Logic Error] getPhotoDtoById method, Request could not be executed ", error.getCause());
         }
-        return list;
     }
 
+    //Shares a specified photo with another user in the database and on AWS
     @Override
     public String sendPhoto(String sharingEmail, String receivingEmail, boolean accessRights, Integer photoId) {
         try {
@@ -147,39 +155,51 @@ public class PhotoCRUDServiceImpl implements PhotoCRUDService {
 
             LOGGER.info("[Photo Logic log] sendPhoto method, shared the photo with email {}", receivingEmail);
             return "Photo shared";
-        } catch (Exception e) {
-            LOGGER.error("[Photo Logic log] sendPhoto method, Could not share the photo with email {}", receivingEmail);
-            throw new RuntimeException("Exception with error ", e.getCause());
+        } catch (Exception error) {
+            LOGGER.error("[Photo Logic log] sendPhoto method, Could not share the photo with email {}, with error {}", receivingEmail, error.getMessage());
+            throw new RuntimeException("[Photo Logic Error] sendPhoto method, Request could not be executed ", error.getCause());
         }
     }
 
-    @Override
-    public PhotoDto getByPhotoNameAndPhotoFormat(String name, String format) {
-        LOGGER.info("[Photo Logic log] getByPhotoNameAndPhotoFormat method, input name {} and format {}", name, format);
-        return new PhotoDto(photoTranslator.findByPhotoNameAndPhotoFormat(name, format));
-    }
-
+    //Loads all the photos from the database by a give user email
     @Override
     public List<PhotoDto> getPhotosByUserEmail(String email) {
-        LOGGER.info("[Photo Logic log] getPhotosByUserEmail method, email {}", email);
-        UserDto userDto = userCRUDService.getUserDtoByEmail(email);
-        LOGGER.info("[Photo Logic log] getPhotosByUserEmail method, id {}", userDto.getUserId());
-        return photoTranslator.findByUserEmail(userDto.getUserId()).stream().map(PhotoDto::new).collect(Collectors.toList());
+        try {
+            LOGGER.info("[Photo Logic log] getPhotosByUserEmail method, email {}", email);
+            UserDto userDto = userCRUDService.getUserDtoByEmail(email);
+            LOGGER.info("[Photo Logic log] getPhotosByUserEmail method, id {}", userDto.getUserId());
+            return photoTranslator.findByUserEmail(userDto.getUserId()).stream().map(PhotoDto::new).collect(Collectors.toList());
+        } catch (RuntimeException error) {
+            LOGGER.error("[Photo Logic log] getPhotosByUserEmail method, Could not return a list of photos for t=user with email {}, with error {}", email, error.getMessage());
+            throw new RuntimeException("[Photo Logic Error] getPhotosByUserEmail method, Request could not be executed ", error.getCause());
+        }
     }
 
+    //Loads all the photos from the database
     @Override
     public List<PhotoDto> getAllPhotos() {
-        List<PhotoDto> photos = new ArrayList<>();
-        for(Photo photo : photoTranslator.getAllPhotos()) {
-            photos.add(new PhotoDto(photo));
+        try {
+            List<PhotoDto> photos = new ArrayList<>();
+            for(Photo photo : photoTranslator.getAllPhotos()) {
+                photos.add(new PhotoDto(photo));
+            }
+            return photos;
+        } catch (RuntimeException error) {
+            LOGGER.error("[Photo Logic log] getAllPhotos method, Could not get all photos, with error {}", error.getMessage());
+            throw new RuntimeException("[Photo Logic Error] getAllPhotos method, Request could not be executed ", error.getCause());
         }
-        return photos;
     }
 
+    //Checks if a photo exists with specified id and photoLink in the database
     @Override
     public boolean photoExists(Integer id, String photoLink) {
-        boolean returnPhotoLogicValue = photoTranslator.photoExists(id, photoLink);
-        LOGGER.info("[Photo Logic log] photoExists method, result {}", returnPhotoLogicValue);
-        return returnPhotoLogicValue;
+        try {
+            boolean returnPhotoLogicValue = photoTranslator.photoExists(id, photoLink);
+            LOGGER.info("[Photo Logic log] photoExists method, result {}", returnPhotoLogicValue);
+            return returnPhotoLogicValue;
+        } catch (RuntimeException error) {
+            LOGGER.error("[Photo Logic log] photoExists method, Photo with id {} and link {} could not be found, with error {}", id, photoLink, error.getMessage());
+            throw new RuntimeException("[Photo Logic Error] photoExists method, Request could not be executed ", error.getCause());
+        }
     }
 }
