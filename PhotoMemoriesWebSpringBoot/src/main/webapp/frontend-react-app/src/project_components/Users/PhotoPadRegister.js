@@ -13,7 +13,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {connect} from "react-redux";
 import {addUser} from "../services/index";
-import PhotoPadToast from "../Photos/PhotoPadToast";
 
 class PhotoPadRegister extends Component {
     constructor(props){
@@ -50,14 +49,12 @@ class PhotoPadRegister extends Component {
 
 
         this.props.addUser(newUser);
-        // this.setState({"registerShow": true});
-        // setTimeout(() => {this.setState({"registerShow": false});return this.props.history.push("/login");}, 3000);
         this.resetRegister();
+        return this.props.history.push("/login");
     };
 
     resetRegister = () => {
         this.setState(() => this.initialState);
-        console.log(this.state.value);
     };
 
     render() {
@@ -65,16 +62,13 @@ class PhotoPadRegister extends Component {
         return (
             <Row className="justify-content-center align-content-center">
                 <Col lg={5}>
-                    <div style={{"display": this.state.registerShow ? "block": "none"}}>
-                        <PhotoPadToast show={this.state.registerShow} message="Added successfully" type={"registerUser"}/>
-                    </div>
                     <Card className={"border border-white bg-white text-dark"}>
                         <Card.Header>
                             <FontAwesomeIcon icon={faKey}/>  Register
                         </Card.Header>
                         <Card.Body>
                             <Form onReset={this.resetRegister} onSubmit={this.createNewUser} controlId="registerForm">
-                                <Form.Group className="mb-1" controlId="formBasicEmail">
+                                <Form.Group className="mb-1">
                                     <Form.Label><FontAwesomeIcon icon={faAddressBook}/> Email address</Form.Label>
                                     <Form.Control type="email" name="email" value={email} onChange={this.detailsChange}  className={"bg-white text-dark"} placeholder="Enter email here" />
                                 </Form.Group>
