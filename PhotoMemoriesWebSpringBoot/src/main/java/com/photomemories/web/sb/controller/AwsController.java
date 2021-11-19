@@ -101,7 +101,8 @@ public class AwsController {
         String[] newType = type.split("\\.");
         switch (newType[1]) {
             case "jpg": { return MediaType.valueOf("image/jpg");}
-            case "png": {return MediaType.valueOf("image/png");}
+            case "png":
+            case "PNG": {return MediaType.valueOf("image/png");}
             case "bmp": {return MediaType.valueOf("image/bmp");}
             case "jpeg": {return MediaType.valueOf("image/jpeg");}
             case "ico": {return MediaType.valueOf("image/ico");}
