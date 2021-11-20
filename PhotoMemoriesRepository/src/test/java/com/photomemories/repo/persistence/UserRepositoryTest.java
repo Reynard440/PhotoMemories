@@ -18,8 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.transaction.Transactional;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -62,7 +61,7 @@ public class UserRepositoryTest {
     @DisplayName("Should verify a user exists by email.")
     public void shouldExistsByEmail() {
         boolean value = userRepository.existsByEmail("reynardengels@gmail.com");
-        assertEquals(true, value);
+        assertTrue(value);
     }
 
     @Test
@@ -87,7 +86,7 @@ public class UserRepositoryTest {
         User user = userRepository.findByEmail("reynardengels@gmail.com");
         assertNotNull(user);
         boolean value = userRepository.existsByUserHashPasswordAndEmail("King6", "reynardengels@gmail.com");
-        assertEquals(true, value);
+        assertTrue(value);
     }
 
     @Test
@@ -96,7 +95,7 @@ public class UserRepositoryTest {
         User user = userRepository.findByEmail("reynardengels@gmail.com");
         assertNotNull(user);
         boolean value = userRepository.existsByPhoneNumberAndEmail("0723949955", "reynardengels@gmail.com");
-        assertEquals(true, value);
+        assertTrue(value);
     }
 
     @Test
@@ -105,6 +104,6 @@ public class UserRepositoryTest {
         User user = userRepository.findByEmail("reynardengels@gmail.com");
         assertNotNull(user);
         boolean value = userRepository.existsById(1);
-        assertEquals(true, value);
+        assertTrue(value);
     }
 }

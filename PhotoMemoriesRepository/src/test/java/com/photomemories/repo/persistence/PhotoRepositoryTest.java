@@ -17,8 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.transaction.Transactional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -69,6 +68,6 @@ public class PhotoRepositoryTest {
     @DisplayName("Should verify photo exists by id and link.")
     public void shouldExistsByPhotoIdAndPhotoLink() {
         boolean value = photoRepository.existsByPhotoIdAndPhotoLink(1, "ReynardEngels.jpeg");
-        assertEquals(true, value);
+        assertTrue(value);
     }
 }
